@@ -159,6 +159,10 @@ func NewToyKevaClient(keva *ToyKeva) *toyClient {
 		connected: true,
 	}
 }
+func (cl *toyClient) SlaveOfNoOne() error {
+	cl.link.turnToMaster()
+	return nil
+}
 
 func (cl *toyClient) Info() (string, error) {
 	return cl.link.info(), nil

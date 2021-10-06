@@ -91,6 +91,8 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 	master := NewToyKeva(host, port)
 	master.turnToMaster()
 	slaveMap := master.withSlaves(3)
+
+	// a function to create fake client from sentinel to slaves, when first discovered by infoing master
 	toySlaveFactory := func(sl *slaveInstance) error {
 		toyInstance := slaveMap[sl.addr]
 		sl.client = NewToyKevaClient(toyInstance)
@@ -104,13 +106,16 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 	basePort := 2000
 	mapRunIDToIdx := map[string]int{}
 	mapIdxToRunID := map[int]string{}
+
 	for i := 0; i < numInstances; i++ {
+		// start new sentinel instance
 		s, err := NewFromConfig(conf)
 		assert.NoError(t, err)
 		s.conf.Port = strconv.Itoa(basePort + i)
 		mapRunIDToIdx[s.runID] = i
 		mapIdxToRunID[i] = s.runID
 
+		// a function to create fake client from sentinel to master
 		s.clientFactory = func(addr string) (internalClient, error) {
 			cl := NewToyKevaClient(master)
 			testLock.Lock()
@@ -419,11 +424,13 @@ func TestLeaderElection(t *testing.T) {
 }
 
 func TestSelectSlave(t *testing.T) {
-	assertion := func(t *testing.T, numInstances int, slaveCustomizer func(*testSuite) *ToyKeva) {
+	// slaveCustomizer let test customize initial slave config (offset, priority) to check if sentinel choose
+	// correct instance for failover
+	assertion := func(t *testing.T, numInstances int, slaveCustomizer func(map[string]*ToyKeva) *ToyKeva) {
 		suite := setupWithCustomConfig(t, numInstances, func(c *Config) {
 			c.Masters[0].Quorum = numInstances/2 + 1 // force normal quorum
 		})
-		expectedChosenSlave := slaveCustomizer(suite)
+		expectedChosenSlave := slaveCustomizer(suite.slavesMap)
 
 		suite.master.kill()
 		time.Sleep(suite.conf.Masters[0].DownAfter)
@@ -445,9 +452,9 @@ func TestSelectSlave(t *testing.T) {
 		)
 	}
 	t.Run("select slave by highest offset", func(t *testing.T) {
-		assertion(t, 3, func(suite *testSuite) *ToyKeva {
-			for idx := range suite.slavesMap {
-				slave := suite.slavesMap[idx]
+		assertion(t, 3, func(slaveMap map[string]*ToyKeva) *ToyKeva {
+			for idx := range slaveMap {
+				slave := slaveMap[idx]
 				slave.mu.Lock()
 				slave.offset = 10
 				slave.mu.Unlock()
@@ -457,9 +464,9 @@ func TestSelectSlave(t *testing.T) {
 		})
 	})
 	t.Run("select slave by highest priority", func(t *testing.T) {
-		assertion(t, 3, func(suite *testSuite) *ToyKeva {
-			for idx := range suite.slavesMap {
-				slave := suite.slavesMap[idx]
+		assertion(t, 3, func(slaveMap map[string]*ToyKeva) *ToyKeva {
+			for idx := range slaveMap {
+				slave := slaveMap[idx]
 				slave.mu.Lock()
 				slave.priority = 10
 				slave.mu.Unlock()
@@ -469,6 +476,47 @@ func TestSelectSlave(t *testing.T) {
 		})
 	})
 }
+
+func TestSlaveOfNoOne(t *testing.T) {
+	assertion := func(t *testing.T, numInstances int, slaveCustomizer func(map[string]*ToyKeva) *ToyKeva) {
+		suite := setupWithCustomConfig(t, numInstances, func(c *Config) {
+			c.Masters[0].Quorum = numInstances/2 + 1 // force normal quorum
+		})
+		expectedChosenSlave := slaveCustomizer(suite.slavesMap)
+
+		suite.master.kill()
+		time.Sleep(suite.conf.Masters[0].DownAfter)
+		//TODO: check more info of this recognized leader
+		suite.checkClusterHasLeader()
+		selectedSlave := suite.checkTermSelectedSlave(1)
+		suite.mu.Lock()
+		var selected *ToyKeva
+		for idx := range suite.slavesMap {
+			sl := suite.slavesMap[idx]
+			if sl.id == selectedSlave {
+				selected = sl
+			}
+		}
+
+		suite.mu.Unlock()
+		assert.Equal(t, expectedChosenSlave.id, selectedSlave, "wrong slave selected", "want %s, but have %s", expectedChosenSlave.slaveInfo.String(),
+			selected.slaveInfo.String(),
+		)
+	}
+	t.Run("select slave by highest offset", func(t *testing.T) {
+		assertion(t, 3, func(slaveMap map[string]*ToyKeva) *ToyKeva {
+			for idx := range slaveMap {
+				slave := slaveMap[idx]
+				slave.mu.Lock()
+				slave.offset = 10
+				slave.mu.Unlock()
+				return slave
+			}
+			return nil
+		})
+	})
+}
+
 func (s *testSuite) checkTermSelectedSlave(term int) string {
 	var ret string
 	eventually(s.t, func() bool {

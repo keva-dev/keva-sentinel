@@ -151,6 +151,7 @@ func (s *Sentinel) subscribeHello(m *masterInstance) {
 }
 
 func (s *Sentinel) masterRoutine(m *masterInstance) {
+
 	go s.masterPingRoutine(m)
 	go s.subscribeHello(m)
 	infoTicker := time.NewTicker(10 * time.Second)
@@ -242,80 +243,44 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 			for {
 				switch m.getFailOverState() {
 				case failOverWaitLeaderElection:
-					//check if is leader yet
-					leader, epoch := s.checkWhoIsLeader(m)
-					isLeader := leader != "" && leader == s.selfID()
-
-					if !isLeader {
-						time.Sleep(1 * time.Second)
-						//abort if failover take too long
-						if time.Since(m.getFailOverStartTime()) > m.sentinelConf.FailoverTimeout {
-							m.mu.Lock()
-							m.failOverState = failOverNone
-							epoch := m.failOverEpoch
-							m.mu.Unlock()
-							stopAskingOtherSentinels()
-
-							s.logger.Debugw(logEventFailoverStateChanged,
-								"new_state", failOverNone,
-								"epoch", epoch,
-							)
-							break failOverFSM
-						}
-						continue
+					aborted := s.checkElectionStatus(m)
+					if aborted {
+						stopAskingOtherSentinels()
+						break failOverFSM
 					}
 
-					// do not call cancel(), keep receiving update from other sentinel
-					s.logger.Debugw(logEventBecameTermLeader,
-						"run_id", leader,
-						"epoch", epoch)
-
-					m.mu.Lock()
-					m.failOverState = failOverSelectSlave
-					m.mu.Unlock()
-
-					s.logger.Debugw(logEventFailoverStateChanged,
-						"new_state", failOverSelectSlave,
-						"epoch", epoch, // epoch = failover epoch = sentinel current epoch
-					)
 				case failOverSelectSlave:
 					slave := s.selectSlave(m)
 
 					// abort failover, start voting for new epoch
 					if slave == nil {
-						m.mu.Lock()
-						m.failOverState = failOverNone
-						epoch := m.failOverEpoch
-						m.mu.Unlock()
+						s.abortFailover(m)
 						stopAskingOtherSentinels()
-
-						s.logger.Debugw(logEventFailoverStateChanged,
-							"new_state", failOverNone,
-							"epoch", epoch,
-						)
 					} else {
-						m.mu.Lock()
-						m.failOverState = failOverPromoteSlave
-						epoch := m.failOverEpoch
-						m.mu.Unlock()
-						slave.mu.Lock()
-						slaveAddr := slave.addr
-						slaveID := slave.runID
-						s.logger.Debugw(logEventSelectedSlave,
-							"slave_addr", slaveAddr,
-							"slave_id", slaveID,
-							"epoch", epoch,
-						)
-
-						s.logger.Debugw(logEventFailoverStateChanged,
-							"new_state", failOverPromoteSlave,
-							"epoch", epoch,
-						)
+						s.promoteSlave(m, slave)
 					}
 					//TODO
 				case failOverPromoteSlave:
-					time.Sleep(1 * time.Second)
-					//TODO
+					m.mu.Lock()
+					promotedSlave := m.promotedSlave
+					m.mu.Unlock()
+					timeout := time.NewTimer(m.sentinelConf.FailoverTimeout)
+					defer timeout.Stop()
+					select {
+					case <-timeout.C:
+						s.abortFailover(m)
+						// when new slave recognized to have switched role, it will notify this channel
+						// or time out
+					case <-promotedSlave.masterRoleSwitchChan:
+						m.mu.Lock()
+						m.failOverState = failOverReconfSlave
+						m.failOverStateChangeTime = time.Now()
+						epoch := m.failOverEpoch
+						m.mu.Unlock()
+						s.logger.Debugw(logEventSlavePromoted,
+							"run_id", promotedSlave.runID,
+							"epoch", epoch)
+					}
 				case failOverReconfSlave:
 					time.Sleep(1 * time.Second)
 					//TODO
@@ -323,6 +288,71 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 			}
 		}
 	}
+}
+
+func (s *Sentinel) checkElectionStatus(m *masterInstance) (aborted bool) {
+	leader, epoch := s.checkWhoIsLeader(m)
+	isLeader := leader != "" && leader == s.selfID()
+
+	if !isLeader {
+		time.Sleep(1 * time.Second)
+
+		//abort if failover take too long
+		if time.Since(m.getFailOverStartTime()) > m.sentinelConf.FailoverTimeout {
+			s.abortFailover(m)
+			return true
+		}
+		return false
+	}
+
+	// do not call cancel(), keep receiving update from other sentinel
+	s.logger.Debugw(logEventBecameTermLeader,
+		"run_id", leader,
+		"epoch", epoch)
+
+	m.mu.Lock()
+	m.failOverState = failOverSelectSlave
+	m.mu.Unlock()
+
+	s.logger.Debugw(logEventFailoverStateChanged,
+		"new_state", failOverSelectSlave,
+		"epoch", epoch, // epoch = failover epoch = sentinel current epoch
+	)
+	return true
+}
+
+func (s *Sentinel) promoteSlave(m *masterInstance, slave *slaveInstance) {
+	m.mu.Lock()
+	m.promotedSlave = slave
+	m.failOverState = failOverPromoteSlave
+	m.failOverStateChangeTime = time.Now()
+	epoch := m.failOverEpoch
+	m.mu.Unlock()
+	slave.mu.Lock()
+	slaveAddr := slave.addr
+	slaveID := slave.runID
+	s.logger.Debugw(logEventSelectedSlave,
+		"slave_addr", slaveAddr,
+		"slave_id", slaveID,
+		"epoch", epoch,
+	)
+
+	s.logger.Debugw(logEventFailoverStateChanged,
+		"new_state", failOverPromoteSlave,
+		"epoch", epoch,
+	)
+}
+func (s *Sentinel) abortFailover(m *masterInstance) {
+	m.mu.Lock()
+	m.failOverState = failOverNone
+	m.failOverStateChangeTime = time.Now()
+	epoch := m.failOverEpoch
+	m.mu.Unlock()
+
+	s.logger.Debugw(logEventFailoverStateChanged,
+		"new_state", failOverNone,
+		"epoch", epoch,
+	)
 }
 
 func (s *Sentinel) notifySlaveRoutines(m *masterInstance) {
@@ -508,17 +538,18 @@ func (s *Sentinel) askSentinelsIfMasterIsDown(m *masterInstance) {
 }
 
 type masterInstance struct {
-	sentinelConf MasterMonitor
-	isKilled     bool
-	name         string
-	mu           sync.Mutex
-	runID        string
-	slaves       map[string]*slaveInstance
-	sentinels    map[string]*sentinelInstance
-	ip           string
-	port         string
-	shutdownChan chan struct{}
-	client       internalClient
+	sentinelConf  MasterMonitor
+	isKilled      bool
+	name          string
+	mu            sync.Mutex
+	runID         string
+	slaves        map[string]*slaveInstance
+	promotedSlave *slaveInstance
+	sentinels     map[string]*sentinelInstance
+	ip            string
+	port          string
+	shutdownChan  chan struct{}
+	client        internalClient
 	// infoClient   internalClient
 
 	state          masterInstanceState
@@ -527,9 +558,10 @@ type masterInstance struct {
 
 	lastSuccessfulPing time.Time
 
-	failOverState     failOverState
-	failOverEpoch     int
-	failOverStartTime time.Time
+	failOverState           failOverState
+	failOverEpoch           int
+	failOverStartTime       time.Time
+	failOverStateChangeTime time.Time
 
 	leaderEpoch int
 	leaderID    string

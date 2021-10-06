@@ -6,4 +6,5 @@ var (
 	logEventVotedFor             = "sentinel_voted_for"
 	logEventFailoverStateChanged = "failover_state_change"
 	logEventSelectedSlave        = "slave_selected"
+	logEventSlavePromoted        = "slave_promoted"
 )

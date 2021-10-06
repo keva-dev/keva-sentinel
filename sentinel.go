@@ -175,6 +175,7 @@ type internalClient interface {
 	Info() (string, error)
 	Ping() (string, error)
 	SubscribeHelloChan() HelloChan
+	SlaveOfNoOne() error
 }
 
 type HelloChan interface {
@@ -185,6 +186,11 @@ type HelloChan interface {
 
 type internalClientImpl struct {
 	*kevago.InternalClient
+}
+
+func (s *internalClientImpl) SlaveOfNoOne() error {
+	panic("unimplemented")
+	return nil
 }
 
 func (s *internalClientImpl) SubscribeHelloChan() HelloChan {
@@ -237,9 +243,12 @@ type slaveInstance struct {
 	pingShutdownChan chan struct{}
 	//each slave has a goroutine that check info every 10s
 	infoShutdownChan chan struct{}
+
+	masterRoleSwitchChan chan struct{}
 	//notify goroutines that master is down, to change info interval from 10 to 1s like Redis
 	masterDownNotify chan struct{}
-	client           internalClient
+
+	client internalClient
 }
 
 type instanceRole int

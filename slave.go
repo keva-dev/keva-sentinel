@@ -90,7 +90,13 @@ func (s *Sentinel) slaveInfoRoutine(sl *slaveInstance) {
 		// TODO
 
 		if roleSwitched {
-			panic("unimlemented")
+			timeout := time.NewTimer(1 * time.Second)
+			select {
+			case <-timeout.C:
+				// treat it as if it is still slave
+			case sl.masterRoleSwitchChan <- struct{}{}:
+				panic("unimlemented")
+			}
 			//TODO
 			// s.parseInfoSlave()
 		}
