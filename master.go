@@ -193,7 +193,7 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 					s.askSentinelsIfMasterIsDown(m)
 					s.checkObjDown(m)
 					if m.getState() == masterStateObjDown {
-						s.notifySlaveRoutines(m)
+						s.notifyMasterDownToSlaveRoutines(m)
 						break SdownLoop
 					}
 				case masterStateObjDown:
@@ -210,33 +210,10 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 			ctx, stopAskingOtherSentinels := context.WithCancel(context.Background())
 			go s.askOtherSentinelsEach1Sec(ctx, m)
 			for m.getState() == masterStateObjDown {
-				// this code only has to wait in case failover timeout reached and it needs to wait 1 more failover timeout duration
-				// before trying failover again
-				secondsLeft := 2*m.sentinelConf.FailoverTimeout - time.Since(m.getFailOverStartTime())
-				if secondsLeft <= 0 {
-					locked(s.mu, func() {
-						s.currentEpoch += 1
-						locked(&m.mu, func() {
-							if m.failOverState != failOverWaitLeaderElection {
-								s.logger.Debugw(logEventFailoverStateChanged,
-									"new_state", failOverWaitLeaderElection,
-									"epoch", s.currentEpoch,
-								)
-							}
-							m.failOverState = failOverWaitLeaderElection
-							m.failOverStartTime = time.Now()
-							m.failOverEpoch = s.currentEpoch
-
-						})
-					})
-					// mostly, when obj down is met, multiples sentinels will try to send request for vote to be leader
-					// to prevent split vote, sleep for a random small duration
-					random := rand.Intn(SENTINEL_MAX_DESYNC) * int(time.Millisecond)
-					time.Sleep(time.Duration(random))
-					// time.Sleep(time.Duration(rand.Intn(SENTINEL_MAX_DESYNC) * int(time.Millisecond)))
+				startFailover := s.checkIfShouldFailover(m)
+				if startFailover {
 					break
 				}
-				<-time.NewTimer(secondsLeft).C
 			}
 			// If any logic changing state of master to something != masterStateObjDown, this code below will be broken
 		failOverFSM:
@@ -259,7 +236,6 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 					} else {
 						s.promoteSlave(m, slave)
 					}
-					//TODO
 				case failOverPromoteSlave:
 					m.mu.Lock()
 					promotedSlave := m.promotedSlave
@@ -283,11 +259,47 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 					}
 				case failOverReconfSlave:
 					time.Sleep(1 * time.Second)
+					// redis has a config to only allow numbers of replicas being reconfigured in parallel
 					//TODO
+					// start a timer
+					// maintain a semaphore to send reconf slave for slaves to new master
+					// for each slave, send slave of command to it
+					// track for each slave, when it change master to current slave, recognize it as done
+					// after all has been done, restructure routines
+					// TODO: need to know what to do with the dead master, continue pinging, or ignore it
 				}
 			}
 		}
 	}
+}
+func (s *Sentinel) checkIfShouldFailover(m *masterInstance) (startFailover bool) {
+	// this code only has to wait in case failover timeout reached and it needs to wait 1 more failover timeout duration
+	// before trying failover again
+	secondsLeft := 2*m.sentinelConf.FailoverTimeout - time.Since(m.getFailOverStartTime())
+	if secondsLeft <= 0 {
+		locked(s.mu, func() {
+			s.currentEpoch += 1
+			locked(&m.mu, func() {
+				if m.failOverState != failOverWaitLeaderElection {
+					s.logger.Debugw(logEventFailoverStateChanged,
+						"new_state", failOverWaitLeaderElection,
+						"epoch", s.currentEpoch,
+					)
+				}
+				m.failOverState = failOverWaitLeaderElection
+				m.failOverStartTime = time.Now()
+				m.failOverEpoch = s.currentEpoch
+
+			})
+		})
+		// mostly, when obj down is met, multiples sentinels will try to send request for vote to be leader
+		// to prevent split vote, sleep for a random small duration
+		random := rand.Intn(SENTINEL_MAX_DESYNC) * int(time.Millisecond)
+		time.Sleep(time.Duration(random))
+		return true
+	}
+	<-time.NewTimer(secondsLeft).C
+	return false
 }
 
 func (s *Sentinel) checkElectionStatus(m *masterInstance) (aborted bool) {
@@ -355,7 +367,7 @@ func (s *Sentinel) abortFailover(m *masterInstance) {
 	)
 }
 
-func (s *Sentinel) notifySlaveRoutines(m *masterInstance) {
+func (s *Sentinel) notifyMasterDownToSlaveRoutines(m *masterInstance) {
 	m.mu.Lock()
 	for idx := range m.slaves {
 		m.slaves[idx].masterDownNotify <- struct{}{}
