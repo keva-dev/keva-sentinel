@@ -11,6 +11,7 @@ masters:
     config_epoch: 
     known_replicas:
       - addr: "localhost:6768"
+    parallel_sync: 1
     # TODO: support return known sentinel from keva
     # known_sentinels:
     #   - addr: "localhost:25673"

@@ -19,6 +19,10 @@ func newQualifiedSlave(id string) *slaveInstance {
 	}
 }
 
+func Test_reconfigSlaves(t *testing.T) {
+
+}
+
 func Test_selectSlave(t *testing.T) {
 	t.Run("test unqualified slaves", func(t *testing.T) {
 		slaves := []*slaveInstance{}

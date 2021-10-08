@@ -2,11 +2,14 @@ package sentinel
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
 	"sync"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
 func (m *masterInstance) killed() bool {
@@ -272,6 +275,64 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 		}
 	}
 }
+
+// TODO: write test for this func
+func (s *Sentinel) reconfigSlaves(m *masterInstance) {
+	m.mu.Lock()
+	parallelSyncSemaphore := make(chan struct{}, m.sentinelConf.ParallelSync)
+
+	slaveList := make([]*slaveInstance, 0, len(m.slaves))
+	for runID := range m.slaves {
+		slaveList = append(slaveList, m.slaves[runID])
+	}
+	m.mu.Unlock()
+
+	errgrp := &errgroup.Group{}
+
+	timeout := time.Now().Add(time.Second * 10)
+	for idx := range slaveList {
+		slave := slaveList[idx]
+		if slave.runID == m.promotedSlave.runID {
+			continue
+		}
+		errgrp.Go(func() error {
+			var done bool
+			for time.Now().Before(timeout) {
+				slave.mu.Lock()
+				host, port := slave.host, slave.port
+				slave.mu.Unlock()
+
+				parallelSyncSemaphore <- struct{}{}
+				err := slave.client.SlaveOf(host, port)
+				if err != nil {
+					time.Sleep(1 * time.Second)
+					continue
+				}
+				slave.mu.Lock()
+				slave.reconfigFlag |= reconfigSent
+				slave.mu.Unlock()
+				break
+			}
+
+			for time.Now().Before(timeout) {
+				slave.mu.Lock()
+				if slave.reconfigFlag&reconfigDone != 0 {
+					slave.reconfigFlag = 0
+					done = true
+				}
+				slave.mu.Unlock()
+				if done {
+					<-parallelSyncSemaphore
+					return nil
+				}
+				time.Sleep(1 * time.Second)
+			}
+			return errors.New("timeout")
+		})
+	}
+	errgrp.Wait()
+}
+
 func (s *Sentinel) checkIfShouldFailover(m *masterInstance) (startFailover bool) {
 	// this code only has to wait in case failover timeout reached and it needs to wait 1 more failover timeout duration
 	// before trying failover again
@@ -341,7 +402,7 @@ func (s *Sentinel) promoteSlave(m *masterInstance, slave *slaveInstance) {
 	epoch := m.failOverEpoch
 	m.mu.Unlock()
 	slave.mu.Lock()
-	slaveAddr := slave.addr
+	slaveAddr := fmt.Sprintf("%s:%s", slave.host, slave.port)
 	slaveID := slave.runID
 	s.logger.Debugw(logEventSelectedSlave,
 		"slave_addr", slaveAddr,

@@ -29,6 +29,7 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 		slaveIns = &slaveInstance{mu: sync.Mutex{}}
 		m.slaves[slaveAddr] = slaveIns //LOGIC of new slave here
 	}
+	maybePromoted := m.promotedSlave
 	m.mu.Unlock()
 
 	//to compare later
@@ -103,9 +104,27 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 	}
 	currentMasterAddr := fmt.Sprintf("%s:%s", slaveIns.masterHost, slaveIns.masterPort)
 	if currentMasterAddr != masterAddr {
-		s.logger.Errorf("master of slave mismatch, has %s, but slave reported to serve %s, sentinel does not support slave switching master",
-			currentMasterAddr, masterAddr,
-		)
+		if maybePromoted != nil {
+
+			maybePromoted.mu.Lock()
+			addr := maybePromoted.addr
+			maybePromoted.mu.Unlock()
+			if addr == currentMasterAddr {
+				if slaveIns.reconfigFlag&reconfigSent > 0 {
+					slaveIns.reconfigFlag &= ^reconfigSent
+					slaveIns.reconfigFlag |= reconfigInProgress
+				}
+				// slave may recognize new master, but the link is not up because it has
+				// not fully sync with master
+				if slaveIns.reconfigFlag&reconfigInProgress > 0 &&
+					slaveIns.masterUp {
+					slaveIns.reconfigFlag &= ^reconfigInProgress
+					slaveIns.reconfigFlag |= reconfigDone
+				}
+
+			}
+		}
+
 		//HANDLE switch master
 		//send slaveof to this slave to make this slave serve correct master again
 	}
@@ -174,13 +193,16 @@ func (s *Sentinel) parseInfoMaster(masterAddress string, info string) (bool, err
 					continue
 				}
 				replOffset, _ := strconv.Atoi(matches[4])
-				addr := fmt.Sprintf("%s:%s", matches[1], matches[2])
+				host, port := matches[1], matches[2]
+				addr := fmt.Sprintf("%s:%s", host, port)
 				_, exist := m.slaves[addr]
 
 				if !exist {
 					newslave := &slaveInstance{
 						masterHost:       m.ip,
 						masterPort:       m.port,
+						host:             host,
+						port:             port,
 						addr:             addr,
 						replOffset:       replOffset,
 						reportedMaster:   m,

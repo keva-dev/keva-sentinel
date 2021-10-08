@@ -42,6 +42,7 @@ type MasterMonitor struct {
 	LeaderEpoch     int             `mapstructure:"config_epoch"` //last leader epoch
 	KnownReplicas   []KnownReplica  `mapstructure:"known_replicas"`
 	KnownSentinels  []KnownSentinel `mapstructure:"known_sentinels`
+	ParallelSync    int             `mapstructure:"parallel_sync"`
 }
 type KnownSentinel struct {
 	ID   string
@@ -176,6 +177,7 @@ type internalClient interface {
 	Ping() (string, error)
 	SubscribeHelloChan() HelloChan
 	SlaveOfNoOne() error
+	SlaveOf(host, port string) error
 }
 
 type HelloChan interface {
@@ -186,6 +188,11 @@ type HelloChan interface {
 
 type internalClientImpl struct {
 	*kevago.InternalClient
+}
+
+func (s *internalClientImpl) SlaveOf(addr, port string) error {
+	panic("unimplemented")
+	return nil
 }
 
 func (s *internalClientImpl) SlaveOfNoOne() error {
@@ -229,12 +236,16 @@ type slaveInstance struct {
 	masterHost         string
 	masterPort         string
 	masterUp           bool
-	addr               string
-	slavePriority      int //TODO
-	replOffset         int
-	reportedRole       instanceRole
-	reportedMaster     *masterInstance
-	sDown              bool
+
+	host string
+	port string
+	addr string
+
+	slavePriority  int //TODO
+	replOffset     int
+	reportedRole   instanceRole
+	reportedMaster *masterInstance
+	sDown          bool
 
 	lastSucessfulPingAt time.Time
 	lastSucessfulInfoAt time.Time
@@ -249,7 +260,15 @@ type slaveInstance struct {
 	masterDownNotify chan struct{}
 
 	client internalClient
+
+	reconfigFlag int
 }
+
+const (
+	reconfigSent = 1 << iota
+	reconfigInProgress
+	reconfigDone
+)
 
 type instanceRole int
 

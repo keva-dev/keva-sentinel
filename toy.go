@@ -159,6 +159,11 @@ func NewToyKevaClient(keva *ToyKeva) *toyClient {
 		connected: true,
 	}
 }
+
+func (cl *toyClient) SlaveOf(addr, port string) error {
+	panic("unimplemented")
+}
+
 func (cl *toyClient) SlaveOfNoOne() error {
 	cl.link.turnToMaster()
 	return nil
