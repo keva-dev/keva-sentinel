@@ -104,8 +104,9 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 	}
 	currentMasterAddr := fmt.Sprintf("%s:%s", slaveIns.masterHost, slaveIns.masterPort)
 	if currentMasterAddr != masterAddr {
+		//TODO: check if old master is still alive
+		// if it is, fix this slave config
 		if maybePromoted != nil {
-
 			maybePromoted.mu.Lock()
 			addr := maybePromoted.addr
 			maybePromoted.mu.Unlock()
@@ -123,10 +124,13 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 				}
 
 			}
+		} else {
+
+			//HANDLE switch master
+			//unless old master is dead
+			//send slaveof to this slave to make this slave serve correct master again
 		}
 
-		//HANDLE switch master
-		//send slaveof to this slave to make this slave serve correct master again
 	}
 	return false, nil
 	//re acquire master lock, check if slave is still there and then spawn goroutine for this slave

@@ -2,7 +2,6 @@ package sentinel
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math/rand"
 	"strings"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/sync/semaphore"
 )
 
 func (m *masterInstance) killed() bool {
@@ -261,6 +261,9 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 							"epoch", epoch)
 					}
 				case failOverReconfSlave:
+					s.reconfigSlaves(m)
+					// shutdown current routine,
+					// construct new routines with new master
 					time.Sleep(1 * time.Second)
 					// redis has a config to only allow numbers of replicas being reconfigured in parallel
 					//TODO
@@ -277,19 +280,20 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 }
 
 // TODO: write test for this func
-func (s *Sentinel) reconfigSlaves(m *masterInstance) {
+func (s *Sentinel) reconfigSlaves(m *masterInstance) error {
 	m.mu.Lock()
-	parallelSyncSemaphore := make(chan struct{}, m.sentinelConf.ParallelSync)
 
 	slaveList := make([]*slaveInstance, 0, len(m.slaves))
 	for runID := range m.slaves {
 		slaveList = append(slaveList, m.slaves[runID])
 	}
 	m.mu.Unlock()
+	sema := semaphore.NewWeighted(int64(m.sentinelConf.ParallelSync))
 
 	errgrp := &errgroup.Group{}
+	ctx, cancel := context.WithTimeout(context.Background(), m.sentinelConf.ReconfigSlaveTimeout)
+	defer cancel()
 
-	timeout := time.Now().Add(time.Second * 10)
 	for idx := range slaveList {
 		slave := slaveList[idx]
 		if slave.runID == m.promotedSlave.runID {
@@ -297,15 +301,16 @@ func (s *Sentinel) reconfigSlaves(m *masterInstance) {
 		}
 		errgrp.Go(func() error {
 			var done bool
-			for time.Now().Before(timeout) {
+			for {
 				slave.mu.Lock()
 				host, port := slave.host, slave.port
 				slave.mu.Unlock()
-
-				parallelSyncSemaphore <- struct{}{}
-				err := slave.client.SlaveOf(host, port)
+				err := sema.Acquire(ctx, 1)
 				if err != nil {
-					time.Sleep(1 * time.Second)
+					return err
+				}
+				err = slave.client.SlaveOf(host, port)
+				if err != nil {
 					continue
 				}
 				slave.mu.Lock()
@@ -314,7 +319,7 @@ func (s *Sentinel) reconfigSlaves(m *masterInstance) {
 				break
 			}
 
-			for time.Now().Before(timeout) {
+			for {
 				slave.mu.Lock()
 				if slave.reconfigFlag&reconfigDone != 0 {
 					slave.reconfigFlag = 0
@@ -322,20 +327,26 @@ func (s *Sentinel) reconfigSlaves(m *masterInstance) {
 				}
 				slave.mu.Unlock()
 				if done {
-					<-parallelSyncSemaphore
+					sema.Release(1)
 					return nil
 				}
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				default:
+				}
+				// TODO: may use sync.Cond instead of ticking
 				time.Sleep(1 * time.Second)
 			}
-			return errors.New("timeout")
 		})
 	}
-	errgrp.Wait()
+	return errgrp.Wait()
+	// update state no matter what
 }
 
 func (s *Sentinel) checkIfShouldFailover(m *masterInstance) (startFailover bool) {
-	// this code only has to wait in case failover timeout reached and it needs to wait 1 more failover timeout duration
-	// before trying failover again
+	// this code only has to wait in case failover timeout reached and block until the next failover is allowed to
+	// continue (2* failover timeout)
 	secondsLeft := 2*m.sentinelConf.FailoverTimeout - time.Since(m.getFailOverStartTime())
 	if secondsLeft <= 0 {
 		locked(s.mu, func() {
@@ -350,7 +361,6 @@ func (s *Sentinel) checkIfShouldFailover(m *masterInstance) (startFailover bool)
 				m.failOverState = failOverWaitLeaderElection
 				m.failOverStartTime = time.Now()
 				m.failOverEpoch = s.currentEpoch
-
 			})
 		})
 		// mostly, when obj down is met, multiples sentinels will try to send request for vote to be leader
@@ -622,7 +632,7 @@ type masterInstance struct {
 	ip            string
 	port          string
 	shutdownChan  chan struct{}
-	client        internalClient
+	client        InternalClient
 	// infoClient   internalClient
 
 	state          masterInstanceState

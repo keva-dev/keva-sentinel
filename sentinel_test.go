@@ -116,7 +116,7 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 		mapIdxToRunID[i] = s.runID
 
 		// a function to create fake client from sentinel to master
-		s.clientFactory = func(addr string) (internalClient, error) {
+		s.clientFactory = func(addr string) (InternalClient, error) {
 			cl := NewToyKevaClient(master)
 			testLock.Lock()
 			links[i] = cl

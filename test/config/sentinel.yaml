@@ -8,6 +8,7 @@ masters:
     quorum: 2 
     down_after: 5s
     failover_timeout: 10s
+    reconfig_slave_timeout: 10s
     config_epoch: 
     known_replicas:
       - addr: "localhost:6768"

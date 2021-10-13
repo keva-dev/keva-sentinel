@@ -33,16 +33,17 @@ type Config struct {
 }
 
 type MasterMonitor struct {
-	Name            string          `mapstructure:"name"`
-	Addr            string          `mapstructure:"addr"`
-	Quorum          int             `mapstructure:"quorum"`
-	DownAfter       time.Duration   `mapstructure:"down_after"`
-	FailoverTimeout time.Duration   `mapstructure:"failover_timeout"`
-	ConfigEpoch     int             `mapstructure:"config_epoch"` //epoch of master received from hello message
-	LeaderEpoch     int             `mapstructure:"config_epoch"` //last leader epoch
-	KnownReplicas   []KnownReplica  `mapstructure:"known_replicas"`
-	KnownSentinels  []KnownSentinel `mapstructure:"known_sentinels`
-	ParallelSync    int             `mapstructure:"parallel_sync"`
+	Name                 string          `mapstructure:"name"`
+	Addr                 string          `mapstructure:"addr"`
+	Quorum               int             `mapstructure:"quorum"`
+	DownAfter            time.Duration   `mapstructure:"down_after"`
+	FailoverTimeout      time.Duration   `mapstructure:"failover_timeout"`
+	ReconfigSlaveTimeout time.Duration   `mapstructure:"reconfig_slave_timeout"`
+	ConfigEpoch          int             `mapstructure:"config_epoch"` //epoch of master received from hello message
+	LeaderEpoch          int             `mapstructure:"config_epoch"` //last leader epoch
+	KnownReplicas        []KnownReplica  `mapstructure:"known_replicas"`
+	KnownSentinels       []KnownSentinel `mapstructure:"known_sentinels`
+	ParallelSync         int             `mapstructure:"parallel_sync"`
 }
 type KnownSentinel struct {
 	ID   string
@@ -65,7 +66,7 @@ type Sentinel struct {
 	// - create client from given address, for example
 	slaveFactory func(*slaveInstance) error
 
-	clientFactory func(string) (internalClient, error)
+	clientFactory func(string) (InternalClient, error)
 	listener      net.Listener
 	logger        *zap.SugaredLogger
 }
@@ -79,7 +80,7 @@ func defaultSlaveFactory(sl *slaveInstance) error {
 	return nil
 }
 
-func newInternalClient(addr string) (internalClient, error) {
+func newInternalClient(addr string) (InternalClient, error) {
 	cl, err := kevago.NewInternalClient(addr)
 	if err != nil {
 		return nil, err
@@ -172,20 +173,6 @@ func (s *Sentinel) Shutdown() {
 	s.listener.Close()
 }
 
-type internalClient interface {
-	Info() (string, error)
-	Ping() (string, error)
-	SubscribeHelloChan() HelloChan
-	SlaveOfNoOne() error
-	SlaveOf(host, port string) error
-}
-
-type HelloChan interface {
-	Close() error
-	Publish(string) error
-	Receive() (string, error)
-}
-
 type internalClientImpl struct {
 	*kevago.InternalClient
 }
@@ -259,7 +246,7 @@ type slaveInstance struct {
 	//notify goroutines that master is down, to change info interval from 10 to 1s like Redis
 	masterDownNotify chan struct{}
 
-	client internalClient
+	client InternalClient
 
 	reconfigFlag int
 }
