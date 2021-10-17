@@ -309,8 +309,16 @@ func (s *Sentinel) reconfigSlaves(m *masterInstance) error {
 				if err != nil {
 					return err
 				}
+				// goroutine exit if ctx is canceled
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				default:
+				}
 				err = slave.client.SlaveOf(host, port)
 				if err != nil {
+					sema.Release(1)
+					time.Sleep(100 * time.Millisecond)
 					continue
 				}
 				slave.mu.Lock()

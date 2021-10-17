@@ -11,13 +11,11 @@ import (
 	"golang.org/x/tools/imports"
 )
 
-
-
-func MockInterfaces(pkgOut, outDir string, repos map[string]interface{}) {
+func MockInterfaces(pkgOut, outDir string, interfaces map[string]interface{}) {
 	os.MkdirAll(outDir, os.ModePerm)
 
-	for name, repo := range repos {
-		builder := mockGen(repo, pkgOut)
+	for name, intface := range interfaces {
+		builder := mockGen(intface, pkgOut)
 
 		res, err := imports.Process("", []byte(builder.String()), &imports.Options{Comments: true})
 		if err != nil {
