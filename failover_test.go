@@ -44,7 +44,7 @@ func Test_reconfigSlaves(t *testing.T) {
 		}
 		s := &Sentinel{}
 
-		err := s.reconfigSlaves(m)
+		err := s.reconfigRemoteSlaves(m)
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})
 	t.Run("randomly fail configuration can recover", func(t *testing.T) {
@@ -90,7 +90,7 @@ func Test_reconfigSlaves(t *testing.T) {
 		s := &Sentinel{}
 
 		beginAt := time.Now()
-		err := s.reconfigSlaves(m)
+		err := s.reconfigRemoteSlaves(m)
 		assert.NoError(t, err)
 		since := time.Since(beginAt)
 		if since > m.sentinelConf.ReconfigSlaveTimeout {
@@ -141,7 +141,7 @@ func Test_reconfigSlaves(t *testing.T) {
 		}
 		s := &Sentinel{}
 
-		err := s.reconfigSlaves(m)
+		err := s.reconfigRemoteSlaves(m)
 		assert.ErrorIs(t, err, context.DeadlineExceeded)
 	})
 
@@ -184,7 +184,7 @@ func Test_reconfigSlaves(t *testing.T) {
 		s := &Sentinel{}
 
 		beginAt := time.Now()
-		err := s.reconfigSlaves(m)
+		err := s.reconfigRemoteSlaves(m)
 		assert.NoError(t, err)
 		since := time.Since(beginAt)
 		if since > m.sentinelConf.ReconfigSlaveTimeout {

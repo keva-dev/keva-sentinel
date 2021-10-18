@@ -82,7 +82,7 @@ func (m *masterInstance) getFailOverState() failOverState {
 func (m *masterInstance) getAddr() string {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	return fmt.Sprintf("%s:%s", m.ip, m.port)
+	return fmt.Sprintf("%s:%s", m.host, m.port)
 }
 
 func (m *masterInstance) getState() masterInstanceState {
@@ -97,7 +97,7 @@ func (s *Sentinel) sayHelloRoutine(m *masterInstance, helloChan HelloChan) {
 		time.Sleep(1 * time.Second)
 		m.mu.Lock()
 		masterName := m.name
-		masterIP := m.ip
+		masterIP := m.host
 		masterPort := m.port
 		masterConfigEpoch := m.configEpoch
 		m.mu.Unlock()
@@ -261,26 +261,97 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 							"epoch", epoch)
 					}
 				case failOverReconfSlave:
-					s.reconfigSlaves(m)
-					// shutdown current routine,
-					// construct new routines with new master
+					s.reconfigRemoteSlaves(m)
+					s.resetMasterInstance(m)
 					time.Sleep(1 * time.Second)
-					// redis has a config to only allow numbers of replicas being reconfigured in parallel
-					//TODO
-					// start a timer
-					// maintain a semaphore to send reconf slave for slaves to new master
-					// for each slave, send slave of command to it
-					// track for each slave, when it change master to current slave, recognize it as done
-					// after all has been done, restructure routines
-					// TODO: need to know what to do with the dead master, continue pinging, or ignore it
 				}
 			}
 		}
 	}
 }
+func (s *Sentinel) resetMasterInstance(m *masterInstance) {
+	m.mu.Lock()
+	promoted := m.promotedSlave
+	name := m.name
+	m.isKilled = true
+	m.mu.Unlock()
+
+	promoted.mu.Lock()
+	promotedAddr := promoted.addr
+	host, port := promoted.host, promoted.port
+	newRunID := m.promotedSlave.runID
+	promoted.mu.Unlock()
+
+	cl, err := s.clientFactory(promotedAddr)
+	if err != nil {
+		panic("todo")
+	}
+	newSlaves := map[string]*slaveInstance{}
+	newMaster := &masterInstance{
+		runID:              newRunID,
+		sentinelConf:       m.sentinelConf,
+		name:               name,
+		host:               host,
+		port:               port,
+		configEpoch:        m.configEpoch,
+		mu:                 sync.Mutex{},
+		client:             cl,
+		slaves:             map[string]*slaveInstance{},
+		sentinels:          map[string]*sentinelInstance{},
+		state:              masterStateUp,
+		lastSuccessfulPing: time.Now(),
+		subjDownNotify:     make(chan struct{}),
+	}
+	m.mu.Lock()
+	for _, sl := range m.slaves {
+		sl.mu.Lock()
+
+		// kill all running slaves routine, for simplicity
+		sl.killed = true
+		if sl.addr != promotedAddr {
+			newSlaves[sl.addr] = &slaveInstance{
+				masterHost:       host,
+				masterPort:       port,
+				host:             sl.host,
+				port:             sl.port,
+				addr:             sl.addr,
+				replOffset:       sl.replOffset,
+				reportedMaster:   newMaster,
+				masterDownNotify: make(chan struct{}, 1),
+			}
+		}
+
+		sl.mu.Unlock()
+	}
+	oldAddr := fmt.Sprintf("%s:%s", m.host, m.port)
+	// turn dead master into slave as well
+	newSlaves[oldAddr] = &slaveInstance{
+		masterHost:       host,
+		masterPort:       port,
+		host:             m.host,
+		port:             m.port,
+		addr:             oldAddr,
+		replOffset:       0, //TODO
+		reportedMaster:   newMaster,
+		masterDownNotify: make(chan struct{}, 1),
+	}
+	m.slaves = newSlaves
+	m.mu.Unlock()
+
+	s.mu.Lock()
+	delete(s.masterInstances, oldAddr)
+	s.masterInstances[newMaster.getAddr()] = newMaster
+	s.mu.Unlock()
+
+	for idx := range newSlaves {
+		go s.slaveRoutine(newSlaves[idx])
+	}
+
+	go s.masterRoutine(newMaster)
+}
 
 // TODO: write test for this func
-func (s *Sentinel) reconfigSlaves(m *masterInstance) error {
+func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
 	m.mu.Lock()
 
 	slaveList := make([]*slaveInstance, 0, len(m.slaves))
@@ -527,7 +598,7 @@ func (s *Sentinel) checkObjDown(m *masterInstance) {
 func (s *Sentinel) askOtherSentinelsEach1Sec(ctx context.Context, m *masterInstance) {
 	m.mu.Lock()
 	masterName := m.name
-	masterIp := m.ip
+	masterIp := m.host
 	masterPort := m.port
 
 	for idx := range m.sentinels {
@@ -591,7 +662,7 @@ func (s *Sentinel) askSentinelsIfMasterIsDown(m *masterInstance) {
 
 	m.mu.Lock()
 	masterName := m.name
-	masterIp := m.ip
+	masterIp := m.host
 	masterPort := m.port
 
 	for _, sentinel := range m.sentinels {
@@ -637,7 +708,7 @@ type masterInstance struct {
 	slaves        map[string]*slaveInstance
 	promotedSlave *slaveInstance
 	sentinels     map[string]*sentinelInstance
-	ip            string
+	host          string
 	port          string
 	shutdownChan  chan struct{}
 	client        InternalClient

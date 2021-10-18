@@ -143,7 +143,7 @@ func (s *Sentinel) Start() error {
 	master := &masterInstance{
 		sentinelConf:       m,
 		name:               m.Name,
-		ip:                 masterIP,
+		host:               masterIP,
 		port:               masterPort,
 		configEpoch:        m.ConfigEpoch,
 		mu:                 sync.Mutex{},

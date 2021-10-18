@@ -33,7 +33,7 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 	m.mu.Unlock()
 
 	//to compare later
-	masterAddr := fmt.Sprintf("%s:%s", m.ip, m.port)
+	masterAddr := fmt.Sprintf("%s:%s", m.host, m.port)
 
 	slaveIns.mu.Lock()
 	defer slaveIns.mu.Unlock()
@@ -203,7 +203,7 @@ func (s *Sentinel) parseInfoMaster(masterAddress string, info string) (bool, err
 
 				if !exist {
 					newslave := &slaveInstance{
-						masterHost:       m.ip,
+						masterHost:       m.host,
 						masterPort:       m.port,
 						host:             host,
 						port:             port,
@@ -228,11 +228,12 @@ func (s *Sentinel) parseInfoMaster(masterAddress string, info string) (bool, err
 		}
 
 	}
-	for key, keep := range slaveCheck {
+	//TODO: what to do when this happen
+	for _, keep := range slaveCheck {
 		if !keep {
-			m.slaves[key].shutdown()
-			delete(m.slaves, key)
-			// despawn goroutine of this slave and remove it
+			// 	m.slaves[key].shutdown()
+			// 	delete(m.slaves, key)
+			// 	// despawn goroutine of this slave and remove it
 		}
 	}
 	for _, item := range newSlaves {
