@@ -56,6 +56,7 @@ type history struct {
 	termsVote          map[int][]termInfo // key by term seq, val is array of each sentinels' term info
 	termsLeader        map[int]string
 	termsSelectedSlave map[int]string
+	termsPromotedSlave map[int]string
 	failOverStates     map[int]failOverState // capture current failoverstate of each instance
 }
 type termInfo struct {
@@ -117,6 +118,7 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 
 		// a function to create fake client from sentinel to master
 		s.clientFactory = func(addr string) (InternalClient, error) {
+			// TODO: this is failing
 			cl := NewToyKevaClient(master)
 			testLock.Lock()
 			links[i] = cl
@@ -158,6 +160,7 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 			termsLeader:        map[int]string{},
 			failOverStates:     map[int]failOverState{},
 			termsSelectedSlave: map[int]string{},
+			termsPromotedSlave: map[int]string{},
 		},
 		mapRunIDtoIdx: mapRunIDToIdx,
 		logObservers:  logObservers,
@@ -167,28 +170,6 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 		go suite.consumeLogs(idx, suite.logObservers[idx])
 	}
 	return suite
-}
-
-func (s *testSuite) consumeLogs(instanceIdx int, observer *observer.ObservedLogs) {
-	for {
-		logs := observer.TakeAll()
-		for _, entry := range logs {
-			switch entry.Message {
-			case logEventBecameTermLeader:
-				s.handleLogEventBecameTermLeader(instanceIdx, entry)
-			case logEventVotedFor:
-				s.handleLogEventSentinelVotedFor(instanceIdx, entry)
-			case logEventNeighborVotedFor:
-				s.handleLogEventNeighborVotedFor(instanceIdx, entry)
-			case logEventFailoverStateChanged:
-				s.handleLogEventFailoverStateChanged(instanceIdx, entry)
-			case logEventSelectedSlave:
-				s.handleLogEventSelectedSlave(instanceIdx, entry)
-			}
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
-	// all events that may change state of this suite from log stream appear here
 }
 
 func setup(t *testing.T, numInstances int) *testSuite {
@@ -423,7 +404,7 @@ func TestLeaderElection(t *testing.T) {
 	})
 }
 
-func TestSelectSlave(t *testing.T) {
+func TestPromoteSlave(t *testing.T) {
 	// slaveCustomizer let test customize initial slave config (offset, priority) to check if sentinel choose
 	// correct instance for failover
 	assertion := func(t *testing.T, numInstances int, slaveCustomizer func(map[string]*ToyKeva) *ToyKeva) {
@@ -436,20 +417,30 @@ func TestSelectSlave(t *testing.T) {
 		time.Sleep(suite.conf.Masters[0].DownAfter)
 		//TODO: check more info of this recognized leader
 		suite.checkClusterHasLeader()
-		selectedSlave := suite.checkTermSelectedSlave(1)
+		promotedSlave := suite.checkTermPromotedSlave(1)
 		suite.mu.Lock()
 		var selected *ToyKeva
 		for idx := range suite.slavesMap {
 			sl := suite.slavesMap[idx]
-			if sl.id == selectedSlave {
+			if sl.id == promotedSlave {
 				selected = sl
 			}
 		}
 
 		suite.mu.Unlock()
-		assert.Equal(t, expectedChosenSlave.id, selectedSlave, "wrong slave selected", "want %s, but have %s", expectedChosenSlave.slaveInfo.String(),
-			selected.slaveInfo.String(),
-		)
+		if promotedSlave == "" {
+			assert.FailNowf(t, "empty slave promoted", "term %d has no promoted slave", 1)
+		} else {
+			suite.mu.Lock()
+			selectedSlave := suite.termsSelectedSlave[1]
+			suite.mu.Unlock()
+			assert.Equal(t, selectedSlave, promotedSlave,
+				"different promoted and selected slave", "promoted (%s) slave is different from selected (%s) slave", promotedSlave, selectedSlave)
+
+			assert.Equal(t, expectedChosenSlave.id, promotedSlave, "wrong slave promoted", "want %s, but have %s", expectedChosenSlave.slaveInfo.String(),
+				selected.slaveInfo.String(),
+			)
+		}
 	}
 	t.Run("select slave by highest offset", func(t *testing.T) {
 		assertion(t, 3, func(slaveMap map[string]*ToyKeva) *ToyKeva {
@@ -477,54 +468,14 @@ func TestSelectSlave(t *testing.T) {
 	})
 }
 
-func TestSlaveOfNoOne(t *testing.T) {
-	assertion := func(t *testing.T, numInstances int, slaveCustomizer func(map[string]*ToyKeva) *ToyKeva) {
-		suite := setupWithCustomConfig(t, numInstances, func(c *Config) {
-			c.Masters[0].Quorum = numInstances/2 + 1 // force normal quorum
-		})
-		expectedChosenSlave := slaveCustomizer(suite.slavesMap)
-
-		suite.master.kill()
-		time.Sleep(suite.conf.Masters[0].DownAfter)
-		//TODO: check more info of this recognized leader
-		suite.checkClusterHasLeader()
-		selectedSlave := suite.checkTermSelectedSlave(1)
-		suite.mu.Lock()
-		var selected *ToyKeva
-		for idx := range suite.slavesMap {
-			sl := suite.slavesMap[idx]
-			if sl.id == selectedSlave {
-				selected = sl
-			}
-		}
-
-		suite.mu.Unlock()
-		assert.Equal(t, expectedChosenSlave.id, selectedSlave, "wrong slave selected", "want %s, but have %s", expectedChosenSlave.slaveInfo.String(),
-			selected.slaveInfo.String(),
-		)
-	}
-	t.Run("select slave by highest offset", func(t *testing.T) {
-		assertion(t, 3, func(slaveMap map[string]*ToyKeva) *ToyKeva {
-			for idx := range slaveMap {
-				slave := slaveMap[idx]
-				slave.mu.Lock()
-				slave.offset = 10
-				slave.mu.Unlock()
-				return slave
-			}
-			return nil
-		})
-	})
-}
-
-func (s *testSuite) checkTermSelectedSlave(term int) string {
+func (s *testSuite) checkTermPromotedSlave(term int) string {
 	var ret string
 	eventually(s.t, func() bool {
 		s.mu.Lock()
 		defer s.mu.Unlock()
-		selected, exist := s.termsSelectedSlave[term]
-		if exist && selected != "" {
-			ret = selected
+		promoted, exist := s.termsPromotedSlave[term]
+		if exist && promoted != "" {
+			ret = promoted
 			return true
 		}
 		return false

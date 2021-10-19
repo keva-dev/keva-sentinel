@@ -243,6 +243,7 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 					m.mu.Lock()
 					promotedSlave := m.promotedSlave
 					m.mu.Unlock()
+
 					timeout := time.NewTimer(m.sentinelConf.FailoverTimeout)
 					defer timeout.Stop()
 					select {
@@ -309,32 +310,16 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 		// kill all running slaves routine, for simplicity
 		sl.killed = true
 		if sl.addr != promotedAddr {
-			newSlaves[sl.addr] = &slaveInstance{
-				masterHost:       host,
-				masterPort:       port,
-				host:             sl.host,
-				port:             sl.port,
-				addr:             sl.addr,
-				replOffset:       sl.replOffset,
-				reportedMaster:   newMaster,
-				masterDownNotify: make(chan struct{}, 1),
-			}
+			newSlaves[sl.addr] = newSlaveInstance(host, port, sl.host, sl.port, sl.replOffset, newMaster)
 		}
 
 		sl.mu.Unlock()
 	}
+
 	oldAddr := fmt.Sprintf("%s:%s", m.host, m.port)
 	// turn dead master into slave as well
-	newSlaves[oldAddr] = &slaveInstance{
-		masterHost:       host,
-		masterPort:       port,
-		host:             m.host,
-		port:             m.port,
-		addr:             oldAddr,
-		replOffset:       0, //TODO
-		reportedMaster:   newMaster,
-		masterDownNotify: make(chan struct{}, 1),
-	}
+	newSlaves[oldAddr] = newSlaveInstance(host, port, m.host, m.port, 0, newMaster)
+
 	m.slaves = newSlaves
 	m.mu.Unlock()
 
@@ -342,6 +327,7 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 	delete(s.masterInstances, oldAddr)
 	s.masterInstances[newMaster.getAddr()] = newMaster
 	s.mu.Unlock()
+	panic("not reached")
 
 	for idx := range newSlaves {
 		go s.slaveRoutine(newSlaves[idx])
@@ -480,7 +466,7 @@ func (s *Sentinel) checkElectionStatus(m *masterInstance) (aborted bool) {
 		"new_state", failOverSelectSlave,
 		"epoch", epoch, // epoch = failover epoch = sentinel current epoch
 	)
-	return true
+	return false
 }
 
 func (s *Sentinel) promoteSlave(m *masterInstance, slave *slaveInstance) {
@@ -493,6 +479,8 @@ func (s *Sentinel) promoteSlave(m *masterInstance, slave *slaveInstance) {
 	slave.mu.Lock()
 	slaveAddr := fmt.Sprintf("%s:%s", slave.host, slave.port)
 	slaveID := slave.runID
+	client := slave.client
+	slave.mu.Unlock()
 	s.logger.Debugw(logEventSelectedSlave,
 		"slave_addr", slaveAddr,
 		"slave_id", slaveID,
@@ -503,6 +491,10 @@ func (s *Sentinel) promoteSlave(m *masterInstance, slave *slaveInstance) {
 		"new_state", failOverPromoteSlave,
 		"epoch", epoch,
 	)
+	err := client.SlaveOfNoOne()
+	if err != nil {
+		s.logger.Errorf("send slave of no one to slave %s return error %s", slaveAddr, err.Error())
+	}
 }
 func (s *Sentinel) abortFailover(m *masterInstance) {
 	m.mu.Lock()

@@ -1,0 +1,246 @@
+=== RUN   TestPromoteSlave
+=== RUN   TestPromoteSlave/select_slave_by_highest_offset
+2021/10/19 22:55:16 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/19 22:55:16 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/19 22:55:16 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/19 22:55:16 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/19 22:55:16 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/19 22:55:16 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-19T22:55:17.807+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,5421fe41-dc21-4cb4-9a53-4ea378e2669b,0,mymaster,localhost,6767,0
+2021-10-19T22:55:17.807+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,734b656b-6aab-48a6-b41d-ac347cd257b5,0,mymaster,localhost,6767,0
+2021-10-19T22:55:17.807+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,5421fe41-dc21-4cb4-9a53-4ea378e2669b,0,mymaster,localhost,6767,0
+2021-10-19T22:55:17.808+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,734b656b-6aab-48a6-b41d-ac347cd257b5,0,mymaster,localhost,6767,0
+2021-10-19T22:55:17.808+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,4d3f4df4-39e1-4848-a651-c937d3172b4c,0,mymaster,localhost,6767,0
+2021-10-19T22:55:17.808+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,4d3f4df4-39e1-4848-a651-c937d3172b4c,0,mymaster,localhost,6767,0
+2021-10-19T22:55:23.807+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-19T22:55:23.807+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-19T22:55:23.807+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-19T22:55:24.808+0700	[35mDEBUG[0m	go-sentinel/master.go:422	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-19T22:55:24.808+0700	[35mDEBUG[0m	go-sentinel/master.go:422	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-19T22:55:24.808+0700	[35mDEBUG[0m	go-sentinel/master.go:422	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-19T22:55:24.808+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:24.808+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:24.808+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:24.809+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:24.808+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:24.809+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:24.809+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:24.809+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:24.809+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:24.809+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:24.809+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:24.809+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:24.889+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:24.889+0700	[35mDEBUG[0m	go-sentinel/master.go:458	sentinel_became_leader	{"run_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:24.889+0700	[35mDEBUG[0m	go-sentinel/master.go:466	failover_state_change	{"new_state": "select_slave", "epoch": 1}
+2021-10-19T22:55:24.889+0700	[35mDEBUG[0m	go-sentinel/master.go:485	slave_selected	{"slave_addr": "localhost:0", "slave_id": "ba7b3ac0-7363-4ef3-9cef-82d557f5b8fc", "epoch": 1}
+2021-10-19T22:55:24.889+0700	[35mDEBUG[0m	go-sentinel/master.go:491	failover_state_change	{"new_state": "promote_slave", "epoch": 1}
+2021-10-19T22:55:24.889+0700	[31mERROR[0m	go-sentinel/master.go:247	identifier: waiting for slave ba7b3ac0-7363-4ef3-9cef-82d557f5b8fc 10s %!s(MISSING)
+2021-10-19T22:55:25.656+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:25.695+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:25.808+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 5421fe41-dc21-4cb4-9a53-4ea378e2669b
+2021-10-19T22:55:25.808+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 734b656b-6aab-48a6-b41d-ac347cd257b5
+2021-10-19T22:55:25.808+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 4d3f4df4-39e1-4848-a651-c937d3172b4c
+2021-10-19T22:55:25.808+0700	[35mDEBUG[0m	go-sentinel/master.go:261	slave_promoted	{"run_id": "ba7b3ac0-7363-4ef3-9cef-82d557f5b8fc", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:25.810+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+=== RUN   TestPromoteSlave/select_slave_by_highest_priority
+2021/10/19 22:55:25 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/19 22:55:25 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/19 22:55:25 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/19 22:55:25 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/19 22:55:25 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/19 22:55:25 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-19T22:55:26.657+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:26.696+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:26.810+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:26.810+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:26.810+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:26.810+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:26.811+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:26.811+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:26.811+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:26.811+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:26.811+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:26.811+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:26.811+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:26.811+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:26.862+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,f0f23b34-a762-4d66-bf03-28b60e547ad4,0,mymaster,localhost,6767,0
+2021-10-19T22:55:26.862+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,f0f23b34-a762-4d66-bf03-28b60e547ad4,0,mymaster,localhost,6767,0
+2021-10-19T22:55:26.863+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,39c471e4-b31f-4abb-806a-7336515b030e,0,mymaster,localhost,6767,0
+2021-10-19T22:55:26.863+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,39c471e4-b31f-4abb-806a-7336515b030e,0,mymaster,localhost,6767,0
+2021-10-19T22:55:26.864+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,b62a6e45-75a2-4986-b546-c766e8327154,0,mymaster,localhost,6767,0
+2021-10-19T22:55:26.864+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,b62a6e45-75a2-4986-b546-c766e8327154,0,mymaster,localhost,6767,0
+2021-10-19T22:55:27.658+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:27.697+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:27.809+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 734b656b-6aab-48a6-b41d-ac347cd257b5
+2021-10-19T22:55:27.809+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 4d3f4df4-39e1-4848-a651-c937d3172b4c
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:27.812+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:28.659+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:28.698+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:28.813+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:28.813+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:28.813+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:28.813+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:28.813+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:28.813+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:28.814+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:28.814+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:28.814+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:28.814+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:28.814+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:28.814+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.659+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.698+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.810+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 734b656b-6aab-48a6-b41d-ac347cd257b5
+2021-10-19T22:55:29.810+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 4d3f4df4-39e1-4848-a651-c937d3172b4c
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:29.814+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:30.660+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:30.699+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:30.815+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:31.661+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:31.699+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:31.812+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 4d3f4df4-39e1-4848-a651-c937d3172b4c
+2021-10-19T22:55:31.812+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 734b656b-6aab-48a6-b41d-ac347cd257b5
+2021-10-19T22:55:31.816+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:31.816+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:31.816+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:31.816+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:31.816+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:31.816+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:31.816+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:31.816+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:31.816+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:31.817+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:31.817+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:31.817+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:32.661+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:32.700+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:32.818+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.661+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.701+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.813+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 734b656b-6aab-48a6-b41d-ac347cd257b5
+2021-10-19T22:55:33.813+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 4d3f4df4-39e1-4848-a651-c937d3172b4c
+2021-10-19T22:55:33.818+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:33.818+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.819+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.819+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.819+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.819+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:33.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:33.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:33.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:33.861+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-19T22:55:33.861+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-19T22:55:33.861+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-19T22:55:34.661+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:34.702+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:34.819+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/master.go:422	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/master.go:422	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "39c471e4-b31f-4abb-806a-7336515b030e", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "39c471e4-b31f-4abb-806a-7336515b030e", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "b62a6e45-75a2-4986-b546-c766e8327154", "voted_for": "39c471e4-b31f-4abb-806a-7336515b030e", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "f0f23b34-a762-4d66-bf03-28b60e547ad4", "voted_for": "39c471e4-b31f-4abb-806a-7336515b030e", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "39c471e4-b31f-4abb-806a-7336515b030e", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "b62a6e45-75a2-4986-b546-c766e8327154", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "f0f23b34-a762-4d66-bf03-28b60e547ad4", "voted_for": "39c471e4-b31f-4abb-806a-7336515b030e", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "b62a6e45-75a2-4986-b546-c766e8327154", "voted_for": "39c471e4-b31f-4abb-806a-7336515b030e", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "39c471e4-b31f-4abb-806a-7336515b030e", "voted_for": "b62a6e45-75a2-4986-b546-c766e8327154", "epoch": 1}
+2021-10-19T22:55:34.862+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "39c471e4-b31f-4abb-806a-7336515b030e", "voted_for": "b62a6e45-75a2-4986-b546-c766e8327154", "epoch": 1}
+2021-10-19T22:55:34.922+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "b62a6e45-75a2-4986-b546-c766e8327154", "epoch": 1}
+2021-10-19T22:55:34.922+0700	[35mDEBUG[0m	go-sentinel/master.go:458	sentinel_became_leader	{"run_id": "39c471e4-b31f-4abb-806a-7336515b030e", "epoch": 1}
+2021-10-19T22:55:34.922+0700	[35mDEBUG[0m	go-sentinel/master.go:466	failover_state_change	{"new_state": "select_slave", "epoch": 1}
+2021-10-19T22:55:34.922+0700	[35mDEBUG[0m	go-sentinel/master.go:485	slave_selected	{"slave_addr": "localhost:0", "slave_id": "dcea7e03-0848-403b-aaf3-12d613be30d0", "epoch": 1}
+2021-10-19T22:55:34.922+0700	[35mDEBUG[0m	go-sentinel/master.go:491	failover_state_change	{"new_state": "promote_slave", "epoch": 1}
+2021-10-19T22:55:34.922+0700	[31mERROR[0m	go-sentinel/master.go:247	identifier: waiting for slave dcea7e03-0848-403b-aaf3-12d613be30d0 10s %!s(MISSING)
+2021-10-19T22:55:34.943+0700	[35mDEBUG[0m	go-sentinel/rpc.go:69	sentinel_voted_for	{"voted_for": "39c471e4-b31f-4abb-806a-7336515b030e", "epoch": 1}
+2021-10-19T22:55:35.662+0700	[35mDEBUG[0m	go-sentinel/master.go:507	failover_state_change	{"new_state": "none", "epoch": 1}
+2021-10-19T22:55:35.663+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "734b656b-6aab-48a6-b41d-ac347cd257b5", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:35.663+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:35.703+0700	[35mDEBUG[0m	go-sentinel/master.go:507	failover_state_change	{"new_state": "none", "epoch": 1}
+2021-10-19T22:55:35.703+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "voted_for": "734b656b-6aab-48a6-b41d-ac347cd257b5", "epoch": 1}
+2021-10-19T22:55:35.703+0700	[35mDEBUG[0m	go-sentinel/master.go:631	neighbor_sentinel_voted_for	{"neighbor_id": "4d3f4df4-39e1-4848-a651-c937d3172b4c", "voted_for": "5421fe41-dc21-4cb4-9a53-4ea378e2669b", "epoch": 1}
+2021-10-19T22:55:35.814+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 734b656b-6aab-48a6-b41d-ac347cd257b5
+2021-10-19T22:55:35.814+0700	[31mERROR[0m	go-sentinel/slave.go:95	identifier: run id 4d3f4df4-39e1-4848-a651-c937d3172b4c
+panic: runtime error: index out of range [3] with length 3
+
+goroutine 50 [running]:
+github.com/keva-dev/go-sentinel.setupWithCustomConfig.func2({0xc000333c98, 0x4fa935})
+	/var/www/go/go-sentinel/sentinel_test.go:123 +0x145
+github.com/keva-dev/go-sentinel.(*Sentinel).resetMasterInstance(0xc000162210, 0xc00013e540)
+	/var/www/go/go-sentinel/master.go:287 +0x20c
+github.com/keva-dev/go-sentinel.(*Sentinel).masterRoutine(0xc000162210, 0xc00013e540)
+	/var/www/go/go-sentinel/master.go:267 +0x55c
+created by github.com/keva-dev/go-sentinel.(*Sentinel).Start
+	/var/www/go/go-sentinel/sentinel.go:168 +0x505
+exit status 2
+FAIL	github.com/keva-dev/go-sentinel	19.016s

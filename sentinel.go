@@ -215,14 +215,13 @@ var (
 )
 
 type slaveInstance struct {
-	runID              string
-	masterName         string
-	killed             bool
-	mu                 sync.Mutex
-	masterDownSinceSec time.Duration
-	masterHost         string
-	masterPort         string
-	masterUp           bool
+	runID           string
+	killed          bool
+	mu              sync.Mutex
+	masterDownSince time.Duration
+	masterHost      string
+	masterPort      string
+	masterUp        bool
 
 	host string
 	port string
@@ -230,17 +229,11 @@ type slaveInstance struct {
 
 	slavePriority  int //TODO
 	replOffset     int
-	reportedRole   instanceRole
 	reportedMaster *masterInstance
 	sDown          bool
 
 	lastSucessfulPingAt time.Time
 	lastSucessfulInfoAt time.Time
-
-	//each slave has a goroutine that ping by interval
-	pingShutdownChan chan struct{}
-	//each slave has a goroutine that check info every 10s
-	infoShutdownChan chan struct{}
 
 	masterRoleSwitchChan chan struct{}
 	//notify goroutines that master is down, to change info interval from 10 to 1s like Redis

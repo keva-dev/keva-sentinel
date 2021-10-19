@@ -60,7 +60,7 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 			if err != nil {
 				continue
 			}
-			slaveIns.masterDownSinceSec = time.Duration(intSec)
+			slaveIns.masterDownSince = time.Duration(intSec)
 			continue
 		}
 		if len(line) >= 12 && line[:12] == "master_host:" {
@@ -202,16 +202,8 @@ func (s *Sentinel) parseInfoMaster(masterAddress string, info string) (bool, err
 				_, exist := m.slaves[addr]
 
 				if !exist {
-					newslave := &slaveInstance{
-						masterHost:       m.host,
-						masterPort:       m.port,
-						host:             host,
-						port:             port,
-						addr:             addr,
-						replOffset:       replOffset,
-						reportedMaster:   m,
-						masterDownNotify: make(chan struct{}, 1),
-					}
+					newslave := newSlaveInstance(m.host, m.port, host, port, replOffset, m)
+
 					err := s.slaveFactory(newslave)
 					if err != nil {
 						s.logger.Errorf("s.slaveFactory: %s", err)

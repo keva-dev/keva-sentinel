@@ -2,6 +2,7 @@ package sentinel
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest/observer"
@@ -33,6 +34,25 @@ func (suite *testSuite) handleLogEventSentinelVotedFor(instanceIdx int, log obse
 	}
 	suite.termsVote[term][instanceIdx] = termInfo
 }
+
+func (suite *testSuite) handleLogEventSlavePromoted(instanceIdx int, log observer.LoggedEntry) {
+	ctxMap := log.ContextMap()
+	promotedSlave := ctxMap["run_id"].(string)
+	term := int(ctxMap["epoch"].(int64))
+	suite.mu.Lock()
+	defer suite.mu.Unlock()
+	previousSelected, exist := suite.termsSelectedSlave[term]
+	if !exist {
+		assert.Failf(suite.t, "slave promoted without selection", "term %d has slave promoted without selected", term)
+		return
+	}
+	if previousSelected != promotedSlave {
+		assert.Failf(suite.t, "slave promoted different from slave selected", "term %d has slave promoted %d different from slave selected", term, previousSelected,
+			promotedSlave)
+	}
+	suite.termsPromotedSlave[term] = promotedSlave
+}
+
 func (suite *testSuite) handleLogEventSelectedSlave(instanceIdx int, log observer.LoggedEntry) {
 	ctxMap := log.ContextMap()
 	selectedSlave := ctxMap["slave_id"].(string)
@@ -41,7 +61,7 @@ func (suite *testSuite) handleLogEventSelectedSlave(instanceIdx int, log observe
 	defer suite.mu.Unlock()
 	previousSelected, exist := suite.termsSelectedSlave[term]
 	if exist {
-		suite.t.Fatalf("term %d has multiple selected slave recognition event, previously is %s and current is %s",
+		assert.Failf(suite.t, "multiple slave selected per term", "term %d has multiple selected slave recognition event, previously is %s and current is %s",
 			term, previousSelected, selectedSlave)
 	}
 	suite.termsSelectedSlave[term] = selectedSlave
@@ -127,4 +147,28 @@ func (suite *testSuite) handleLogEventNeighborVotedFor(instanceIdx int, log obse
 	}
 	termInfo.neighborVotes[neighborID] = votedFor
 	suite.termsVote[term][instanceIdx] = termInfo
+}
+
+func (s *testSuite) consumeLogs(instanceIdx int, observer *observer.ObservedLogs) {
+	for {
+		logs := observer.TakeAll()
+		for _, entry := range logs {
+			switch entry.Message {
+			case logEventBecameTermLeader:
+				s.handleLogEventBecameTermLeader(instanceIdx, entry)
+			case logEventVotedFor:
+				s.handleLogEventSentinelVotedFor(instanceIdx, entry)
+			case logEventNeighborVotedFor:
+				s.handleLogEventNeighborVotedFor(instanceIdx, entry)
+			case logEventFailoverStateChanged:
+				s.handleLogEventFailoverStateChanged(instanceIdx, entry)
+			case logEventSelectedSlave:
+				s.handleLogEventSelectedSlave(instanceIdx, entry)
+			case logEventSlavePromoted:
+				s.handleLogEventSlavePromoted(instanceIdx, entry)
+			}
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	// all events that may change state of this suite from log stream appear here
 }

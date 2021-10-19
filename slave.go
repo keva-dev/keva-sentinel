@@ -1,6 +1,7 @@
 package sentinel
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 	"time"
@@ -44,7 +45,7 @@ func (s *Sentinel) selectSlave(m *masterInstance) *slaveInstance {
 			}
 
 			// accept the fact that this slave still does not see master is down somehow
-			if slave.masterDownSinceSec > maxDownTime {
+			if slave.masterDownSince > maxDownTime {
 				return
 			}
 
@@ -90,15 +91,17 @@ func (s *Sentinel) slaveInfoRoutine(sl *slaveInstance) {
 		// TODO
 
 		if roleSwitched {
+
 			timeout := time.NewTimer(1 * time.Second)
+			defer timeout.Stop()
 			select {
 			case <-timeout.C:
 				// treat it as if it is still slave
 			case sl.masterRoleSwitchChan <- struct{}{}:
-				panic("unimlemented")
+				// master routine is waiting for this signal, send and return, this will become new master
+				//TODO: what non-leader sentinel behaves when seeing this
+				return
 			}
-			//TODO
-			// s.parseInfoSlave()
 		}
 		timer.Reset(infoDelay)
 		select {
@@ -106,6 +109,19 @@ func (s *Sentinel) slaveInfoRoutine(sl *slaveInstance) {
 			infoDelay = 1 * time.Second
 		case <-timer.C:
 		}
+	}
+}
+func newSlaveInstance(masterHost, masterPort, host, port string, replOffset int, master *masterInstance) *slaveInstance {
+	return &slaveInstance{
+		masterHost:           masterHost,
+		masterPort:           masterPort,
+		host:                 host,
+		port:                 port,
+		addr:                 fmt.Sprintf("%s:%s", host, port),
+		replOffset:           replOffset,
+		reportedMaster:       master,
+		masterDownNotify:     make(chan struct{}, 1),
+		masterRoleSwitchChan: make(chan struct{}),
 	}
 }
 

@@ -161,7 +161,7 @@ func NewToyKevaClient(keva *ToyKeva) *toyClient {
 }
 
 func (cl *toyClient) SlaveOf(addr, port string) error {
-	panic("unimplemented")
+	return nil
 }
 
 func (cl *toyClient) SlaveOfNoOne() error {
