@@ -42,7 +42,7 @@ type testSuite struct {
 	mapRunIDtoIdx map[string]int // code use runID as identifier, test suite use integer index, use this to remap
 	mapIdxtoRunID map[int]string // code use runID as identifier, test suite use integer index, use this to remap
 	instances     []*Sentinel
-	links         []*toyClient
+	masterLinks   []*toyClient // each represent a connection from a sentinel to master
 	conf          Config
 	master        *ToyKeva
 	slavesMap     map[string]*ToyKeva
@@ -101,13 +101,12 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 	}
 	// make master remember slaves
 	sentinels := []*Sentinel{}
-	links := make([]*toyClient, numInstances)
+	masterLinks := make([]*toyClient, numInstances)
 	logObservers := make([]*observer.ObservedLogs, numInstances)
 	testLock := &sync.Mutex{}
 	basePort := 2000
 	mapRunIDToIdx := map[string]int{}
 	mapIdxToRunID := map[int]string{}
-
 	for i := 0; i < numInstances; i++ {
 		// start new sentinel instance
 		s, err := NewFromConfig(conf)
@@ -118,12 +117,15 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 
 		// a function to create fake client from sentinel to master
 		s.clientFactory = func(addr string) (InternalClient, error) {
-			// TODO: this is failing
-			cl := NewToyKevaClient(master)
 			testLock.Lock()
-			links[i] = cl
+			instance, isslave := slaveMap[addr]
+			if !isslave {
+				instance = master
+			}
+			client := NewToyKevaClient(instance)
+			masterLinks[i] = client
 			testLock.Unlock()
-			return cl, nil
+			return client, nil
 		}
 
 		s.slaveFactory = toySlaveFactory
@@ -149,12 +151,12 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 		masterI.mu.Unlock()
 	}
 	suite := &testSuite{
-		instances: sentinels,
-		links:     links,
-		mu:        testLock,
-		conf:      conf,
-		master:    master,
-		slavesMap: slaveMap,
+		instances:   sentinels,
+		masterLinks: masterLinks,
+		mu:          testLock,
+		conf:        conf,
+		master:      master,
+		slavesMap:   slaveMap,
 		history: history{
 			termsVote:          map[int][]termInfo{},
 			termsLeader:        map[int]string{},
@@ -206,7 +208,7 @@ func TestSDown(t *testing.T) {
 			masterI.mu.Unlock()
 		}
 
-		disconnecteds := suite.links[:numSdown]
+		disconnecteds := suite.masterLinks[:numSdown]
 		for _, link := range disconnecteds {
 			link.disconnect()
 		}
