@@ -1,0 +1,76 @@
+=== RUN   TestPromoteSlave
+=== RUN   TestPromoteSlave/select_slave_by_highest_offset
+2021-10-25T19:54:20.134+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "5994ec1c-7a1a-433e-b68a-b7bb9beee9d4", "epoch": 0}
+2021/10/25 19:54:20 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:54:20 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:54:20 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021-10-25T19:54:20.134+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "5994ec1c-7a1a-433e-b68a-b7bb9beee9d4", "epoch": 0}
+2021-10-25T19:54:20.134+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "5994ec1c-7a1a-433e-b68a-b7bb9beee9d4", "epoch": 0}
+2021/10/25 19:54:20 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/25 19:54:20 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/25 19:54:20 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:54:21.135+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,86030112-3206-4f95-bdac-b49dd0a4014d,0,mymaster,localhost,6767,0
+2021-10-25T19:54:21.135+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,86030112-3206-4f95-bdac-b49dd0a4014d,0,mymaster,localhost,6767,0
+2021-10-25T19:54:21.135+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,13d9be77-7d17-468d-938d-fd8c099a588d,0,mymaster,localhost,6767,0
+2021-10-25T19:54:21.135+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,13d9be77-7d17-468d-938d-fd8c099a588d,0,mymaster,localhost,6767,0
+2021-10-25T19:54:21.136+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,8013135b-15cc-4e52-ad4e-2b12bfdbefaf,0,mymaster,localhost,6767,0
+2021-10-25T19:54:21.136+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,8013135b-15cc-4e52-ad4e-2b12bfdbefaf,0,mymaster,localhost,6767,0
+2021-10-25T19:54:27.135+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:54:27.135+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:54:27.135+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:54:28.135+0700	[35mDEBUG[0m	go-sentinel/master.go:442	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-25T19:54:28.135+0700	[35mDEBUG[0m	go-sentinel/master.go:442	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-25T19:54:28.136+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "86030112-3206-4f95-bdac-b49dd0a4014d", "epoch": 1}
+2021-10-25T19:54:28.136+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "86030112-3206-4f95-bdac-b49dd0a4014d", "epoch": 1}
+2021-10-25T19:54:28.136+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "13d9be77-7d17-468d-938d-fd8c099a588d", "epoch": 1}
+2021-10-25T19:54:28.136+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "8013135b-15cc-4e52-ad4e-2b12bfdbefaf", "voted_for": "86030112-3206-4f95-bdac-b49dd0a4014d", "epoch": 1}
+2021-10-25T19:54:28.136+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "86030112-3206-4f95-bdac-b49dd0a4014d", "voted_for": "13d9be77-7d17-468d-938d-fd8c099a588d", "epoch": 1}
+2021-10-25T19:54:28.136+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "13d9be77-7d17-468d-938d-fd8c099a588d", "voted_for": "86030112-3206-4f95-bdac-b49dd0a4014d", "epoch": 1}
+2021-10-25T19:54:28.136+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "8013135b-15cc-4e52-ad4e-2b12bfdbefaf", "voted_for": "86030112-3206-4f95-bdac-b49dd0a4014d", "epoch": 1}
+2021-10-25T19:54:28.136+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "13d9be77-7d17-468d-938d-fd8c099a588d", "voted_for": "86030112-3206-4f95-bdac-b49dd0a4014d", "epoch": 1}
+2021-10-25T19:54:28.136+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "86030112-3206-4f95-bdac-b49dd0a4014d", "voted_for": "13d9be77-7d17-468d-938d-fd8c099a588d", "epoch": 1}
+2021-10-25T19:54:28.217+0700	[35mDEBUG[0m	go-sentinel/master.go:478	sentinel_became_leader	{"run_id": "86030112-3206-4f95-bdac-b49dd0a4014d", "epoch": 1}
+2021-10-25T19:54:28.217+0700	[35mDEBUG[0m	go-sentinel/master.go:486	failover_state_change	{"new_state": "select_slave", "epoch": 1}
+2021-10-25T19:54:28.217+0700	[35mDEBUG[0m	go-sentinel/master.go:505	slave_selected	{"slave_addr": "localhost:1", "slave_id": "4cf11d9b-add7-438d-b280-5b45b401243d", "epoch": 1}
+2021-10-25T19:54:28.217+0700	[35mDEBUG[0m	go-sentinel/master.go:511	failover_state_change	{"new_state": "promote_slave", "epoch": 1}
+2021-10-25T19:54:29.136+0700	[35mDEBUG[0m	go-sentinel/master.go:266	slave_promoted	{"run_id": "4cf11d9b-add7-438d-b280-5b45b401243d", "epoch": 1}
+=== RUN   TestPromoteSlave/select_slave_by_highest_priority
+2021-10-25T19:54:29.189+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "7280a397-40de-4a02-aa01-2f978bd3fe42", "epoch": 0}
+2021/10/25 19:54:29 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:54:29 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:54:29.189+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "7280a397-40de-4a02-aa01-2f978bd3fe42", "epoch": 0}
+2021/10/25 19:54:29 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:54:29 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:54:29.189+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "7280a397-40de-4a02-aa01-2f978bd3fe42", "epoch": 0}
+2021/10/25 19:54:29 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:54:29 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:54:30.190+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,67a8d915-fb9d-4326-a01d-6c65237ab89d,0,mymaster,localhost,6767,0
+2021-10-25T19:54:30.190+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,67a8d915-fb9d-4326-a01d-6c65237ab89d,0,mymaster,localhost,6767,0
+2021-10-25T19:54:30.191+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,609cb5a7-69a6-49b3-b522-340e39f50ede,0,mymaster,localhost,6767,0
+2021-10-25T19:54:30.191+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,609cb5a7-69a6-49b3-b522-340e39f50ede,0,mymaster,localhost,6767,0
+2021-10-25T19:54:30.191+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,50e3ffec-6522-452b-bc80-067febbbe058,0,mymaster,localhost,6767,0
+2021-10-25T19:54:30.192+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,50e3ffec-6522-452b-bc80-067febbbe058,0,mymaster,localhost,6767,0
+2021-10-25T19:54:35.190+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:54:36.190+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:54:36.190+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:54:37.190+0700	[35mDEBUG[0m	go-sentinel/master.go:442	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-25T19:54:37.191+0700	[35mDEBUG[0m	go-sentinel/master.go:442	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-25T19:54:37.191+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "609cb5a7-69a6-49b3-b522-340e39f50ede", "epoch": 1}
+2021-10-25T19:54:37.191+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "609cb5a7-69a6-49b3-b522-340e39f50ede", "epoch": 1}
+2021-10-25T19:54:37.191+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "50e3ffec-6522-452b-bc80-067febbbe058", "epoch": 1}
+2021-10-25T19:54:37.191+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "50e3ffec-6522-452b-bc80-067febbbe058", "voted_for": "609cb5a7-69a6-49b3-b522-340e39f50ede", "epoch": 1}
+2021-10-25T19:54:37.191+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "67a8d915-fb9d-4326-a01d-6c65237ab89d", "voted_for": "609cb5a7-69a6-49b3-b522-340e39f50ede", "epoch": 1}
+2021-10-25T19:54:37.191+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "609cb5a7-69a6-49b3-b522-340e39f50ede", "voted_for": "50e3ffec-6522-452b-bc80-067febbbe058", "epoch": 1}
+2021-10-25T19:54:37.191+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "67a8d915-fb9d-4326-a01d-6c65237ab89d", "voted_for": "609cb5a7-69a6-49b3-b522-340e39f50ede", "epoch": 1}
+2021-10-25T19:54:38.038+0700	[35mDEBUG[0m	go-sentinel/master.go:478	sentinel_became_leader	{"run_id": "609cb5a7-69a6-49b3-b522-340e39f50ede", "epoch": 1}
+2021-10-25T19:54:38.038+0700	[35mDEBUG[0m	go-sentinel/master.go:486	failover_state_change	{"new_state": "select_slave", "epoch": 1}
+2021-10-25T19:54:38.038+0700	[35mDEBUG[0m	go-sentinel/master.go:505	slave_selected	{"slave_addr": "localhost:0", "slave_id": "5157b653-49ee-43e5-b833-ad54e0749abd", "epoch": 1}
+2021-10-25T19:54:38.038+0700	[35mDEBUG[0m	go-sentinel/master.go:511	failover_state_change	{"new_state": "promote_slave", "epoch": 1}
+2021-10-25T19:54:38.191+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "50e3ffec-6522-452b-bc80-067febbbe058", "voted_for": "609cb5a7-69a6-49b3-b522-340e39f50ede", "epoch": 1}
+2021-10-25T19:54:38.191+0700	[35mDEBUG[0m	go-sentinel/master.go:653	neighbor_sentinel_voted_for	{"neighbor_id": "609cb5a7-69a6-49b3-b522-340e39f50ede", "voted_for": "50e3ffec-6522-452b-bc80-067febbbe058", "epoch": 1}
+2021-10-25T19:54:38.191+0700	[35mDEBUG[0m	go-sentinel/master.go:266	slave_promoted	{"run_id": "5157b653-49ee-43e5-b833-ad54e0749abd", "epoch": 1}
+--- PASS: TestPromoteSlave (18.11s)
+    --- PASS: TestPromoteSlave/select_slave_by_highest_offset (9.05s)
+    --- PASS: TestPromoteSlave/select_slave_by_highest_priority (9.05s)
+PASS
+ok  	github.com/keva-dev/go-sentinel	18.113s

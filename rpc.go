@@ -37,10 +37,12 @@ func (s *Sentinel) getCurrentEpoch() int {
 	return s.currentEpoch
 }
 
-func (s *Sentinel) updateEpoch(newEpoch int) {
+func (s *Sentinel) updateEpochIfNeeded(newEpoch int) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.currentEpoch = newEpoch
+	if newEpoch > s.currentEpoch {
+		s.currentEpoch = newEpoch
+	}
 }
 
 func (s *Sentinel) selfID() string {
@@ -48,13 +50,12 @@ func (s *Sentinel) selfID() string {
 }
 
 func (s *Sentinel) voteLeader(m *masterInstance, reqEpoch int, reqRunID string) (leaderEpoch int, leaderID string) {
-	if reqEpoch > s.getCurrentEpoch() {
-		s.updateEpoch(reqEpoch)
-	}
+	s.updateEpochIfNeeded(reqEpoch)
 	selfID := s.selfID()
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
+	var voteGranted bool
 	if m.leaderEpoch < reqEpoch {
 		m.leaderID = reqRunID
 		m.leaderEpoch = reqEpoch
@@ -63,13 +64,17 @@ func (s *Sentinel) voteLeader(m *masterInstance, reqEpoch int, reqRunID string) 
 		if m.leaderID != selfID {
 			m.failOverStartTime = time.Now()
 		}
+		voteGranted = true
 	}
+
 	leaderEpoch = m.leaderEpoch
 	leaderID = m.leaderID
-	s.logger.Debugw(logEventVotedFor,
-		"voted_for", leaderID,
-		"epoch", leaderEpoch,
-	)
+	if voteGranted {
+		s.logger.Debugw(logEventVotedFor,
+			"voted_for", leaderID,
+			"epoch", leaderEpoch,
+		)
+	}
 	return
 }
 

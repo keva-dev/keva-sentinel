@@ -202,13 +202,11 @@ func (s *Sentinel) parseInfoMaster(masterAddress string, info string) (bool, err
 				_, exist := m.slaves[addr]
 
 				if !exist {
-					newslave := newSlaveInstance(m.host, m.port, host, port, replOffset, m)
-
-					err := s.slaveFactory(newslave)
+					newslave, err := s.newSlaveInstance(m.host, m.port, host, port, replOffset, m)
 					if err != nil {
-						s.logger.Errorf("s.slaveFactory: %s", err)
 						continue
 					}
+
 					newSlaves = append(newSlaves, newslave)
 
 				}

@@ -33,17 +33,16 @@ type Config struct {
 }
 
 type MasterMonitor struct {
-	Name                 string          `mapstructure:"name"`
-	Addr                 string          `mapstructure:"addr"`
-	Quorum               int             `mapstructure:"quorum"`
-	DownAfter            time.Duration   `mapstructure:"down_after"`
-	FailoverTimeout      time.Duration   `mapstructure:"failover_timeout"`
-	ReconfigSlaveTimeout time.Duration   `mapstructure:"reconfig_slave_timeout"`
-	ConfigEpoch          int             `mapstructure:"config_epoch"` //epoch of master received from hello message
-	LeaderEpoch          int             `mapstructure:"config_epoch"` //last leader epoch
-	KnownReplicas        []KnownReplica  `mapstructure:"known_replicas"`
-	KnownSentinels       []KnownSentinel `mapstructure:"known_sentinels`
-	ParallelSync         int             `mapstructure:"parallel_sync"`
+	Name                 string         `mapstructure:"name"`
+	Addr                 string         `mapstructure:"addr"`
+	Quorum               int            `mapstructure:"quorum"`
+	DownAfter            time.Duration  `mapstructure:"down_after"`
+	FailoverTimeout      time.Duration  `mapstructure:"failover_timeout"`
+	ReconfigSlaveTimeout time.Duration  `mapstructure:"reconfig_slave_timeout"`
+	ConfigEpoch          int            `mapstructure:"config_epoch"` //epoch of master received from hello message
+	LeaderEpoch          int            `mapstructure:"config_epoch"` //last leader epoch
+	KnownReplicas        []KnownReplica `mapstructure:"known_replicas"`
+	ParallelSync         int            `mapstructure:"parallel_sync"`
 }
 type KnownSentinel struct {
 	ID   string

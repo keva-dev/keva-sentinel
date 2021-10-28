@@ -3,7 +3,9 @@ package sentinel
 import (
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -111,8 +113,8 @@ func (s *Sentinel) slaveInfoRoutine(sl *slaveInstance) {
 		}
 	}
 }
-func newSlaveInstance(masterHost, masterPort, host, port string, replOffset int, master *masterInstance) *slaveInstance {
-	return &slaveInstance{
+func (s *Sentinel) newSlaveInstance(masterHost, masterPort, host, port string, replOffset int, master *masterInstance) (*slaveInstance, error) {
+	newslave := &slaveInstance{
 		masterHost:           masterHost,
 		masterPort:           masterPort,
 		host:                 host,
@@ -123,10 +125,122 @@ func newSlaveInstance(masterHost, masterPort, host, port string, replOffset int,
 		masterDownNotify:     make(chan struct{}, 1),
 		masterRoleSwitchChan: make(chan struct{}),
 	}
+	err := s.slaveFactory(newslave)
+	if err != nil {
+		s.logger.Errorf("s.slaveFactory: %s", err)
+		return nil, err
+	}
+	return newslave, nil
+}
+func (s *Sentinel) sayHelloRoutineToSlave(sl *slaveInstance, helloChan HelloChan) {
+	for !sl.iskilled() {
+		time.Sleep(1 * time.Second)
+		m := sl.reportedMaster
+		m.mu.Lock()
+		masterName := m.name
+		masterIP := m.host
+		masterPort := m.port
+		masterConfigEpoch := m.configEpoch
+		m.mu.Unlock()
+		info := fmt.Sprintf("%s,%s,%s,%d,%s,%s,%s,%d",
+			s.conf.Binds[0], s.conf.Port, s.selfID(),
+			s.getCurrentEpoch(), masterName, masterIP, masterPort, masterConfigEpoch,
+		)
+		err := helloChan.Publish(info)
+		if err != nil {
+			s.logger.Errorf("helloChan.Publish: %s", err)
+		}
+	}
+}
+
+/* Format is composed of 8 tokens:
+ * 0=ip,1=port,2=runid,3=current_epoch,4=master_name,
+ * 5=master_ip,6=master_port,7=master_config_epoch. */
+func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
+	//TODO: handle connection lost/broken pipe
+	helloChan := sl.client.SubscribeHelloChan()
+
+	go s.sayHelloRoutineToSlave(sl, helloChan)
+	for !sl.iskilled() {
+		newmsg, err := helloChan.Receive()
+		if err != nil {
+			s.logger.Errorf("helloChan.Receive: %s", err)
+			continue
+			//skip for now
+		}
+		parts := strings.Split(newmsg, ",")
+		if len(parts) != 8 {
+			s.logger.Errorf("helloChan.Receive: invalid format for newmsg: %s", newmsg)
+			continue
+		}
+		runid := parts[2]
+		m := sl.reportedMaster
+		m.mu.Lock()
+		_, ok := m.sentinels[runid]
+		if !ok {
+			client, err := newRPCClient(parts[0], parts[1])
+			if err != nil {
+				s.logger.Errorf("newRPCClient: cannot create new client to other sentinel with info: %s: %s", newmsg, err)
+				m.mu.Unlock()
+				continue
+			}
+			si := &sentinelInstance{
+				mu:     sync.Mutex{},
+				sdown:  false,
+				client: client,
+				runID:  runid,
+			}
+
+			m.sentinels[runid] = si
+			s.logger.Infof("subscribeHello: connected to new sentinel: %s", newmsg)
+		}
+		m.mu.Unlock()
+
+		mname, mhost, mport := parts[4], parts[5], parts[6]
+
+		neighborEpoch, err := strconv.Atoi(parts[3])
+		if err != nil {
+			continue
+		}
+		neighborConfigEpoch, err := strconv.Atoi(parts[3])
+		if err != nil {
+			continue
+		}
+		s.mu.Lock()
+		currentEpoch := s.currentEpoch
+		if neighborEpoch > currentEpoch {
+			s.currentEpoch = neighborEpoch
+			// Not sure if this needs reseting anything in fsm
+			panic("not implemented")
+		}
+		s.mu.Unlock()
+		m.mu.Lock()
+		currentConfigEpoch := m.configEpoch
+		var switched bool
+		if currentConfigEpoch < neighborConfigEpoch {
+			name, host, port := m.name, m.host, m.port
+
+			if name != mname || port != mport || host != mhost {
+				switched = true
+				promotedSlave, exist := m.slaves[fmt.Sprintf("%s:%s", host, port)]
+				if !exist {
+					continue
+				}
+				m.promotedSlave = promotedSlave
+			}
+		}
+		if switched {
+			select {
+			case m.followerNewMasterNotify <- struct{}{}:
+			default:
+			}
+		}
+	}
 }
 
 func (s *Sentinel) slaveRoutine(sl *slaveInstance) {
 	go s.slaveInfoRoutine(sl)
+	go s.slaveHelloRoutine(sl)
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 	for !sl.iskilled() {

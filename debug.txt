@@ -1,0 +1,218 @@
+=== RUN   TestResetMasterInstance
+=== RUN   TestResetMasterInstance/select_slave_by_highest_offset
+2021/10/25 19:55:34 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:55:34 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:55:34.926+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "2fc68368-2568-45c4-8c4d-843522a5a257", "epoch": 0}
+2021-10-25T19:55:34.926+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "2fc68368-2568-45c4-8c4d-843522a5a257", "epoch": 0}
+2021/10/25 19:55:34 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:55:34 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:55:34.926+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "2fc68368-2568-45c4-8c4d-843522a5a257", "epoch": 0}
+2021/10/25 19:55:34 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:55:34 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:55:35.927+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,e8888876-9bee-4c80-9122-fb0c919fee08,0,mymaster,localhost,6767,0
+2021-10-25T19:55:35.927+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,e8888876-9bee-4c80-9122-fb0c919fee08,0,mymaster,localhost,6767,0
+2021-10-25T19:55:35.927+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,ad87e754-1503-4329-b5f2-70658e3ef3fd,0,mymaster,localhost,6767,0
+2021-10-25T19:55:35.927+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,ad87e754-1503-4329-b5f2-70658e3ef3fd,0,mymaster,localhost,6767,0
+2021-10-25T19:55:35.927+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,38388ef3-c838-4642-b976-f011bc6b9b1a,0,mymaster,localhost,6767,0
+2021-10-25T19:55:35.927+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,38388ef3-c838-4642-b976-f011bc6b9b1a,0,mymaster,localhost,6767,0
+2021-10-25T19:55:41.927+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:55:41.927+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:55:41.927+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/master.go:443	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/master.go:443	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/master.go:443	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "38388ef3-c838-4642-b976-f011bc6b9b1a", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "e8888876-9bee-4c80-9122-fb0c919fee08", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "e8888876-9bee-4c80-9122-fb0c919fee08", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "e8888876-9bee-4c80-9122-fb0c919fee08", "voted_for": "38388ef3-c838-4642-b976-f011bc6b9b1a", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "ad87e754-1503-4329-b5f2-70658e3ef3fd", "voted_for": "e8888876-9bee-4c80-9122-fb0c919fee08", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "ad87e754-1503-4329-b5f2-70658e3ef3fd", "voted_for": "e8888876-9bee-4c80-9122-fb0c919fee08", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "38388ef3-c838-4642-b976-f011bc6b9b1a", "voted_for": "e8888876-9bee-4c80-9122-fb0c919fee08", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "38388ef3-c838-4642-b976-f011bc6b9b1a", "voted_for": "e8888876-9bee-4c80-9122-fb0c919fee08", "epoch": 1}
+2021-10-25T19:55:42.928+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "e8888876-9bee-4c80-9122-fb0c919fee08", "voted_for": "38388ef3-c838-4642-b976-f011bc6b9b1a", "epoch": 1}
+2021-10-25T19:55:43.816+0700	[35mDEBUG[0m	go-sentinel/master.go:479	sentinel_became_leader	{"run_id": "e8888876-9bee-4c80-9122-fb0c919fee08", "epoch": 1}
+2021-10-25T19:55:43.816+0700	[35mDEBUG[0m	go-sentinel/master.go:487	failover_state_change	{"new_state": "select_slave", "epoch": 1}
+2021-10-25T19:55:43.816+0700	[35mDEBUG[0m	go-sentinel/master.go:506	slave_selected	{"slave_addr": "localhost:2", "slave_id": "d96d304e-8cfe-45bc-a984-80eb905ce53b", "epoch": 1}
+2021-10-25T19:55:43.816+0700	[35mDEBUG[0m	go-sentinel/master.go:512	failover_state_change	{"new_state": "promote_slave", "epoch": 1}
+2021-10-25T19:55:43.928+0700	[35mDEBUG[0m	go-sentinel/master.go:266	slave_promoted	{"run_id": "d96d304e-8cfe-45bc-a984-80eb905ce53b", "epoch": 1}
+    sentinel_test.go:573: 
+        	Error Trace:	sentinel_test.go:573
+        	            				sentinel_test.go:529
+        	            				sentinel_test.go:491
+        	            				sentinel_test.go:503
+        	Error:      	Condition never satisfied
+        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
+    sentinel_test.go:492: 
+        	Error Trace:	sentinel_test.go:492
+        	            				sentinel_test.go:503
+        	Error:      	Not equal: 
+        	            	expected: "d96d304e-8cfe-45bc-a984-80eb905ce53b"
+        	            	actual  : ""
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1 +1 @@
+        	            	-d96d304e-8cfe-45bc-a984-80eb905ce53b
+        	            	+
+        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
+    sentinel_test.go:494: 
+        	Error Trace:	sentinel_test.go:494
+        	            				sentinel_test.go:503
+        	Error:      	failover failed
+        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
+        	Messages:   	term 2 has no new master instantiated
+=== RUN   TestResetMasterInstance/select_slave_by_highest_priority
+2021/10/25 19:55:49 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:55:49 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:55:49.030+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "f15ab283-7dde-4a4f-b660-5ede393d730c", "epoch": 0}
+2021/10/25 19:55:49 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:55:49 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/25 19:55:49 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:55:49 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:55:49.030+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "f15ab283-7dde-4a4f-b660-5ede393d730c", "epoch": 0}
+2021-10-25T19:55:49.030+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "f15ab283-7dde-4a4f-b660-5ede393d730c", "epoch": 0}
+2021-10-25T19:55:50.033+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,8bc5b7ec-2729-45d4-bb1e-b439d2866fee,0,mymaster,localhost,6767,0
+2021-10-25T19:55:50.033+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,8bc5b7ec-2729-45d4-bb1e-b439d2866fee,0,mymaster,localhost,6767,0
+2021-10-25T19:55:50.035+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,28a8355d-7d68-4396-8cf2-18261582302f,0,mymaster,localhost,6767,0
+2021-10-25T19:55:50.035+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,28a8355d-7d68-4396-8cf2-18261582302f,0,mymaster,localhost,6767,0
+2021-10-25T19:55:50.036+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,990006a0-b116-4c32-993f-dafd2ab48989,0,mymaster,localhost,6767,0
+2021-10-25T19:55:50.036+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,990006a0-b116-4c32-993f-dafd2ab48989,0,mymaster,localhost,6767,0
+2021-10-25T19:55:53.014+0700	[35mDEBUG[0m	go-sentinel/master.go:528	failover_state_change	{"new_state": "none", "epoch": 1}
+2021-10-25T19:55:53.015+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "38388ef3-c838-4642-b976-f011bc6b9b1a", "voted_for": "e8888876-9bee-4c80-9122-fb0c919fee08", "epoch": 1}
+2021-10-25T19:55:53.015+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "e8888876-9bee-4c80-9122-fb0c919fee08", "voted_for": "38388ef3-c838-4642-b976-f011bc6b9b1a", "epoch": 1}
+2021-10-25T19:55:53.782+0700	[35mDEBUG[0m	go-sentinel/master.go:528	failover_state_change	{"new_state": "none", "epoch": 1}
+2021-10-25T19:55:53.783+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "e8888876-9bee-4c80-9122-fb0c919fee08", "voted_for": "38388ef3-c838-4642-b976-f011bc6b9b1a", "epoch": 1}
+2021-10-25T19:55:53.783+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "ad87e754-1503-4329-b5f2-70658e3ef3fd", "voted_for": "e8888876-9bee-4c80-9122-fb0c919fee08", "epoch": 1}
+2021-10-25T19:55:53.935+0700	[35mDEBUG[0m	go-sentinel/master.go:272	done
+2021-10-25T19:55:53.935+0700	[35mDEBUG[0m	go-sentinel/master.go:273	failover_state_change	{"epoch": 1, "new_state": "reset_instance"}
+2021-10-25T19:55:53.935+0700	[35mDEBUG[0m	go-sentinel/master.go:354	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x20 pc=0x83e20e]
+
+goroutine 419 [running]:
+github.com/keva-dev/go-sentinel.(*ToyKeva).isAlive(0x3b9aca00)
+	/var/www/go/go-sentinel/toy.go:95 +0x2e
+github.com/keva-dev/go-sentinel.(*toyClient).Ping(0xc000300150)
+	/var/www/go/go-sentinel/toy.go:190 +0x25
+github.com/keva-dev/go-sentinel.(*Sentinel).slaveRoutine(0xc000162160, 0xc0003dc700)
+	/var/www/go/go-sentinel/slave.go:139 +0x102
+created by github.com/keva-dev/go-sentinel.(*Sentinel).resetMasterInstance
+	/var/www/go/go-sentinel/master.go:352 +0xa1b
+exit status 2
+FAIL	github.com/keva-dev/go-sentinel	19.020s
+=== RUN   TestResetMasterInstance
+=== RUN   TestResetMasterInstance/select_slave_by_highest_offset
+2021-10-25T19:57:13.383+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "ba070662-4d2d-4575-9fd3-686a18675606", "epoch": 0}
+2021-10-25T19:57:13.383+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "ba070662-4d2d-4575-9fd3-686a18675606", "epoch": 0}
+2021-10-25T19:57:13.383+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "ba070662-4d2d-4575-9fd3-686a18675606", "epoch": 0}
+2021/10/25 19:57:13 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:57:13 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:57:13 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/25 19:57:13 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/25 19:57:13 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:57:13 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:57:14.384+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,148e5960-7ccb-4e93-b647-677bd1867b10,0,mymaster,localhost,6767,0
+2021-10-25T19:57:14.384+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,c5d94efb-ff5e-4526-9823-78f8dcdfb1ba,0,mymaster,localhost,6767,0
+2021-10-25T19:57:14.384+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,c5d94efb-ff5e-4526-9823-78f8dcdfb1ba,0,mymaster,localhost,6767,0
+2021-10-25T19:57:14.385+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,148e5960-7ccb-4e93-b647-677bd1867b10,0,mymaster,localhost,6767,0
+2021-10-25T19:57:14.385+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,e3320679-3aaf-48d8-b488-66927465fa15,0,mymaster,localhost,6767,0
+2021-10-25T19:57:14.385+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,e3320679-3aaf-48d8-b488-66927465fa15,0,mymaster,localhost,6767,0
+2021-10-25T19:57:20.384+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:57:20.384+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:57:20.384+0700	[33mWARN[0m	go-sentinel/master.go:35	master mymaster is subjectively down
+2021-10-25T19:57:21.385+0700	[35mDEBUG[0m	go-sentinel/master.go:443	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-25T19:57:21.385+0700	[35mDEBUG[0m	go-sentinel/master.go:443	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-25T19:57:21.385+0700	[35mDEBUG[0m	go-sentinel/master.go:443	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-25T19:57:21.385+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "148e5960-7ccb-4e93-b647-677bd1867b10", "epoch": 1}
+2021-10-25T19:57:21.385+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "148e5960-7ccb-4e93-b647-677bd1867b10", "epoch": 1}
+2021-10-25T19:57:21.386+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "c5d94efb-ff5e-4526-9823-78f8dcdfb1ba", "voted_for": "148e5960-7ccb-4e93-b647-677bd1867b10", "epoch": 1}
+2021-10-25T19:57:21.386+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "e3320679-3aaf-48d8-b488-66927465fa15", "epoch": 1}
+2021-10-25T19:57:21.386+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "e3320679-3aaf-48d8-b488-66927465fa15", "voted_for": "148e5960-7ccb-4e93-b647-677bd1867b10", "epoch": 1}
+2021-10-25T19:57:21.386+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "c5d94efb-ff5e-4526-9823-78f8dcdfb1ba", "voted_for": "148e5960-7ccb-4e93-b647-677bd1867b10", "epoch": 1}
+2021-10-25T19:57:21.386+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "e3320679-3aaf-48d8-b488-66927465fa15", "voted_for": "148e5960-7ccb-4e93-b647-677bd1867b10", "epoch": 1}
+2021-10-25T19:57:21.386+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "148e5960-7ccb-4e93-b647-677bd1867b10", "voted_for": "e3320679-3aaf-48d8-b488-66927465fa15", "epoch": 1}
+2021-10-25T19:57:21.386+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "148e5960-7ccb-4e93-b647-677bd1867b10", "voted_for": "e3320679-3aaf-48d8-b488-66927465fa15", "epoch": 1}
+2021-10-25T19:57:21.466+0700	[35mDEBUG[0m	go-sentinel/master.go:479	sentinel_became_leader	{"run_id": "148e5960-7ccb-4e93-b647-677bd1867b10", "epoch": 1}
+2021-10-25T19:57:21.466+0700	[35mDEBUG[0m	go-sentinel/master.go:487	failover_state_change	{"new_state": "select_slave", "epoch": 1}
+2021-10-25T19:57:21.466+0700	[35mDEBUG[0m	go-sentinel/master.go:506	slave_selected	{"slave_addr": "localhost:0", "slave_id": "de79d491-feea-41a9-b59e-5920c5aa40c5", "epoch": 1}
+2021-10-25T19:57:21.466+0700	[35mDEBUG[0m	go-sentinel/master.go:512	failover_state_change	{"new_state": "promote_slave", "epoch": 1}
+2021-10-25T19:57:22.386+0700	[35mDEBUG[0m	go-sentinel/master.go:266	slave_promoted	{"run_id": "de79d491-feea-41a9-b59e-5920c5aa40c5", "epoch": 1}
+    sentinel_test.go:573: 
+        	Error Trace:	sentinel_test.go:573
+        	            				sentinel_test.go:529
+        	            				sentinel_test.go:491
+        	            				sentinel_test.go:503
+        	Error:      	Condition never satisfied
+        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
+    sentinel_test.go:492: 
+        	Error Trace:	sentinel_test.go:492
+        	            				sentinel_test.go:503
+        	Error:      	Not equal: 
+        	            	expected: "de79d491-feea-41a9-b59e-5920c5aa40c5"
+        	            	actual  : ""
+        	            	
+        	            	Diff:
+        	            	--- Expected
+        	            	+++ Actual
+        	            	@@ -1 +1 @@
+        	            	-de79d491-feea-41a9-b59e-5920c5aa40c5
+        	            	+
+        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
+    sentinel_test.go:494: 
+        	Error Trace:	sentinel_test.go:494
+        	            				sentinel_test.go:503
+        	Error:      	failover failed
+        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
+        	Messages:   	term 2 has no new master instantiated
+=== RUN   TestResetMasterInstance/select_slave_by_highest_priority
+2021/10/25 19:57:27 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:57:27 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:57:27.487+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "d6fcdc3e-4497-4bdd-a963-b4e427f8d9f4", "epoch": 0}
+2021-10-25T19:57:27.487+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "d6fcdc3e-4497-4bdd-a963-b4e427f8d9f4", "epoch": 0}
+2021-10-25T19:57:27.487+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "d6fcdc3e-4497-4bdd-a963-b4e427f8d9f4", "epoch": 0}
+2021/10/25 19:57:27 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:57:27 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/25 19:57:27 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/25 19:57:27 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-25T19:57:28.489+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,5e73a71c-b414-408e-a12b-a23afc908596,0,mymaster,localhost,6767,0
+2021-10-25T19:57:28.489+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2001,5e73a71c-b414-408e-a12b-a23afc908596,0,mymaster,localhost,6767,0
+2021-10-25T19:57:28.489+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,21d8e249-3261-4931-a38d-f00611cfe441,0,mymaster,localhost,6767,0
+2021-10-25T19:57:28.489+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2000,21d8e249-3261-4931-a38d-f00611cfe441,0,mymaster,localhost,6767,0
+2021-10-25T19:57:28.491+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,e1c8848a-e48e-4b30-bef6-7f315a06fdb7,0,mymaster,localhost,6767,0
+2021-10-25T19:57:28.491+0700	[34mINFO[0m	go-sentinel/master.go:149	subscribeHello: connected to new sentinel: localhost,2002,e1c8848a-e48e-4b30-bef6-7f315a06fdb7,0,mymaster,localhost,6767,0
+2021-10-25T19:57:32.239+0700	[35mDEBUG[0m	go-sentinel/master.go:528	failover_state_change	{"new_state": "none", "epoch": 1}
+2021-10-25T19:57:32.239+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "e3320679-3aaf-48d8-b488-66927465fa15", "voted_for": "148e5960-7ccb-4e93-b647-677bd1867b10", "epoch": 1}
+2021-10-25T19:57:32.239+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "148e5960-7ccb-4e93-b647-677bd1867b10", "voted_for": "e3320679-3aaf-48d8-b488-66927465fa15", "epoch": 1}
+2021-10-25T19:57:32.281+0700	[35mDEBUG[0m	go-sentinel/master.go:528	failover_state_change	{"new_state": "none", "epoch": 1}
+2021-10-25T19:57:32.281+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "148e5960-7ccb-4e93-b647-677bd1867b10", "voted_for": "e3320679-3aaf-48d8-b488-66927465fa15", "epoch": 1}
+2021-10-25T19:57:32.281+0700	[35mDEBUG[0m	go-sentinel/master.go:654	neighbor_sentinel_voted_for	{"neighbor_id": "c5d94efb-ff5e-4526-9823-78f8dcdfb1ba", "voted_for": "148e5960-7ccb-4e93-b647-677bd1867b10", "epoch": 1}
+2021-10-25T19:57:32.393+0700	[35mDEBUG[0m	go-sentinel/master.go:272	failover_state_change	{"epoch": 1, "new_state": "reset_instance"}
+2021-10-25T19:57:32.393+0700	[35mDEBUG[0m	go-sentinel/master.go:353	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+2021-10-25T19:57:32.393+0700	[35mDEBUG[0m	go-sentinel/master.go:157	master_instance_created	{"master_name": "mymaster", "run_id": "de79d491-feea-41a9-b59e-5920c5aa40c5", "epoch": 0}
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x20 pc=0x83e2ce]
+
+goroutine 424 [running]:
+github.com/keva-dev/go-sentinel.(*ToyKeva).isAlive(0x3b9aca00)
+	/var/www/go/go-sentinel/toy.go:95 +0x2e
+github.com/keva-dev/go-sentinel.(*toyClient).Ping(0xc0002b2168)
+	/var/www/go/go-sentinel/toy.go:190 +0x25
+github.com/keva-dev/go-sentinel.(*Sentinel).slaveRoutine(0xc000146b00, 0xc0002d2700)
+	/var/www/go/go-sentinel/slave.go:139 +0x102
+created by github.com/keva-dev/go-sentinel.(*Sentinel).resetMasterInstance
+	/var/www/go/go-sentinel/master.go:351 +0x9fb
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x20 pc=0x83d78b]
+
+goroutine 368 [running]:
+github.com/keva-dev/go-sentinel.(*ToyKeva).info(0x0)
+	/var/www/go/go-sentinel/toy.go:29 +0x4b
+github.com/keva-dev/go-sentinel.(*toyClient).Info(0xc00031a230)
+	/var/www/go/go-sentinel/toy.go:173 +0x1c
+github.com/keva-dev/go-sentinel.(*Sentinel).slaveInfoRoutine(0xc000146b00, 0xc0002d2700)
+	/var/www/go/go-sentinel/slave.go:73 +0x8f
+created by github.com/keva-dev/go-sentinel.(*Sentinel).slaveRoutine
+	/var/www/go/go-sentinel/slave.go:135 +0x8f
+exit status 2
+FAIL	github.com/keva-dev/go-sentinel	19.033s

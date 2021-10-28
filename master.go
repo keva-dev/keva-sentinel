@@ -92,7 +92,7 @@ func (m *masterInstance) getState() masterInstanceState {
 }
 
 // for now, only say hello through master, redis also say hello through slaves
-func (s *Sentinel) sayHelloRoutine(m *masterInstance, helloChan HelloChan) {
+func (s *Sentinel) sayHelloRoutineToMaster(m *masterInstance, helloChan HelloChan) {
 	for !m.killed() {
 		time.Sleep(1 * time.Second)
 		m.mu.Lock()
@@ -112,10 +112,15 @@ func (s *Sentinel) sayHelloRoutine(m *masterInstance, helloChan HelloChan) {
 	}
 }
 
+/* Format is composed of 8 tokens:
+ * 0=ip,1=port,2=runid,3=current_epoch,4=master_name,
+ * 5=master_ip,6=master_port,7=master_config_epoch.
+ */
+// Todo: this function is per instance, not per master
 func (s *Sentinel) subscribeHello(m *masterInstance) {
 	helloChan := m.client.SubscribeHelloChan()
 
-	go s.sayHelloRoutine(m, helloChan)
+	go s.sayHelloRoutineToMaster(m, helloChan)
 	for !m.killed() {
 		newmsg, err := helloChan.Receive()
 		if err != nil {
@@ -154,7 +159,12 @@ func (s *Sentinel) subscribeHello(m *masterInstance) {
 }
 
 func (s *Sentinel) masterRoutine(m *masterInstance) {
-
+	s.logger.Debugw(logEventMasterInstanceCreated,
+		"master_name", m.name,
+		"run_id", m.runID,
+		"sentinel_run_id", s.runID,
+		"epoch", m.configEpoch,
+	)
 	go s.masterPingRoutine(m)
 	go s.subscribeHello(m)
 	infoTicker := time.NewTicker(10 * time.Second)
@@ -181,6 +191,8 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 					// continue for now
 				}
 				if roleSwitched {
+					// if master has been switched to slave, this loop should
+					// should have been killed and started as a loop for slave
 					panic("unimlemented")
 					//TODO
 					// s.parseInfoSlave()
@@ -222,11 +234,28 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 		failOverFSM:
 			for {
 				switch m.getFailOverState() {
+				// non-leader can not reach next step
 				case failOverWaitLeaderElection:
-					aborted := s.checkElectionStatus(m)
+					aborted, isleader := s.checkElectionStatus(m)
+					if isleader {
+						// to next state of fsm
+						continue
+					}
 					if aborted {
 						stopAskingOtherSentinels()
 						break failOverFSM
+					}
+					ticker := time.NewTicker(1 * time.Second)
+
+					select {
+					case <-ticker.C:
+					case <-m.followerNewMasterNotify:
+						stopAskingOtherSentinels()
+						s.resetMasterInstance(m)
+
+						// this is a follower sentinel and new master recognize
+						// from leader sentinel through hello message
+						return
 					}
 
 				case failOverSelectSlave:
@@ -263,8 +292,11 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 					}
 				case failOverReconfSlave:
 					s.reconfigRemoteSlaves(m)
+					s.logger.Debugw(logEventFailoverStateChanged,
+						"epoch", m.getFailOverEpoch(),
+						"new_state", failOverResetInstance)
 					s.resetMasterInstance(m)
-					time.Sleep(1 * time.Second)
+
 				}
 			}
 		}
@@ -272,6 +304,7 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 }
 func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 	m.mu.Lock()
+	epoch := m.failOverEpoch
 	promoted := m.promotedSlave
 	name := m.name
 	m.isKilled = true
@@ -310,7 +343,11 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 		// kill all running slaves routine, for simplicity
 		sl.killed = true
 		if sl.addr != promotedAddr {
-			newSlaves[sl.addr] = newSlaveInstance(host, port, sl.host, sl.port, sl.replOffset, newMaster)
+			newslave, err := s.newSlaveInstance(host, port, sl.host, sl.port, sl.replOffset, newMaster)
+			if err != nil {
+				continue
+			}
+			newSlaves[sl.addr] = newslave
 		}
 
 		sl.mu.Unlock()
@@ -318,7 +355,12 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 
 	oldAddr := fmt.Sprintf("%s:%s", m.host, m.port)
 	// turn dead master into slave as well
-	newSlaves[oldAddr] = newSlaveInstance(host, port, m.host, m.port, 0, newMaster)
+	newslave, err := s.newSlaveInstance(host, port, m.host, m.port, 0, newMaster)
+	if err != nil {
+
+	} else {
+		newSlaves[oldAddr] = newslave
+	}
 
 	m.slaves = newSlaves
 	m.mu.Unlock()
@@ -327,12 +369,14 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 	delete(s.masterInstances, oldAddr)
 	s.masterInstances[newMaster.getAddr()] = newMaster
 	s.mu.Unlock()
-	panic("not reached")
 
 	for idx := range newSlaves {
 		go s.slaveRoutine(newSlaves[idx])
 	}
-
+	s.logger.Debugw(logEventFailoverStateChanged,
+		"new_state", failOverDone,
+		"epoch", epoch,
+	)
 	go s.masterRoutine(newMaster)
 }
 
@@ -438,19 +482,17 @@ func (s *Sentinel) checkIfShouldFailover(m *masterInstance) (startFailover bool)
 	return false
 }
 
-func (s *Sentinel) checkElectionStatus(m *masterInstance) (aborted bool) {
+func (s *Sentinel) checkElectionStatus(m *masterInstance) (aborted bool, isLeader bool) {
 	leader, epoch := s.checkWhoIsLeader(m)
-	isLeader := leader != "" && leader == s.selfID()
+	isLeader = leader != "" && leader == s.selfID()
 
 	if !isLeader {
-		time.Sleep(1 * time.Second)
-
 		//abort if failover take too long
 		if time.Since(m.getFailOverStartTime()) > m.sentinelConf.FailoverTimeout {
 			s.abortFailover(m)
-			return true
+			return true, false
 		}
-		return false
+		return false, false
 	}
 
 	// do not call cancel(), keep receiving update from other sentinel
@@ -466,7 +508,7 @@ func (s *Sentinel) checkElectionStatus(m *masterInstance) (aborted bool) {
 		"new_state", failOverSelectSlave,
 		"epoch", epoch, // epoch = failover epoch = sentinel current epoch
 	)
-	return false
+	return false, true
 }
 
 func (s *Sentinel) promoteSlave(m *masterInstance, slave *slaveInstance) {
@@ -596,6 +638,7 @@ func (s *Sentinel) askOtherSentinelsEach1Sec(ctx context.Context, m *masterInsta
 	for idx := range m.sentinels {
 		sentinel := m.sentinels[idx]
 		go func() {
+			var loggedForNeighbor bool
 			for m.getState() >= masterStateSubjDown {
 				select {
 				case <-ctx.Done():
@@ -627,11 +670,14 @@ func (s *Sentinel) askOtherSentinelsEach1Sec(ctx context.Context, m *masterInsta
 					sentinel.sdown = reply.MasterDown
 
 					if reply.VotedLeaderID != "" {
-						s.logger.Debugw(logEventNeighborVotedFor,
-							"neighbor_id", sentinel.runID,
-							"voted_for", reply.VotedLeaderID,
-							"epoch", reply.LeaderEpoch,
-						)
+						if !loggedForNeighbor {
+							s.logger.Debugw(logEventNeighborVotedFor,
+								"neighbor_id", sentinel.runID,
+								"voted_for", reply.VotedLeaderID,
+								"epoch", reply.LeaderEpoch,
+							)
+							loggedForNeighbor = true
+						}
 						sentinel.leaderEpoch = reply.LeaderEpoch
 						sentinel.leaderID = reply.VotedLeaderID
 					}
@@ -706,9 +752,10 @@ type masterInstance struct {
 	client        InternalClient
 	// infoClient   internalClient
 
-	state          masterInstanceState
-	subjDownNotify chan struct{}
-	downSince      time.Time
+	state                   masterInstanceState
+	subjDownNotify          chan struct{}
+	followerNewMasterNotify chan struct{}
+	downSince               time.Time
 
 	lastSuccessfulPing time.Time
 
@@ -717,8 +764,8 @@ type masterInstance struct {
 	failOverStartTime       time.Time
 	failOverStateChangeTime time.Time
 
-	leaderEpoch int
-	leaderID    string
+	leaderEpoch int    // epoch of current leader, only set during failover
+	leaderID    string // current leader id
 	// failOverStartTime time.Time
 
 	configEpoch int
@@ -732,12 +779,16 @@ var (
 	failOverSelectSlave        failOverState = 2
 	failOverPromoteSlave       failOverState = 3
 	failOverReconfSlave        failOverState = 4
+	failOverResetInstance      failOverState = 5
+	failOverDone               failOverState = 6
 	failOverStateValueMap                    = map[string]failOverState{
 		"none":                 failOverNone,
 		"wait_leader_election": failOverWaitLeaderElection,
 		"select_slave":         failOverSelectSlave,
 		"promote_slave":        failOverPromoteSlave,
 		"reconfig_slave":       failOverReconfSlave,
+		"failover_done":        failOverDone,
+		"reset_instance":       failOverResetInstance,
 	}
 	failOverStateMap = map[failOverState]string{
 		0: "none",
@@ -745,6 +796,8 @@ var (
 		2: "select_slave",
 		3: "promote_slave",
 		4: "reconfig_slave",
+		5: "reset_instance",
+		6: "failover_done",
 	}
 )
 

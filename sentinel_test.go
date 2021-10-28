@@ -51,13 +51,15 @@ type testSuite struct {
 	t            *testing.T
 }
 type history struct {
-	currentLeader      string
-	currentTerm        int
-	termsVote          map[int][]termInfo // key by term seq, val is array of each sentinels' term info
-	termsLeader        map[int]string
-	termsSelectedSlave map[int]string
-	termsPromotedSlave map[int]string
-	failOverStates     map[int]failOverState // capture current failoverstate of each instance
+	currentLeader               string
+	currentTerm                 int
+	termsVote                   map[int][]termInfo // key by term seq, val is array of each sentinels' term info
+	termsLeader                 map[int]string
+	termsSelectedSlave          map[int]string
+	termsPromotedSlave          map[int]string
+	termsMasterID               map[int]string
+	termsMasterInstanceCreation map[int][]string      // check which sentinel has initialize master instance
+	failOverStates              map[int]failOverState // capture current failoverstate of each instance
 }
 type termInfo struct {
 	selfVote      string
@@ -108,12 +110,13 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 	mapRunIDToIdx := map[string]int{}
 	mapIdxToRunID := map[int]string{}
 	for i := 0; i < numInstances; i++ {
+		localIdx := i
 		// start new sentinel instance
 		s, err := NewFromConfig(conf)
 		assert.NoError(t, err)
-		s.conf.Port = strconv.Itoa(basePort + i)
-		mapRunIDToIdx[s.runID] = i
-		mapIdxToRunID[i] = s.runID
+		s.conf.Port = strconv.Itoa(basePort + localIdx)
+		mapRunIDToIdx[s.runID] = localIdx
+		mapIdxToRunID[localIdx] = s.runID
 
 		// a function to create fake client from sentinel to master
 		s.clientFactory = func(addr string) (InternalClient, error) {
@@ -123,14 +126,14 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 				instance = master
 			}
 			client := NewToyKevaClient(instance)
-			masterLinks[i] = client
+			masterLinks[localIdx] = client
 			testLock.Unlock()
 			return client, nil
 		}
 
 		s.slaveFactory = toySlaveFactory
 		customLogger, observer := customLogObserver()
-		logObservers[i] = observer
+		logObservers[localIdx] = observer
 		s.logger = customLogger
 		err = s.Start()
 		assert.NoError(t, err)
@@ -163,6 +166,7 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 			failOverStates:     map[int]failOverState{},
 			termsSelectedSlave: map[int]string{},
 			termsPromotedSlave: map[int]string{},
+			termsMasterID:      map[int]string{},
 		},
 		mapRunIDtoIdx: mapRunIDToIdx,
 		logObservers:  logObservers,
@@ -468,6 +472,72 @@ func TestPromoteSlave(t *testing.T) {
 			return nil
 		})
 	})
+}
+func TestResetMasterInstance(t *testing.T) {
+	// slaveCustomizer let test customize initial slave config (offset, priority) to check if sentinel choose
+	// correct instance for failover
+	assertion := func(t *testing.T, numInstances int, slaveCustomizer func(map[string]*ToyKeva) *ToyKeva) {
+		suite := setupWithCustomConfig(t, numInstances, func(c *Config) {
+			c.Masters[0].Quorum = numInstances/2 + 1 // force normal quorum
+		})
+		expectedNewMaster := slaveCustomizer(suite.slavesMap)
+		expectedNewMaster.mu.Lock()
+		expectedID := expectedNewMaster.id
+		expectedNewMaster.mu.Unlock()
+		suite.master.kill()
+		time.Sleep(suite.conf.Masters[0].DownAfter)
+		//TODO: check more info of this recognized leader
+		promotedSlave := suite.checkTermPromotedSlave(1)
+		suite.checkClusterHasLeader()
+		newRunID := suite.checkTermMasterRunID(1)
+		assert.Equal(t, promotedSlave, newRunID)
+		if newRunID == "" {
+			assert.FailNowf(t, "failover failed", "term %d has no new master instantiated", 2)
+		} else {
+			suite.mu.Lock()
+			if newRunID != expectedID {
+				assert.FailNowf(t, "failover to wrong master", "term %d wants master %s instead of %s", expectedID, newRunID)
+			}
+		}
+	}
+	t.Run("select slave by highest offset", func(t *testing.T) {
+		assertion(t, 3, func(slaveMap map[string]*ToyKeva) *ToyKeva {
+			for idx := range slaveMap {
+				slave := slaveMap[idx]
+				slave.mu.Lock()
+				slave.offset = 10
+				slave.mu.Unlock()
+				return slave
+			}
+			return nil
+		})
+	})
+	t.Run("select slave by highest priority", func(t *testing.T) {
+		assertion(t, 3, func(slaveMap map[string]*ToyKeva) *ToyKeva {
+			for idx := range slaveMap {
+				slave := slaveMap[idx]
+				slave.mu.Lock()
+				slave.priority = 10
+				slave.mu.Unlock()
+				return slave
+			}
+			return nil
+		})
+	})
+}
+func (s *testSuite) checkTermMasterRunID(term int) string {
+	var ret string
+	eventually(s.t, func() bool {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		runID, exist := s.termsMasterID[term]
+		if exist && runID != "" {
+			ret = runID
+			return true
+		}
+		return false
+	}, 5*time.Second)
+	return ret
 }
 
 func (s *testSuite) checkTermPromotedSlave(term int) string {

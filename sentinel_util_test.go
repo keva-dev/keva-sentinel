@@ -34,6 +34,26 @@ func (suite *testSuite) handleLogEventSentinelVotedFor(instanceIdx int, log obse
 	}
 	suite.termsVote[term][instanceIdx] = termInfo
 }
+func (suite *testSuite) handleLogEventMasterInstanceCreated(instanceIdx int, log observer.LoggedEntry) {
+	ctxMap := log.ContextMap()
+	// TODO: add master name when sentinel can handle multile masters masterName := ctxMap["master_name"].(string)
+	runID := ctxMap["run_id"].(string)
+	term := int(ctxMap["epoch"].(int64))
+	sentinelRunID := ctxMap["sentinel_run_id"].(string)
+	suite.mu.Lock()
+	defer suite.mu.Unlock()
+	previousMasterID, exist := suite.termsMasterID[term]
+	if exist {
+		if previousMasterID != runID {
+			assert.Failf(suite.t, "conflict master id per term", "term %d has multiple master ID: %s and %s", previousMasterID,
+				runID)
+
+			return
+		}
+	}
+	suite.termsMasterID[term] = runID
+	suite.termsMasterInstanceCreation[term] = append(suite.termsMasterInstanceCreation[term], sentinelRunID)
+}
 
 func (suite *testSuite) handleLogEventSlavePromoted(instanceIdx int, log observer.LoggedEntry) {
 	ctxMap := log.ContextMap()
@@ -109,8 +129,11 @@ func (suite *testSuite) handleLogEventFailoverStateChanged(instanceIdx int, log 
 		}
 	case failOverNone:
 		if oldState != failOverWaitLeaderElection && oldState != failOverSelectSlave {
-			assert.Failf(suite.t, "log consume error", "can only transition from %s to %s, but have %s to %s",
-				failOverWaitLeaderElection, failOverNone, oldState, failOverNone)
+			assert.Failf(suite.t, "log consume error", "invalid failover state transition from %s to %s", oldState, newState)
+		}
+	case failOverDone:
+		if oldState != failOverReconfSlave {
+			assert.Failf(suite.t, "log consume error", "invalid failover state transition from %s to %s", oldState, newState)
 		}
 	default:
 		assert.Failf(suite.t, "log consume error", "invalid failover state: %d", newState)
@@ -166,6 +189,8 @@ func (s *testSuite) consumeLogs(instanceIdx int, observer *observer.ObservedLogs
 				s.handleLogEventSelectedSlave(instanceIdx, entry)
 			case logEventSlavePromoted:
 				s.handleLogEventSlavePromoted(instanceIdx, entry)
+			case logEventMasterInstanceCreated:
+				s.handleLogEventMasterInstanceCreated(instanceIdx, entry)
 			}
 		}
 		time.Sleep(100 * time.Millisecond)
