@@ -234,6 +234,7 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 		s.mu.Lock()
 		currentEpoch := s.currentEpoch
 		if neighborEpoch > currentEpoch {
+			fmt.Printf("updateing sentinel epoch hello: %s %d\n", s.runID, neighborEpoch)
 			s.currentEpoch = neighborEpoch
 			// Not sure if this needs reseting anything in fsm
 			//TODO panic("not implemented")
@@ -256,11 +257,9 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 		}
 		m.mu.Unlock()
 		if switched {
-			fmt.Printf("switching.....%s\n", s.runID)
 			select {
 			case m.followerNewMasterNotify <- struct{}{}:
 			default:
-				fmt.Println("failed to switched")
 			}
 		}
 	}

@@ -239,7 +239,6 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 			case <-timer.C:
 			case <-m.followerNewMasterNotify:
 				stopAskingOtherSentinels()
-				fmt.Printf("switching::::::%s\n", s.runID)
 				s.resetMasterInstance(m, true)
 
 				// this is a follower sentinel and new master recognize
@@ -268,7 +267,6 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 					case <-ticker.C:
 					case <-m.followerNewMasterNotify:
 						stopAskingOtherSentinels()
-						fmt.Printf("switching::::::%s\n", s.runID)
 						s.resetMasterInstance(m, true)
 
 						// this is a follower sentinel and new master recognize
@@ -495,29 +493,43 @@ func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
 func (s *Sentinel) nextFailoverAllowed(m *masterInstance) time.Duration {
 	// this code only has to wait in case failover timeout reached and block until the next failover is allowed to
 	// continue (2* failover timeout)
-	secondsLeft := 2*m.sentinelConf.FailoverTimeout - time.Since(m.getFailOverStartTime())
+	retry := false
+	startTime := m.getFailOverStartTime()
+	secondsLeft := 2*m.sentinelConf.FailoverTimeout - time.Since(startTime)
 	if secondsLeft <= 0 {
 		locked(s.mu, func() {
-			s.currentEpoch += 1
 			locked(&m.mu, func() {
-				if m.failOverState != failOverWaitLeaderElection {
-					s.logger.Debugw(logEventFailoverStateChanged,
-						"new_state", failOverWaitLeaderElection,
-						"epoch", s.currentEpoch,
-					)
-					s.logger.Debugw(logEventRequestingElection,
-						"epoch", s.currentEpoch,
-						"sentinel_run_id", s.runID,
-					)
+				if m.failOverStartTime.Equal(startTime) {
+					// if some how, this sentinel receive new epoch from hello message
+					// it will uncessarily increment the epoch one more time, causing already
+					// voting candidates to fail, need logic to check this
+					// TODO
+					s.currentEpoch += 1
+					if m.failOverState != failOverWaitLeaderElection {
+						s.logger.Debugw(logEventFailoverStateChanged,
+							"new_state", failOverWaitLeaderElection,
+							"epoch", s.currentEpoch,
+						)
+						s.logger.Debugw(logEventRequestingElection,
+							"epoch", s.currentEpoch,
+							"sentinel_run_id", s.runID,
+						)
+					}
+					m.failOverState = failOverWaitLeaderElection
+					m.failOverStartTime = time.Now()
+					m.failOverEpoch = s.currentEpoch
+				} else {
+					// some other thread has modify this start time already
+					retry = true
 				}
-				m.failOverState = failOverWaitLeaderElection
-				m.failOverStartTime = time.Now()
-				m.failOverEpoch = s.currentEpoch
 			})
 		})
 		// mostly, when obj down is met, multiples sentinels will try to send request for vote to be leader
 		// to prevent split vote, sleep for a random small duration
 		secondsLeft = 0
+	}
+	if retry {
+		return s.nextFailoverAllowed(m)
 	}
 	return secondsLeft + time.Duration(rand.Intn(SENTINEL_MAX_DESYNC)*int(time.Millisecond))
 }

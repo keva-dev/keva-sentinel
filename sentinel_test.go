@@ -492,10 +492,7 @@ func TestResetMasterInstance(t *testing.T) {
 		newRunID := suite.checkTermMasterRunID(1)
 		assert.Equal(t, promotedSlave, newRunID)
 		if newRunID != "" {
-			suite.mu.Lock()
-			if newRunID != expectedID {
-				assert.FailNowf(t, "failover to wrong master", "term %d wants master %s instead of %s", expectedID, newRunID)
-			}
+			assert.Equal(t, newRunID, expectedID, "failover to wrong master", "term %d wants master %s instead of %s", expectedID, newRunID)
 		}
 
 		// check if all instance create new master instance
