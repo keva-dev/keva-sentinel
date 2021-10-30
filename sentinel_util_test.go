@@ -124,6 +124,8 @@ func (suite *testSuite) handleLogEventFailoverStateChanged(instanceIdx int, log 
 	case failOverPromoteSlave:
 		fallthrough
 	case failOverReconfSlave:
+		fallthrough
+	case failOverResetInstance:
 		if newState-oldState != 1 {
 			assert.Failf(suite.t, "log consume error", "invalid failover state transition from %s to %s", oldState, newState)
 		}
@@ -132,7 +134,7 @@ func (suite *testSuite) handleLogEventFailoverStateChanged(instanceIdx int, log 
 			assert.Failf(suite.t, "log consume error", "invalid failover state transition from %s to %s", oldState, newState)
 		}
 	case failOverDone:
-		if oldState != failOverReconfSlave {
+		if oldState != failOverResetInstance && oldState != failOverWaitLeaderElection {
 			assert.Failf(suite.t, "log consume error", "invalid failover state transition from %s to %s", oldState, newState)
 		}
 	default:

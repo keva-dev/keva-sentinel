@@ -12,17 +12,22 @@ import (
 	"golang.org/x/sync/semaphore"
 )
 
+func (m *masterInstance) keepSendingPeriodRequest() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.stopSendingRequest
+}
+
 func (m *masterInstance) killed() bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	return m.isKilled
-
 }
 
 func (s *Sentinel) masterPingRoutine(m *masterInstance) {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
-	for !m.killed() {
+	for !m.keepSendingPeriodRequest() {
 		<-ticker.C
 		_, err := m.client.Ping()
 		if err != nil {
@@ -93,7 +98,7 @@ func (m *masterInstance) getState() masterInstanceState {
 
 // for now, only say hello through master, redis also say hello through slaves
 func (s *Sentinel) sayHelloRoutineToMaster(m *masterInstance, helloChan HelloChan) {
-	for !m.killed() {
+	for !m.keepSendingPeriodRequest() {
 		time.Sleep(2 * time.Second)
 		m.mu.Lock()
 		masterName := m.name
@@ -119,8 +124,9 @@ func (s *Sentinel) sayHelloRoutineToMaster(m *masterInstance, helloChan HelloCha
 // Todo: this function is per instance, not per master
 func (s *Sentinel) subscribeHello(m *masterInstance) {
 	helloChan := m.client.SubscribeHelloChan()
+	selfID := s.selfID()
 	go s.sayHelloRoutineToMaster(m, helloChan)
-	for !m.killed() {
+	for !m.keepSendingPeriodRequest() {
 		newmsg, err := helloChan.Receive()
 		if err != nil {
 			s.logger.Errorf("helloChan.Receive: %s", err)
@@ -133,6 +139,9 @@ func (s *Sentinel) subscribeHello(m *masterInstance) {
 			continue
 		}
 		runid := parts[2]
+		if runid == selfID {
+			continue
+		}
 		m.mu.Lock()
 		_, ok := m.sentinels[runid]
 		if !ok {
@@ -289,6 +298,9 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 							epoch = m.failOverEpoch
 							m.configEpoch = epoch
 						})
+						s.logger.Debugw(logEventFailoverStateChanged,
+							"epoch", m.getFailOverEpoch(),
+							"new_state", failOverReconfSlave)
 						s.logger.Debugw(logEventSlavePromoted,
 							"run_id", promotedSlave.runID,
 							"epoch", epoch)
@@ -312,6 +324,7 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 		epoch                                                   int
 		name                                                    string
 		promotedRunID, promotedAddr, promotedHost, promotedPort string
+		sentinels                                               map[string]*sentinelInstance
 	)
 	locked(&m.mu, func() {
 		epoch = m.failOverEpoch
@@ -319,6 +332,7 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 		name = m.name
 		m.isKilled = true
 		oldAddr = fmt.Sprintf("%s:%s", m.host, m.port)
+		sentinels = m.sentinels
 	})
 	locked(&promoted.mu, func() {
 		promotedAddr = promoted.addr
@@ -331,21 +345,21 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 		panic("todo")
 	}
 	newSlaves := map[string]*slaveInstance{}
-	fmt.Printf("here: %d\n", m.configEpoch)
 	newMaster := &masterInstance{
-		runID:              promotedRunID,
-		sentinelConf:       m.sentinelConf,
-		name:               name,
-		host:               promotedHost,
-		port:               promotedPort,
-		configEpoch:        m.configEpoch,
-		mu:                 sync.Mutex{},
-		client:             cl,
-		slaves:             map[string]*slaveInstance{},
-		sentinels:          map[string]*sentinelInstance{},
-		state:              masterStateUp,
-		lastSuccessfulPing: time.Now(),
-		subjDownNotify:     make(chan struct{}),
+		runID:                   promotedRunID,
+		sentinelConf:            m.sentinelConf,
+		name:                    name,
+		host:                    promotedHost,
+		port:                    promotedPort,
+		configEpoch:             m.configEpoch,
+		mu:                      sync.Mutex{},
+		client:                  cl,
+		slaves:                  map[string]*slaveInstance{},
+		sentinels:               sentinels,
+		state:                   masterStateUp,
+		lastSuccessfulPing:      time.Now(),
+		subjDownNotify:          make(chan struct{}),
+		followerNewMasterNotify: make(chan struct{}),
 	}
 
 	locked(&m.mu, func() {
@@ -632,6 +646,7 @@ func (s *Sentinel) checkObjDown(m *masterInstance) {
 	}
 	if down >= quorum {
 		m.state = masterStateObjDown
+		m.stopSendingRequest = true
 	}
 }
 
@@ -744,18 +759,19 @@ func (s *Sentinel) askSentinelsIfMasterIsDown(m *masterInstance) {
 }
 
 type masterInstance struct {
-	sentinelConf  MasterMonitor
-	isKilled      bool
-	name          string
-	mu            sync.Mutex
-	runID         string
-	slaves        map[string]*slaveInstance
-	promotedSlave *slaveInstance
-	sentinels     map[string]*sentinelInstance
-	host          string
-	port          string
-	shutdownChan  chan struct{}
-	client        InternalClient
+	sentinelConf       MasterMonitor
+	isKilled           bool
+	stopSendingRequest bool
+	name               string
+	mu                 sync.Mutex
+	runID              string
+	slaves             map[string]*slaveInstance
+	promotedSlave      *slaveInstance
+	sentinels          map[string]*sentinelInstance
+	host               string
+	port               string
+	shutdownChan       chan struct{}
+	client             InternalClient
 	// infoClient   internalClient
 
 	state                   masterInstanceState

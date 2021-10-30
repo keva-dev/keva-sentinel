@@ -140,18 +140,19 @@ func (s *Sentinel) Start() error {
 	}
 	s.mu.Lock()
 	master := &masterInstance{
-		sentinelConf:       m,
-		name:               m.Name,
-		host:               masterIP,
-		port:               masterPort,
-		configEpoch:        m.ConfigEpoch,
-		mu:                 sync.Mutex{},
-		client:             cl,
-		slaves:             map[string]*slaveInstance{},
-		sentinels:          map[string]*sentinelInstance{},
-		state:              masterStateUp,
-		lastSuccessfulPing: time.Now(),
-		subjDownNotify:     make(chan struct{}),
+		sentinelConf:            m,
+		name:                    m.Name,
+		host:                    masterIP,
+		port:                    masterPort,
+		configEpoch:             m.ConfigEpoch,
+		mu:                      sync.Mutex{},
+		client:                  cl,
+		slaves:                  map[string]*slaveInstance{},
+		sentinels:               map[string]*sentinelInstance{},
+		state:                   masterStateUp,
+		lastSuccessfulPing:      time.Now(),
+		subjDownNotify:          make(chan struct{}),
+		followerNewMasterNotify: make(chan struct{}),
 	}
 	s.masterInstances[m.Addr] = master
 	s.mu.Unlock()

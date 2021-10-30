@@ -76,35 +76,35 @@ func (s *Sentinel) slaveInfoRoutine(sl *slaveInstance) {
 		if err != nil {
 			s.logger.Errorf("sl.client.Info: %s", err)
 			//TODO continue for now
-			continue
 		} else {
 			sl.mu.Lock()
 			sl.lastSucessfulInfoAt = time.Now()
 			sl.mu.Unlock()
-		}
-		roleSwitched, err := s.parseInfoSlave(sl.reportedMaster, sl.addr, info)
-		if err != nil {
-			s.logger.Errorf("parseInfoslave error: %v", err)
-			continue
-			// continue for now
-		}
+			roleSwitched, err := s.parseInfoSlave(sl.reportedMaster, sl.addr, info)
+			if err != nil {
+				s.logger.Errorf("parseInfoslave error: %v", err)
+				continue
+				// continue for now
+			}
 
-		// slave change master post failover logic
-		// TODO
+			// slave change master post failover logic
+			// TODO
 
-		if roleSwitched {
+			if roleSwitched {
 
-			timeout := time.NewTimer(1 * time.Second)
-			defer timeout.Stop()
-			select {
-			case <-timeout.C:
-				// treat it as if it is still slave
-			case sl.masterRoleSwitchChan <- struct{}{}:
-				// master routine is waiting for this signal, send and return, this will become new master
-				//TODO: what non-leader sentinel behaves when seeing this
-				return
+				timeout := time.NewTimer(1 * time.Second)
+				defer timeout.Stop()
+				select {
+				case <-timeout.C:
+					// treat it as if it is still slave
+				case sl.masterRoleSwitchChan <- struct{}{}:
+					// master routine is waiting for this signal, send and return, this will become new master
+					//TODO: what non-leader sentinel behaves when seeing this
+					return
+				}
 			}
 		}
+
 		timer.Reset(infoDelay)
 		select {
 		case <-sl.masterDownNotify:
@@ -141,12 +141,24 @@ func (s *Sentinel) sayHelloRoutineToSlave(sl *slaveInstance, helloChan HelloChan
 	for !sl.iskilled() {
 		time.Sleep(2 * time.Second)
 		m := sl.reportedMaster
-		m.mu.Lock()
-		masterName := m.name
-		masterIP := m.host
-		masterPort := m.port
-		masterConfigEpoch := m.configEpoch
-		m.mu.Unlock()
+		var (
+			masterName, masterIP, masterPort string
+			masterConfigEpoch                int
+		)
+		locked(&m.mu, func() {
+			masterName = m.name
+			if m.promotedSlave != nil {
+				locked(&m.promotedSlave.mu, func() {
+					masterIP = m.promotedSlave.host
+					masterPort = m.promotedSlave.port
+				})
+			} else {
+				masterIP = m.host
+				masterPort = m.port
+			}
+			masterConfigEpoch = m.configEpoch
+		})
+
 		info := fmt.Sprintf("%s,%s,%s,%d,%s,%s,%s,%d",
 			s.conf.Binds[0], s.conf.Port, s.selfID(),
 			s.getCurrentEpoch(), masterName, masterIP, masterPort, masterConfigEpoch,
@@ -165,6 +177,7 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 	//TODO: handle connection lost/broken pipe
 	helloChan := sl.client.SubscribeHelloChan()
 
+	selfID := s.selfID()
 	go s.sayHelloRoutineToSlave(sl, helloChan)
 	for !sl.iskilled() {
 		newmsg, err := helloChan.Receive()
@@ -179,13 +192,17 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 			continue
 		}
 		runid := parts[2]
+		if runid == selfID {
+			continue
+		}
 		m := sl.reportedMaster
 		m.mu.Lock()
+		masterName := m.name
 		_, ok := m.sentinels[runid]
 		if !ok {
 			client, err := newRPCClient(parts[0], parts[1])
 			if err != nil {
-				s.logger.Errorf("newRPCClient: cannot create new client to other sentinel with info: %s: %s", newmsg, err)
+				s.logger.Errorf("newRPCClient: cannot create new client to other sentinel with info: %s: %s\ndebug: %s", newmsg, err, newmsg)
 				m.mu.Unlock()
 				continue
 			}
@@ -201,7 +218,10 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 		}
 		m.mu.Unlock()
 
-		mname, mhost, mport := parts[4], parts[5], parts[6]
+		masterNameInMsg, newHost, newPort := parts[4], parts[5], parts[6]
+		if masterName != masterNameInMsg {
+			continue
+		}
 
 		neighborEpoch, err := strconv.Atoi(parts[3])
 		if err != nil {
@@ -224,10 +244,10 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 		var switched bool
 		if currentConfigEpoch < neighborConfigEpoch {
 			m.configEpoch = neighborConfigEpoch
-			name, host, port := m.name, m.host, m.port
+			host, port := m.host, m.port
 
-			if name != mname || port != mport || host != mhost {
-				promotedSlave, exist := m.slaves[fmt.Sprintf("%s:%s", host, port)]
+			if port != newPort || host != newHost {
+				promotedSlave, exist := m.slaves[fmt.Sprintf("%s:%s", newHost, newPort)]
 				if exist {
 					switched = true
 					m.promotedSlave = promotedSlave

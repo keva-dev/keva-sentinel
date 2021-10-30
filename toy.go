@@ -55,10 +55,10 @@ type ToyKeva struct {
 
 func (keva *ToyKeva) slaveOf(host, port string) {
 	addr := fmt.Sprintf("%s:%s", host, port)
+	instance := keva.InstancesManager.getInstanceByAddr(addr)
 	keva.mu.Lock()
 	keva.role = "slave"
 	keva.slaves = nil
-	instance := keva.addrMap[addr]
 	keva.master = instance
 	keva.masterHost = host
 	keva.masterPort = port
@@ -202,10 +202,10 @@ func (m *InstancesManager) SpawnSlaves(num int) map[string]*ToyKeva {
 	return slaveMap
 }
 
-func (keva *ToyKeva) turnToSlave() {
-	keva.role = "slave"
-	keva.alive = true
-}
+// func (keva *ToyKeva) turnToSlave() {
+// 	keva.role = "slave"
+// 	keva.alive = true
+// }
 
 func (keva *ToyKeva) turnToMaster() {
 	keva.mu.Lock()
@@ -213,6 +213,9 @@ func (keva *ToyKeva) turnToMaster() {
 	keva.alive = true
 	keva.slaveInfo = nil
 	keva.mu.Unlock()
+	locked(keva.InstancesManager.mu, func() {
+		keva.InstancesManager.currentMaster = keva
+	})
 }
 
 func NewToyKevaClient(keva *ToyKeva) *toyClient {
@@ -224,6 +227,9 @@ func NewToyKevaClient(keva *ToyKeva) *toyClient {
 }
 
 func (cl *toyClient) SlaveOf(host, port string) error {
+	if !cl.link.isAlive() {
+		return fmt.Errorf("dead")
+	}
 	cl.link.slaveOf(host, port)
 	return nil
 }
@@ -234,6 +240,9 @@ func (cl *toyClient) SlaveOfNoOne() error {
 }
 
 func (cl *toyClient) Info() (string, error) {
+	if !cl.link.isAlive() {
+		return "", fmt.Errorf("dead")
+	}
 	return cl.link.info(), nil
 }
 
