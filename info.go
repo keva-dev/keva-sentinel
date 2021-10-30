@@ -121,7 +121,6 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 					slaveIns.masterUp {
 					slaveIns.reconfigFlag &= ^reconfigInProgress
 					slaveIns.reconfigFlag |= reconfigDone
-					fmt.Println("done")
 				}
 
 			}

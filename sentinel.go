@@ -169,7 +169,9 @@ func (s *Sentinel) Start() error {
 }
 
 func (s *Sentinel) Shutdown() {
-	s.listener.Close()
+	locked(s.mu, func() {
+		s.listener.Close()
+	})
 }
 
 type internalClientImpl struct {

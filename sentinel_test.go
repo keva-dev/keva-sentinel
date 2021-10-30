@@ -140,7 +140,7 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 		defer s.Shutdown()
 	}
 	// sleep for 2 second to ensure all sentinels have pubsub and recognized each other
-	time.Sleep(2 * time.Second)
+	time.Sleep(3 * time.Second)
 	for _, s := range sentinels {
 		s.mu.Lock()
 		masterI, ok := s.masterInstances[defaultMasterAddr]
@@ -424,16 +424,7 @@ func TestPromoteSlave(t *testing.T) {
 		//TODO: check more info of this recognized leader
 		suite.checkClusterHasLeader()
 		promotedSlave := suite.checkTermPromotedSlave(1)
-		suite.mu.Lock()
-		var selected *ToyKeva
-		for idx := range suite.slavesMap {
-			sl := suite.slavesMap[idx]
-			if sl.id == promotedSlave {
-				selected = sl
-			}
-		}
 
-		suite.mu.Unlock()
 		if promotedSlave == "" {
 			assert.FailNowf(t, "empty slave promoted", "term %d has no promoted slave", 1)
 		} else {
@@ -443,8 +434,8 @@ func TestPromoteSlave(t *testing.T) {
 			assert.Equal(t, selectedSlave, promotedSlave,
 				"different promoted and selected slave", "promoted (%s) slave is different from selected (%s) slave", promotedSlave, selectedSlave)
 
-			assert.Equal(t, expectedChosenSlave.id, promotedSlave, "wrong slave promoted", "want %s, but have %s", expectedChosenSlave.slaveInfo.String(),
-				selected.slaveInfo.String(),
+			assert.Equal(t, expectedChosenSlave.id, promotedSlave, "wrong slave promoted", "want %s, but have %s", expectedChosenSlave.id,
+				promotedSlave,
 			)
 		}
 	}

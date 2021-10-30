@@ -94,7 +94,7 @@ func (m *masterInstance) getState() masterInstanceState {
 // for now, only say hello through master, redis also say hello through slaves
 func (s *Sentinel) sayHelloRoutineToMaster(m *masterInstance, helloChan HelloChan) {
 	for !m.killed() {
-		time.Sleep(1 * time.Second)
+		time.Sleep(2 * time.Second)
 		m.mu.Lock()
 		masterName := m.name
 		masterIP := m.host
@@ -280,11 +280,15 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 						// when new slave recognized to have switched role, it will notify this channel
 						// or time out
 					case <-promotedSlave.masterRoleSwitchChan:
-						m.mu.Lock()
-						m.failOverState = failOverReconfSlave
-						m.failOverStateChangeTime = time.Now()
-						epoch := m.failOverEpoch
-						m.mu.Unlock()
+						var (
+							epoch int
+						)
+						locked(&m.mu, func() {
+							m.failOverState = failOverReconfSlave
+							m.failOverStateChangeTime = time.Now()
+							epoch = m.failOverEpoch
+							m.configEpoch = epoch
+						})
 						s.logger.Debugw(logEventSlavePromoted,
 							"run_id", promotedSlave.runID,
 							"epoch", epoch)
@@ -327,6 +331,7 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 		panic("todo")
 	}
 	newSlaves := map[string]*slaveInstance{}
+	fmt.Printf("here: %d\n", m.configEpoch)
 	newMaster := &masterInstance{
 		runID:              promotedRunID,
 		sentinelConf:       m.sentinelConf,
@@ -396,13 +401,12 @@ func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
 	errgrp := &errgroup.Group{}
 	ctx, cancel := context.WithTimeout(context.Background(), m.sentinelConf.ReconfigSlaveTimeout)
 	defer cancel()
-
+	locked(&m.promotedSlave.mu, func() {
+		promotedHost, promotedPort = m.promotedSlave.host, m.promotedSlave.port
+	})
 	for idx := range slaveList {
 		slave := slaveList[idx]
 		if slave.runID == m.promotedSlave.runID {
-			slave.mu.Lock()
-			promotedHost, promotedPort = slave.host, slave.port
-			slave.mu.Unlock()
 			continue
 		}
 		errgrp.Go(func() error {
@@ -434,7 +438,6 @@ func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
 				slave.mu.Lock()
 				if slave.reconfigFlag&reconfigDone != 0 {
 					slave.reconfigFlag = 0
-					fmt.Println("done")
 					done = true
 				}
 				slave.mu.Unlock()

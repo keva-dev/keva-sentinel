@@ -114,6 +114,8 @@ func (s *Sentinel) serveRPC() {
 	if e != nil {
 		log.Fatal("listen error:", e)
 	}
-	s.listener = l
+	locked(s.mu, func() {
+		s.listener = l
+	})
 	http.Serve(l, mux)
 }

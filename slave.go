@@ -139,7 +139,7 @@ func (s *Sentinel) newSlaveInstance(masterHost, masterPort, host, port string, r
 }
 func (s *Sentinel) sayHelloRoutineToSlave(sl *slaveInstance, helloChan HelloChan) {
 	for !sl.iskilled() {
-		time.Sleep(1 * time.Second)
+		time.Sleep(2 * time.Second)
 		m := sl.reportedMaster
 		m.mu.Lock()
 		masterName := m.name
@@ -207,7 +207,7 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 		if err != nil {
 			continue
 		}
-		neighborConfigEpoch, err := strconv.Atoi(parts[3])
+		neighborConfigEpoch, err := strconv.Atoi(parts[7])
 		if err != nil {
 			continue
 		}
@@ -223,6 +223,7 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 		currentConfigEpoch := m.configEpoch
 		var switched bool
 		if currentConfigEpoch < neighborConfigEpoch {
+			m.configEpoch = neighborConfigEpoch
 			name, host, port := m.name, m.host, m.port
 
 			if name != mname || port != mport || host != mhost {
