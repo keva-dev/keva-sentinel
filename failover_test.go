@@ -28,9 +28,9 @@ func Test_reconfigSlaves(t *testing.T) {
 
 			if i == 0 {
 				promoted = sla
-				mockClient.On("SlaveOf", sla.host, sla.port).Panic("not expect promoted to be configured")
+				mockClient.On("SlaveOf", mock.Anything, mock.Anything).Panic("not expect promoted to be configured")
 			} else {
-				mockClient.On("SlaveOf", sla.host, sla.port).Once().Return(nil)
+				mockClient.On("SlaveOf", promoted.host, promoted.port).Once().Return(nil)
 			}
 			slaves[sla.addr] = sla
 		}
@@ -63,13 +63,13 @@ func Test_reconfigSlaves(t *testing.T) {
 
 			if i == 0 {
 				promoted = sla
-				mockClient.On("SlaveOf", sla.host, sla.port).Panic("not expect promoted to be configured")
+				mockClient.On("SlaveOf", mock.Anything, mock.Anything).Panic("not expect promoted to be configured")
 			} else {
 				// make some slave fail to communicate at first
 				if i%2 == 0 {
-					mockClient.On("SlaveOf", sla.host, sla.port).Once().Return(errors.New("dummy error"))
+					mockClient.On("SlaveOf", promoted.host, promoted.port).Once().Return(errors.New("dummy error"))
 				}
-				mockClient.On("SlaveOf", sla.host, sla.port).Once().Run(func(mock.Arguments) {
+				mockClient.On("SlaveOf", promoted.host, promoted.port).Once().Run(func(mock.Arguments) {
 					go func() {
 						sla.mu.Lock()
 						sla.reconfigFlag |= reconfigDone
@@ -113,13 +113,13 @@ func Test_reconfigSlaves(t *testing.T) {
 
 			if i == 0 {
 				promoted = sla
-				mockClient.On("SlaveOf", sla.host, sla.port).Panic("not expect promoted to be configured")
+				mockClient.On("SlaveOf", mock.Anything, mock.Anything).Panic("not expect promoted to be configured")
 			} else {
 				// some slaves are permanently failing
 				if i%2 == 0 {
-					mockClient.On("SlaveOf", sla.host, sla.port).Return(errors.New("dummy err"))
+					mockClient.On("SlaveOf", promoted.host, promoted.port).Return(errors.New("dummy err"))
 				} else {
-					mockClient.On("SlaveOf", sla.host, sla.port).Once().Run(func(mock.Arguments) {
+					mockClient.On("SlaveOf", promoted.host, promoted.port).Once().Run(func(mock.Arguments) {
 						go func() {
 							sla.mu.Lock()
 							sla.reconfigFlag |= reconfigDone
@@ -161,9 +161,9 @@ func Test_reconfigSlaves(t *testing.T) {
 
 			if i == 0 {
 				promoted = sla
-				mockClient.On("SlaveOf", sla.host, sla.port).Panic("not expect promoted to be configured")
+				mockClient.On("SlaveOf", mock.Anything, mock.Anything).Panic("not expect promoted to be configured")
 			} else {
-				mockClient.On("SlaveOf", sla.host, sla.port).Once().Run(func(mock.Arguments) {
+				mockClient.On("SlaveOf", promoted.host, promoted.port).Once().Run(func(mock.Arguments) {
 					go func() {
 						sla.mu.Lock()
 						sla.reconfigFlag |= reconfigDone

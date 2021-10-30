@@ -232,12 +232,21 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 			// canceling the on going goroutine, or when the failover is successful
 			ctx, stopAskingOtherSentinels := context.WithCancel(context.Background())
 			go s.askOtherSentinelsEach1Sec(ctx, m)
-			for m.getState() == masterStateObjDown {
-				startFailover := s.checkIfShouldFailover(m)
-				if startFailover {
-					break
-				}
+			sleepToNextFailover := s.nextFailoverAllowed(m)
+			timer := time.NewTimer(sleepToNextFailover)
+			defer timer.Stop()
+			select {
+			case <-timer.C:
+			case <-m.followerNewMasterNotify:
+				stopAskingOtherSentinels()
+				fmt.Printf("switching::::::%s\n", s.runID)
+				s.resetMasterInstance(m, true)
+
+				// this is a follower sentinel and new master recognize
+				// from leader sentinel through hello message
+				return
 			}
+
 			// If any logic changing state of master to something != masterStateObjDown, this code below will be broken
 		failOverFSM:
 			for {
@@ -259,7 +268,8 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 					case <-ticker.C:
 					case <-m.followerNewMasterNotify:
 						stopAskingOtherSentinels()
-						s.resetMasterInstance(m)
+						fmt.Printf("switching::::::%s\n", s.runID)
+						s.resetMasterInstance(m, true)
 
 						// this is a follower sentinel and new master recognize
 						// from leader sentinel through hello message
@@ -298,26 +308,28 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 							epoch = m.failOverEpoch
 							m.configEpoch = epoch
 						})
-						s.logger.Debugw(logEventFailoverStateChanged,
-							"epoch", m.getFailOverEpoch(),
-							"new_state", failOverReconfSlave)
 						s.logger.Debugw(logEventSlavePromoted,
 							"run_id", promotedSlave.runID,
 							"epoch", epoch)
+						s.logger.Debugw(logEventFailoverStateChanged,
+							"epoch", m.getFailOverEpoch(),
+							"new_state", failOverReconfSlave)
+
 					}
 				case failOverReconfSlave:
 					s.reconfigRemoteSlaves(m)
 					s.logger.Debugw(logEventFailoverStateChanged,
 						"epoch", m.getFailOverEpoch(),
 						"new_state", failOverResetInstance)
-					s.resetMasterInstance(m)
+					s.resetMasterInstance(m, false)
 
 				}
 			}
 		}
 	}
 }
-func (s *Sentinel) resetMasterInstance(m *masterInstance) {
+func (s *Sentinel) resetMasterInstance(m *masterInstance, isfollower bool) {
+
 	var (
 		promoted                                                *slaveInstance
 		oldAddr                                                 string
@@ -327,13 +339,18 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 		sentinels                                               map[string]*sentinelInstance
 	)
 	locked(&m.mu, func() {
-		epoch = m.failOverEpoch
+		if isfollower {
+			epoch = m.leaderEpoch
+		} else {
+			epoch = m.failOverEpoch
+		}
 		promoted = m.promotedSlave
 		name = m.name
 		m.isKilled = true
 		oldAddr = fmt.Sprintf("%s:%s", m.host, m.port)
 		sentinels = m.sentinels
 	})
+
 	locked(&promoted.mu, func() {
 		promotedAddr = promoted.addr
 		promotedHost, promotedPort = promoted.host, promoted.port
@@ -344,6 +361,7 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 	if err != nil {
 		panic("todo")
 	}
+
 	newSlaves := map[string]*slaveInstance{}
 	newMaster := &masterInstance{
 		runID:                   promotedRunID,
@@ -359,7 +377,7 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 		state:                   masterStateUp,
 		lastSuccessfulPing:      time.Now(),
 		subjDownNotify:          make(chan struct{}),
-		followerNewMasterNotify: make(chan struct{}),
+		followerNewMasterNotify: make(chan struct{}, 1),
 	}
 
 	locked(&m.mu, func() {
@@ -385,7 +403,7 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 		m.slaves = newSlaves
 	})
 
-	locked(&m.mu, func() {
+	locked(s.mu, func() {
 		delete(s.masterInstances, oldAddr)
 		s.masterInstances[newMaster.getAddr()] = newMaster
 	})
@@ -402,6 +420,7 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 
 // TODO: write test for this func
 func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
+	defer fmt.Println("done reconfig")
 	m.mu.Lock()
 
 	slaveList := make([]*slaveInstance, 0, len(m.slaves))
@@ -473,7 +492,7 @@ func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
 	// update state no matter what
 }
 
-func (s *Sentinel) checkIfShouldFailover(m *masterInstance) (startFailover bool) {
+func (s *Sentinel) nextFailoverAllowed(m *masterInstance) time.Duration {
 	// this code only has to wait in case failover timeout reached and block until the next failover is allowed to
 	// continue (2* failover timeout)
 	secondsLeft := 2*m.sentinelConf.FailoverTimeout - time.Since(m.getFailOverStartTime())
@@ -486,6 +505,10 @@ func (s *Sentinel) checkIfShouldFailover(m *masterInstance) (startFailover bool)
 						"new_state", failOverWaitLeaderElection,
 						"epoch", s.currentEpoch,
 					)
+					s.logger.Debugw(logEventRequestingElection,
+						"epoch", s.currentEpoch,
+						"sentinel_run_id", s.runID,
+					)
 				}
 				m.failOverState = failOverWaitLeaderElection
 				m.failOverStartTime = time.Now()
@@ -494,12 +517,9 @@ func (s *Sentinel) checkIfShouldFailover(m *masterInstance) (startFailover bool)
 		})
 		// mostly, when obj down is met, multiples sentinels will try to send request for vote to be leader
 		// to prevent split vote, sleep for a random small duration
-		random := rand.Intn(SENTINEL_MAX_DESYNC) * int(time.Millisecond)
-		time.Sleep(time.Duration(random))
-		return true
+		secondsLeft = 0
 	}
-	<-time.NewTimer(secondsLeft).C
-	return false
+	return secondsLeft + time.Duration(rand.Intn(SENTINEL_MAX_DESYNC)*int(time.Millisecond))
 }
 
 func (s *Sentinel) checkElectionStatus(m *masterInstance) (aborted bool, isLeader bool) {

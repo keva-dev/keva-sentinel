@@ -40,6 +40,7 @@ func (suite *testSuite) handleLogEventMasterInstanceCreated(instanceIdx int, log
 	runID := ctxMap["run_id"].(string)
 	term := int(ctxMap["epoch"].(int64))
 	sentinelRunID := ctxMap["sentinel_run_id"].(string)
+	fmt.Printf("run id %s\n", sentinelRunID)
 	suite.mu.Lock()
 	defer suite.mu.Unlock()
 	previousMasterID, exist := suite.termsMasterID[term]
@@ -53,6 +54,7 @@ func (suite *testSuite) handleLogEventMasterInstanceCreated(instanceIdx int, log
 	}
 	suite.termsMasterID[term] = runID
 	suite.termsMasterInstanceCreation[term] = append(suite.termsMasterInstanceCreation[term], sentinelRunID)
+	fmt.Println(suite.termsMasterInstanceCreation[term])
 }
 
 func (suite *testSuite) handleLogEventSlavePromoted(instanceIdx int, log observer.LoggedEntry) {
@@ -86,6 +88,15 @@ func (suite *testSuite) handleLogEventSelectedSlave(instanceIdx int, log observe
 	}
 	suite.termsSelectedSlave[term] = selectedSlave
 	suite.currentLeader = selectedSlave
+}
+
+func (suite *testSuite) handleLogEventRequestingElection(instanceIdx int, log observer.LoggedEntry) {
+	ctxMap := log.ContextMap()
+	runid := ctxMap["sentinel_run_id"].(string)
+	term := int(ctxMap["epoch"].(int64))
+	suite.mu.Lock()
+	defer suite.mu.Unlock()
+	suite.termsVoters[term] = append(suite.termsVoters[term], runid)
 }
 
 func (suite *testSuite) handleLogEventBecameTermLeader(instanceIdx int, log observer.LoggedEntry) {
@@ -134,7 +145,9 @@ func (suite *testSuite) handleLogEventFailoverStateChanged(instanceIdx int, log 
 			assert.Failf(suite.t, "log consume error", "invalid failover state transition from %s to %s", oldState, newState)
 		}
 	case failOverDone:
-		if oldState != failOverResetInstance && oldState != failOverWaitLeaderElection {
+		if oldState != failOverResetInstance &&
+			oldState != failOverWaitLeaderElection &&
+			oldState != failOverNone {
 			assert.Failf(suite.t, "log consume error", "invalid failover state transition from %s to %s", oldState, newState)
 		}
 	default:
@@ -179,6 +192,8 @@ func (s *testSuite) consumeLogs(instanceIdx int, observer *observer.ObservedLogs
 		logs := observer.TakeAll()
 		for _, entry := range logs {
 			switch entry.Message {
+			case logEventRequestingElection:
+				s.handleLogEventRequestingElection(instanceIdx, entry)
 			case logEventBecameTermLeader:
 				s.handleLogEventBecameTermLeader(instanceIdx, entry)
 			case logEventVotedFor:

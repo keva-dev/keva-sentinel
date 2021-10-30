@@ -107,6 +107,7 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 		//TODO: check if old master is still alive
 		// if it is, fix this slave config
 		if maybePromoted != nil {
+			fmt.Println("here")
 			maybePromoted.mu.Lock()
 			addr := maybePromoted.addr
 			maybePromoted.mu.Unlock()
@@ -121,6 +122,7 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 					slaveIns.masterUp {
 					slaveIns.reconfigFlag &= ^reconfigInProgress
 					slaveIns.reconfigFlag |= reconfigDone
+					fmt.Println("done 1")
 				}
 
 			}

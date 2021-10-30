@@ -55,6 +55,7 @@ type history struct {
 	currentLeader               string
 	currentTerm                 int
 	termsVote                   map[int][]termInfo // key by term seq, val is array of each sentinels' term info
+	termsVoters                 map[int][]string
 	termsLeader                 map[int]string
 	termsSelectedSlave          map[int]string
 	termsPromotedSlave          map[int]string
@@ -160,6 +161,7 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 		slavesMap: slaveMap,
 		history: history{
 			termsVote:                   map[int][]termInfo{},
+			termsVoters:                 map[int][]string{},
 			termsLeader:                 map[int]string{},
 			failOverStates:              map[int]failOverState{},
 			termsSelectedSlave:          map[int]string{},
@@ -403,6 +405,13 @@ func TestLeaderElection(t *testing.T) {
 		suite.cluster.killCurrentMaster()
 		time.Sleep(suite.conf.Masters[0].DownAfter)
 		//TODO: check more info of this recognized leader
+
+		voters := suite.checkVotersOfTerm(1, numInstances)
+		expect := []string{}
+		for _, item := range suite.instances {
+			expect = append(expect, item.runID)
+		}
+		assert.ElementsMatch(t, expect, voters)
 		suite.checkClusterHasLeader()
 	}
 	t.Run("3 instances vote leader success", func(t *testing.T) {
@@ -536,7 +545,7 @@ func (s *testSuite) checkTermMasterCreation(term int, length int) []string {
 			return true
 		}
 		return false
-	}, 5*time.Second, "term %d has not enough %d master creation event", term, length)
+	}, 10*time.Second, "term %d has not enough %d master creation event", term, length)
 	return ret
 }
 func (s *testSuite) checkTermMasterRunID(term int) string {
@@ -566,6 +575,21 @@ func (s *testSuite) checkTermPromotedSlave(term int) string {
 		}
 		return false
 	}, 5*time.Second, "term %d has no slave promoted", term)
+	return ret
+}
+
+func (s *testSuite) checkVotersOfTerm(term int, expectVoters int) []string {
+	var ret []string
+	eventually(s.t, func() bool {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		voters := s.termsVoters[term]
+		if len(voters) == expectVoters {
+			ret = voters
+			return true
+		}
+		return false
+	}, 10*time.Second, "term %d does not have %d voters", term, expectVoters)
 	return ret
 }
 

@@ -152,7 +152,7 @@ func (s *Sentinel) Start() error {
 		state:                   masterStateUp,
 		lastSuccessfulPing:      time.Now(),
 		subjDownNotify:          make(chan struct{}),
-		followerNewMasterNotify: make(chan struct{}),
+		followerNewMasterNotify: make(chan struct{}, 1),
 	}
 	s.masterInstances[m.Addr] = master
 	s.mu.Unlock()

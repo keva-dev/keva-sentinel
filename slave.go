@@ -256,9 +256,11 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 		}
 		m.mu.Unlock()
 		if switched {
+			fmt.Printf("switching.....%s\n", s.runID)
 			select {
 			case m.followerNewMasterNotify <- struct{}{}:
 			default:
+				fmt.Println("failed to switched")
 			}
 		}
 	}
