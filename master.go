@@ -119,7 +119,6 @@ func (s *Sentinel) sayHelloRoutineToMaster(m *masterInstance, helloChan HelloCha
 // Todo: this function is per instance, not per master
 func (s *Sentinel) subscribeHello(m *masterInstance) {
 	helloChan := m.client.SubscribeHelloChan()
-
 	go s.sayHelloRoutineToMaster(m, helloChan)
 	for !m.killed() {
 		newmsg, err := helloChan.Receive()
@@ -303,18 +302,25 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 	}
 }
 func (s *Sentinel) resetMasterInstance(m *masterInstance) {
-	m.mu.Lock()
-	epoch := m.failOverEpoch
-	promoted := m.promotedSlave
-	name := m.name
-	m.isKilled = true
-	m.mu.Unlock()
-
-	promoted.mu.Lock()
-	promotedAddr := promoted.addr
-	host, port := promoted.host, promoted.port
-	newRunID := m.promotedSlave.runID
-	promoted.mu.Unlock()
+	var (
+		promoted                                                *slaveInstance
+		oldAddr                                                 string
+		epoch                                                   int
+		name                                                    string
+		promotedRunID, promotedAddr, promotedHost, promotedPort string
+	)
+	locked(&m.mu, func() {
+		epoch = m.failOverEpoch
+		promoted = m.promotedSlave
+		name = m.name
+		m.isKilled = true
+		oldAddr = fmt.Sprintf("%s:%s", m.host, m.port)
+	})
+	locked(&promoted.mu, func() {
+		promotedAddr = promoted.addr
+		promotedHost, promotedPort = promoted.host, promoted.port
+		promotedRunID = m.promotedSlave.runID
+	})
 
 	cl, err := s.clientFactory(promotedAddr)
 	if err != nil {
@@ -322,11 +328,11 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 	}
 	newSlaves := map[string]*slaveInstance{}
 	newMaster := &masterInstance{
-		runID:              newRunID,
+		runID:              promotedRunID,
 		sentinelConf:       m.sentinelConf,
 		name:               name,
-		host:               host,
-		port:               port,
+		host:               promotedHost,
+		port:               promotedPort,
 		configEpoch:        m.configEpoch,
 		mu:                 sync.Mutex{},
 		client:             cl,
@@ -336,39 +342,34 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance) {
 		lastSuccessfulPing: time.Now(),
 		subjDownNotify:     make(chan struct{}),
 	}
-	m.mu.Lock()
-	for _, sl := range m.slaves {
-		sl.mu.Lock()
 
-		// kill all running slaves routine, for simplicity
-		sl.killed = true
-		if sl.addr != promotedAddr {
-			newslave, err := s.newSlaveInstance(host, port, sl.host, sl.port, sl.replOffset, newMaster)
-			if err != nil {
-				continue
-			}
-			newSlaves[sl.addr] = newslave
+	locked(&m.mu, func() {
+		for _, sl := range m.slaves {
+			locked(&sl.mu, func() {
+				// kill all running slaves routine, for simplicity
+				sl.killed = true
+				if sl.addr != promotedAddr {
+					newslave, err := s.newSlaveInstance(promotedHost, promotedPort, sl.host, sl.port, sl.replOffset, newMaster)
+					if err == nil {
+						newSlaves[sl.addr] = newslave
+					}
+				}
+			})
 		}
+		// turn dead master into slave as well
+		newslave, err := s.newSlaveInstance(promotedHost, promotedPort, m.host, m.port, 0, newMaster)
+		if err != nil {
 
-		sl.mu.Unlock()
-	}
+		} else {
+			newSlaves[oldAddr] = newslave
+		}
+		m.slaves = newSlaves
+	})
 
-	oldAddr := fmt.Sprintf("%s:%s", m.host, m.port)
-	// turn dead master into slave as well
-	newslave, err := s.newSlaveInstance(host, port, m.host, m.port, 0, newMaster)
-	if err != nil {
-
-	} else {
-		newSlaves[oldAddr] = newslave
-	}
-
-	m.slaves = newSlaves
-	m.mu.Unlock()
-
-	s.mu.Lock()
-	delete(s.masterInstances, oldAddr)
-	s.masterInstances[newMaster.getAddr()] = newMaster
-	s.mu.Unlock()
+	locked(&m.mu, func() {
+		delete(s.masterInstances, oldAddr)
+		s.masterInstances[newMaster.getAddr()] = newMaster
+	})
 
 	for idx := range newSlaves {
 		go s.slaveRoutine(newSlaves[idx])
@@ -385,6 +386,7 @@ func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
 	m.mu.Lock()
 
 	slaveList := make([]*slaveInstance, 0, len(m.slaves))
+	var promotedHost, promotedPort string
 	for runID := range m.slaves {
 		slaveList = append(slaveList, m.slaves[runID])
 	}
@@ -398,14 +400,14 @@ func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
 	for idx := range slaveList {
 		slave := slaveList[idx]
 		if slave.runID == m.promotedSlave.runID {
+			slave.mu.Lock()
+			promotedHost, promotedPort = slave.host, slave.port
+			slave.mu.Unlock()
 			continue
 		}
 		errgrp.Go(func() error {
 			var done bool
 			for {
-				slave.mu.Lock()
-				host, port := slave.host, slave.port
-				slave.mu.Unlock()
 				err := sema.Acquire(ctx, 1)
 				if err != nil {
 					return err
@@ -416,7 +418,7 @@ func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
 					return ctx.Err()
 				default:
 				}
-				err = slave.client.SlaveOf(host, port)
+				err = slave.client.SlaveOf(promotedHost, promotedPort)
 				if err != nil {
 					sema.Release(1)
 					time.Sleep(100 * time.Millisecond)
@@ -432,6 +434,7 @@ func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
 				slave.mu.Lock()
 				if slave.reconfigFlag&reconfigDone != 0 {
 					slave.reconfigFlag = 0
+					fmt.Println("done")
 					done = true
 				}
 				slave.mu.Unlock()

@@ -10,6 +10,33 @@ import (
 	"github.com/google/uuid"
 )
 
+type InstancesManager struct {
+	currentTerm   int
+	currentMaster *ToyKeva
+	addrMap       map[string]*ToyKeva
+	mu            *sync.Mutex
+}
+
+func (m *InstancesManager) killCurrentMaster() {
+	m.mu.Lock()
+	master := m.currentMaster
+	m.mu.Unlock()
+	master.kill()
+}
+
+func (m *InstancesManager) getInstanceByAddr(addr string) *ToyKeva {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.addrMap[addr]
+}
+
+func (m *InstancesManager) getMaster() *ToyKeva {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.currentMaster
+
+}
+
 // ToyKeva simulator used for testing purpose
 type ToyKeva struct {
 	host string
@@ -23,6 +50,19 @@ type ToyKeva struct {
 	slaves     []*ToyKeva
 	subs       map[string]chan string //key by fake sessionid
 	*slaveInfo                        // only set if current keva is a slave
+	*InstancesManager
+}
+
+func (keva *ToyKeva) slaveOf(host, port string) {
+	addr := fmt.Sprintf("%s:%s", host, port)
+	keva.mu.Lock()
+	keva.role = "slave"
+	keva.slaves = nil
+	instance := keva.addrMap[addr]
+	keva.master = instance
+	keva.masterHost = host
+	keva.masterPort = port
+	keva.mu.Unlock()
 }
 
 func (keva *ToyKeva) info() string {
@@ -103,42 +143,62 @@ type toyClient struct {
 	mu        *sync.Mutex
 }
 
-func NewToyKeva(host, port string) *ToyKeva {
-	return &ToyKeva{
-		id:    uuid.NewString(),
-		mu:    &sync.Mutex{},
-		subs:  map[string]chan string{},
-		alive: true,
-		host:  host,
-		port:  port,
+func (m *InstancesManager) NewSlaveKeva(host, port string) *ToyKeva {
+	addr := host + ":" + port
+	instance := &ToyKeva{
+		role:             "slave",
+		id:               uuid.NewString(),
+		mu:               &sync.Mutex{},
+		subs:             map[string]chan string{},
+		alive:            true,
+		host:             host,
+		port:             port,
+		InstancesManager: m,
 	}
+	m.addrMap[addr] = instance
+	return instance
 }
 
-func (keva *ToyKeva) withSlaves(num int) map[string]*ToyKeva {
-	if keva.role != "master" {
-		panic("cannot assign slaves to non master keva")
+func (m *InstancesManager) NewMasterToyKeva(host, port string) *ToyKeva {
+	addr := host + ":" + port
+
+	instance := &ToyKeva{
+		role:             "master",
+		id:               uuid.NewString(),
+		mu:               &sync.Mutex{},
+		subs:             map[string]chan string{},
+		alive:            true,
+		host:             host,
+		port:             port,
+		InstancesManager: m,
 	}
+	m.addrMap[addr] = instance
+	m.currentMaster = instance
+	return instance
+}
+
+func (m *InstancesManager) SpawnSlaves(num int) map[string]*ToyKeva {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	slaves := []*ToyKeva{}
 	slaveMap := map[string]*ToyKeva{}
+	master := m.currentMaster
 
 	for i := 0; i < num; i++ {
-		newSlave := NewToyKeva("localhost", strconv.Itoa(i)) // fake port, toy master does not call toy slave through network call
-		newSlave.turnToSlave()
-		newSlave.host = "localhost"
+		newSlave := m.NewSlaveKeva("localhost", strconv.Itoa(i)) // fake port, toy master does not call toy slave through network call
 		newSlave.slaveInfo = &slaveInfo{
-			masterHost: keva.host,
-			masterPort: keva.port,
+			masterHost: master.host,
+			masterPort: master.port,
 			priority:   1,
 			offset:     0,
 			lag:        0, // TODO: don't understand what it means
-			master:     keva,
+			master:     master,
 		}
 		addr := fmt.Sprintf("%s:%s", newSlave.host, newSlave.port)
 		slaves = append(slaves, newSlave)
 		slaveMap[addr] = newSlave
 	}
-	keva.slaves = slaves
-
+	master.slaves = slaves
 	return slaveMap
 }
 
@@ -148,8 +208,11 @@ func (keva *ToyKeva) turnToSlave() {
 }
 
 func (keva *ToyKeva) turnToMaster() {
+	keva.mu.Lock()
 	keva.role = "master"
 	keva.alive = true
+	keva.slaveInfo = nil
+	keva.mu.Unlock()
 }
 
 func NewToyKevaClient(keva *ToyKeva) *toyClient {
@@ -160,7 +223,8 @@ func NewToyKevaClient(keva *ToyKeva) *toyClient {
 	}
 }
 
-func (cl *toyClient) SlaveOf(addr, port string) error {
+func (cl *toyClient) SlaveOf(host, port string) error {
+	cl.link.slaveOf(host, port)
 	return nil
 }
 

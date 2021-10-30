@@ -130,6 +130,11 @@ func (s *Sentinel) newSlaveInstance(masterHost, masterPort, host, port string, r
 		s.logger.Errorf("s.slaveFactory: %s", err)
 		return nil, err
 	}
+	cl, err := s.clientFactory(fmt.Sprintf("%s:%s", host, port))
+	if err != nil {
+		return nil, err
+	}
+	newslave.client = cl
 	return newslave, nil
 }
 func (s *Sentinel) sayHelloRoutineToSlave(sl *slaveInstance, helloChan HelloChan) {
@@ -211,7 +216,7 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 		if neighborEpoch > currentEpoch {
 			s.currentEpoch = neighborEpoch
 			// Not sure if this needs reseting anything in fsm
-			panic("not implemented")
+			//TODO panic("not implemented")
 		}
 		s.mu.Unlock()
 		m.mu.Lock()
@@ -221,14 +226,14 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 			name, host, port := m.name, m.host, m.port
 
 			if name != mname || port != mport || host != mhost {
-				switched = true
 				promotedSlave, exist := m.slaves[fmt.Sprintf("%s:%s", host, port)]
-				if !exist {
-					continue
+				if exist {
+					switched = true
+					m.promotedSlave = promotedSlave
 				}
-				m.promotedSlave = promotedSlave
 			}
 		}
+		m.mu.Unlock()
 		if switched {
 			select {
 			case m.followerNewMasterNotify <- struct{}{}:

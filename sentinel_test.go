@@ -44,8 +44,9 @@ type testSuite struct {
 	instances     []*Sentinel
 	masterLinks   []*toyClient // each represent a connection from a sentinel to master
 	conf          Config
-	master        *ToyKeva
-	slavesMap     map[string]*ToyKeva
+	cluster       *InstancesManager
+	// master        *ToyKeva
+	slavesMap map[string]*ToyKeva
 	history
 	logObservers []*observer.ObservedLogs
 	t            *testing.T
@@ -90,10 +91,14 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 	masterAddr := conf.Masters[0].Addr
 	parts := strings.Split(masterAddr, ":")
 	host, port := parts[0], parts[1]
+	// fake cluster of instances
+	toyCluster := &InstancesManager{
+		addrMap: map[string]*ToyKeva{},
+		mu:      &sync.Mutex{},
+	}
 
-	master := NewToyKeva(host, port)
-	master.turnToMaster()
-	slaveMap := master.withSlaves(3)
+	cluster := toyCluster.NewMasterToyKeva(host, port)
+	slaveMap := cluster.SpawnSlaves(3)
 
 	// a function to create fake client from sentinel to slaves, when first discovered by infoing master
 	toySlaveFactory := func(sl *slaveInstance) error {
@@ -103,7 +108,6 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 	}
 	// make master remember slaves
 	sentinels := []*Sentinel{}
-	masterLinks := make([]*toyClient, numInstances)
 	logObservers := make([]*observer.ObservedLogs, numInstances)
 	testLock := &sync.Mutex{}
 	basePort := 2000
@@ -120,14 +124,8 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 
 		// a function to create fake client from sentinel to master
 		s.clientFactory = func(addr string) (InternalClient, error) {
-			testLock.Lock()
-			instance, isslave := slaveMap[addr]
-			if !isslave {
-				instance = master
-			}
+			instance := cluster.getInstanceByAddr(addr)
 			client := NewToyKevaClient(instance)
-			masterLinks[localIdx] = client
-			testLock.Unlock()
 			return client, nil
 		}
 
@@ -143,7 +141,6 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 	}
 	// sleep for 2 second to ensure all sentinels have pubsub and recognized each other
 	time.Sleep(2 * time.Second)
-
 	for _, s := range sentinels {
 		s.mu.Lock()
 		masterI, ok := s.masterInstances[defaultMasterAddr]
@@ -154,24 +151,27 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 		masterI.mu.Unlock()
 	}
 	suite := &testSuite{
-		instances:   sentinels,
-		masterLinks: masterLinks,
-		mu:          testLock,
-		conf:        conf,
-		master:      master,
-		slavesMap:   slaveMap,
+		instances: sentinels,
+		// masterLinks: masterLinks,
+		mu:      testLock,
+		conf:    conf,
+		cluster: toyCluster,
+		// master:      master,
+		slavesMap: slaveMap,
 		history: history{
-			termsVote:          map[int][]termInfo{},
-			termsLeader:        map[int]string{},
-			failOverStates:     map[int]failOverState{},
-			termsSelectedSlave: map[int]string{},
-			termsPromotedSlave: map[int]string{},
-			termsMasterID:      map[int]string{},
+			termsVote:                   map[int][]termInfo{},
+			termsLeader:                 map[int]string{},
+			failOverStates:              map[int]failOverState{},
+			termsSelectedSlave:          map[int]string{},
+			termsPromotedSlave:          map[int]string{},
+			termsMasterID:               map[int]string{},
+			termsMasterInstanceCreation: map[int][]string{},
 		},
 		mapRunIDtoIdx: mapRunIDToIdx,
 		logObservers:  logObservers,
 		t:             t,
 	}
+
 	for idx := range suite.logObservers {
 		go suite.consumeLogs(idx, suite.logObservers[idx])
 	}
@@ -256,7 +256,7 @@ func TestODown(t *testing.T) {
 			assert.Equal(t, numInstances-1, len(masterI.sentinels))
 			masterI.mu.Unlock()
 		}
-		suite.master.kill()
+		suite.cluster.killCurrentMaster()
 
 		time.Sleep(suite.conf.Masters[0].DownAfter)
 
@@ -268,7 +268,7 @@ func TestODown(t *testing.T) {
 			gr.Go(func() error {
 				met := eventually(t, func() bool {
 					return masterStateIs(defaultMasterAddr, localSentinel, masterStateObjDown)
-				}, 5*time.Second)
+				}, 5*time.Second, "sentinel %s did not recognize master as o down", localSentinel.listener.Addr())
 				if !met {
 					return fmt.Errorf("sentinel %s did not recognize master as o down", localSentinel.listener.Addr())
 				}
@@ -320,7 +320,7 @@ func TestLeaderVoteNotConflict(t *testing.T) {
 		suite := setupWithCustomConfig(t, numInstances, func(c *Config) {
 			c.Masters[0].Quorum = numInstances/2 + 1 // force normal quorum
 		})
-		suite.master.kill()
+		suite.cluster.killCurrentMaster()
 		time.Sleep(suite.conf.Masters[0].DownAfter)
 
 		// check if a given sentinel is in sdown state, and holds for a long time
@@ -400,7 +400,7 @@ func TestLeaderElection(t *testing.T) {
 		suite := setupWithCustomConfig(t, numInstances, func(c *Config) {
 			c.Masters[0].Quorum = numInstances/2 + 1 // force normal quorum
 		})
-		suite.master.kill()
+		suite.cluster.killCurrentMaster()
 		time.Sleep(suite.conf.Masters[0].DownAfter)
 		//TODO: check more info of this recognized leader
 		suite.checkClusterHasLeader()
@@ -419,7 +419,7 @@ func TestPromoteSlave(t *testing.T) {
 		})
 		expectedChosenSlave := slaveCustomizer(suite.slavesMap)
 
-		suite.master.kill()
+		suite.cluster.killCurrentMaster()
 		time.Sleep(suite.conf.Masters[0].DownAfter)
 		//TODO: check more info of this recognized leader
 		suite.checkClusterHasLeader()
@@ -484,21 +484,29 @@ func TestResetMasterInstance(t *testing.T) {
 		expectedNewMaster.mu.Lock()
 		expectedID := expectedNewMaster.id
 		expectedNewMaster.mu.Unlock()
-		suite.master.kill()
+		suite.cluster.killCurrentMaster()
 		time.Sleep(suite.conf.Masters[0].DownAfter)
 		//TODO: check more info of this recognized leader
 		promotedSlave := suite.checkTermPromotedSlave(1)
 		suite.checkClusterHasLeader()
 		newRunID := suite.checkTermMasterRunID(1)
 		assert.Equal(t, promotedSlave, newRunID)
-		if newRunID == "" {
-			assert.FailNowf(t, "failover failed", "term %d has no new master instantiated", 2)
-		} else {
+		if newRunID != "" {
 			suite.mu.Lock()
 			if newRunID != expectedID {
 				assert.FailNowf(t, "failover to wrong master", "term %d wants master %s instead of %s", expectedID, newRunID)
 			}
 		}
+
+		// check if all instance create new master instance
+		instanceIDs := suite.checkTermMasterCreation(1, 3)
+		suite.mu.Lock()
+		totalInstances := []string{}
+		for _, s := range suite.instances {
+			totalInstances = append(totalInstances, s.runID)
+		}
+		assert.ElementsMatch(t, totalInstances, instanceIDs, "mismatch sentinels instances")
+		suite.mu.Unlock()
 	}
 	t.Run("select slave by highest offset", func(t *testing.T) {
 		assertion(t, 3, func(slaveMap map[string]*ToyKeva) *ToyKeva {
@@ -525,6 +533,21 @@ func TestResetMasterInstance(t *testing.T) {
 		})
 	})
 }
+
+func (s *testSuite) checkTermMasterCreation(term int, length int) []string {
+	var ret []string
+	eventually(s.t, func() bool {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		sentinelIds, exist := s.termsMasterInstanceCreation[term]
+		if exist && len(sentinelIds) == length {
+			ret = sentinelIds
+			return true
+		}
+		return false
+	}, 5*time.Second)
+	return ret
+}
 func (s *testSuite) checkTermMasterRunID(term int) string {
 	var ret string
 	eventually(s.t, func() bool {
@@ -536,7 +559,7 @@ func (s *testSuite) checkTermMasterRunID(term int) string {
 			return true
 		}
 		return false
-	}, 5*time.Second)
+	}, 5*time.Second, "term %d has no master created", term)
 	return ret
 }
 
@@ -551,7 +574,7 @@ func (s *testSuite) checkTermPromotedSlave(term int) string {
 			return true
 		}
 		return false
-	}, 5*time.Second)
+	}, 5*time.Second, "term %d has no slave promoted", term)
 	return ret
 }
 
@@ -560,7 +583,7 @@ func (s *testSuite) checkClusterHasLeader() {
 		s.mu.Lock()
 		defer s.mu.Unlock()
 		return s.currentLeader != ""
-	}, 10*time.Second)
+	}, 10*time.Second, "current leader is empty")
 }
 
 func getSentinelMaster(masterAddr string, s *Sentinel) *masterInstance {
