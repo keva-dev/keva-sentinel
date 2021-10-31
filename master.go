@@ -232,6 +232,7 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 			// stopAskingOtherSentinels: used when the fsm state wnats to turn back to this current line
 			// canceling the on going goroutine, or when the failover is successful
 			ctx, stopAskingOtherSentinels := context.WithCancel(context.Background())
+			defer stopAskingOtherSentinels()
 			go s.askOtherSentinelsEach1Sec(ctx, m)
 			sleepToNextFailover := s.nextFailoverAllowed(m)
 			timer := time.NewTimer(sleepToNextFailover)
@@ -239,7 +240,6 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 			select {
 			case <-timer.C:
 			case <-m.followerNewMasterNotify:
-				stopAskingOtherSentinels()
 				s.resetMasterInstance(m, true)
 
 				// this is a follower sentinel and new master recognize
@@ -255,6 +255,7 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 				case failOverWaitLeaderElection:
 					aborted, isleader := s.checkElectionStatus(m)
 					if isleader {
+						stopAskingOtherSentinels()
 						// to next state of fsm
 						continue
 					}
@@ -267,7 +268,6 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 					select {
 					case <-ticker.C:
 					case <-m.followerNewMasterNotify:
-						stopAskingOtherSentinels()
 						s.resetMasterInstance(m, true)
 
 						// this is a follower sentinel and new master recognize
@@ -281,7 +281,6 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 					// abort failover, start voting for new epoch
 					if slave == nil {
 						s.abortFailover(m)
-						stopAskingOtherSentinels()
 					} else {
 						s.promoteSlave(m, slave)
 					}
@@ -321,7 +320,7 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 						"epoch", m.getFailOverEpoch(),
 						"new_state", failOverResetInstance)
 					s.resetMasterInstance(m, false)
-
+					return
 				}
 			}
 		}

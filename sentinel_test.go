@@ -517,18 +517,18 @@ func TestResetMasterInstance(t *testing.T) {
 			return nil
 		})
 	})
-	// t.Run("select slave by highest priority", func(t *testing.T) {
-	// 	assertion(t, 3, func(slaveMap map[string]*ToyKeva) *ToyKeva {
-	// 		for idx := range slaveMap {
-	// 			slave := slaveMap[idx]
-	// 			slave.mu.Lock()
-	// 			slave.priority = 10
-	// 			slave.mu.Unlock()
-	// 			return slave
-	// 		}
-	// 		return nil
-	// 	})
-	// })
+	t.Run("select slave by highest priority", func(t *testing.T) {
+		assertion(t, 3, func(slaveMap map[string]*ToyKeva) *ToyKeva {
+			for idx := range slaveMap {
+				slave := slaveMap[idx]
+				slave.mu.Lock()
+				slave.priority = 10
+				slave.mu.Unlock()
+				return slave
+			}
+			return nil
+		})
+	})
 }
 
 func (s *testSuite) checkTermMasterCreation(term int, length int) []string {
