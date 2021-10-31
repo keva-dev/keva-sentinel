@@ -1,200 +1,1324 @@
+=== RUN   TestResetMasterInstance
 === RUN   TestResetMasterInstance/select_slave_by_highest_offset
-2021-10-30T22:05:28.835+0700	[35mDEBUG[0m	go-sentinel/master.go:170	master_instance_created	{"master_name": "mymaster", "run_id": "a2d4e0d7-0e80-42b4-b8cd-91bbfe0cfe59", "sentinel_run_id": "164b4e76-4e30-4b3a-939c-c4e11ff68fd2", "epoch": 0}
-2021/10/30 22:05:28 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
-2021/10/30 22:05:28 rpc.Register: method "Start" has 1 input parameters; needs exactly three
-2021/10/30 22:05:28 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
-2021/10/30 22:05:28 rpc.Register: method "Start" has 1 input parameters; needs exactly three
-2021-10-30T22:05:28.835+0700	[35mDEBUG[0m	go-sentinel/master.go:170	master_instance_created	{"master_name": "mymaster", "run_id": "a2d4e0d7-0e80-42b4-b8cd-91bbfe0cfe59", "sentinel_run_id": "7b496577-5f63-4bca-8265-c9dda150a8df", "epoch": 0}
-2021/10/30 22:05:28 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
-2021/10/30 22:05:28 rpc.Register: method "Start" has 1 input parameters; needs exactly three
-2021-10-30T22:05:28.835+0700	[35mDEBUG[0m	go-sentinel/master.go:170	master_instance_created	{"master_name": "mymaster", "run_id": "a2d4e0d7-0e80-42b4-b8cd-91bbfe0cfe59", "sentinel_run_id": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "epoch": 0}
-2021-10-30T22:05:30.837+0700	[34mINFO[0m	go-sentinel/master.go:162	subscribeHello: connected to new sentinel: localhost,2002,164b4e76-4e30-4b3a-939c-c4e11ff68fd2,0,mymaster,localhost,6767,0
-2021-10-30T22:05:30.837+0700	[34mINFO[0m	go-sentinel/slave.go:217	subscribeHello: connected to new sentinel: localhost,2001,7b496577-5f63-4bca-8265-c9dda150a8df,0,mymaster,localhost,6767,0
-2021-10-30T22:05:30.837+0700	[34mINFO[0m	go-sentinel/slave.go:217	subscribeHello: connected to new sentinel: localhost,2002,164b4e76-4e30-4b3a-939c-c4e11ff68fd2,0,mymaster,localhost,6767,0
-2021-10-30T22:05:30.838+0700	[34mINFO[0m	go-sentinel/master.go:162	subscribeHello: connected to new sentinel: localhost,2001,7b496577-5f63-4bca-8265-c9dda150a8df,0,mymaster,localhost,6767,0
-2021-10-30T22:05:30.840+0700	[34mINFO[0m	go-sentinel/master.go:162	subscribeHello: connected to new sentinel: localhost,2000,44b1a895-5def-4857-bfe4-40dd37fdf48c,0,mymaster,localhost,6767,0
-2021-10-30T22:05:30.840+0700	[34mINFO[0m	go-sentinel/slave.go:217	subscribeHello: connected to new sentinel: localhost,2000,44b1a895-5def-4857-bfe4-40dd37fdf48c,0,mymaster,localhost,6767,0
-run id 44b1a895-5def-4857-bfe4-40dd37fdf48c
-run id 164b4e76-4e30-4b3a-939c-c4e11ff68fd2
-[44b1a895-5def-4857-bfe4-40dd37fdf48c]
-[44b1a895-5def-4857-bfe4-40dd37fdf48c 164b4e76-4e30-4b3a-939c-c4e11ff68fd2]
-run id 7b496577-5f63-4bca-8265-c9dda150a8df
-[44b1a895-5def-4857-bfe4-40dd37fdf48c 164b4e76-4e30-4b3a-939c-c4e11ff68fd2 7b496577-5f63-4bca-8265-c9dda150a8df]
-2021-10-30T22:05:35.835+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
-2021-10-30T22:05:37.835+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
-2021-10-30T22:05:37.835+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
-2021-10-30T22:05:38.836+0700	[35mDEBUG[0m	go-sentinel/master.go:505	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
-2021-10-30T22:05:38.836+0700	[35mDEBUG[0m	go-sentinel/master.go:509	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "164b4e76-4e30-4b3a-939c-c4e11ff68fd2"}
-2021-10-30T22:05:38.836+0700	[35mDEBUG[0m	go-sentinel/master.go:505	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
-2021-10-30T22:05:38.836+0700	[35mDEBUG[0m	go-sentinel/master.go:509	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "7b496577-5f63-4bca-8265-c9dda150a8df"}
-updateing sentinel epoch hello: 44b1a895-5def-4857-bfe4-40dd37fdf48c 1
-2021-10-30T22:05:38.836+0700	[35mDEBUG[0m	go-sentinel/master.go:505	failover_state_change	{"new_state": "wait_leader_election", "epoch": 2}
-2021-10-30T22:05:38.836+0700	[35mDEBUG[0m	go-sentinel/master.go:509	sentinel_requesting_leader_election	{"epoch": 2, "sentinel_run_id": "44b1a895-5def-4857-bfe4-40dd37fdf48c"}
-2021-10-30T22:05:38.836+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "164b4e76-4e30-4b3a-939c-c4e11ff68fd2", "epoch": 1}
-2021-10-30T22:05:38.836+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "7b496577-5f63-4bca-8265-c9dda150a8df", "epoch": 1}
-2021-10-30T22:05:38.837+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "7b496577-5f63-4bca-8265-c9dda150a8df", "epoch": 1}
-updateing sentinel epoch: 7b496577-5f63-4bca-8265-c9dda150a8df 2
-2021-10-30T22:05:38.837+0700	[35mDEBUG[0m	go-sentinel/master.go:723	neighbor_sentinel_voted_for	{"neighbor_id": "7b496577-5f63-4bca-8265-c9dda150a8df", "voted_for": "164b4e76-4e30-4b3a-939c-c4e11ff68fd2", "epoch": 1}
-updateing sentinel epoch: 164b4e76-4e30-4b3a-939c-c4e11ff68fd2 2
-2021-10-30T22:05:38.837+0700	[35mDEBUG[0m	go-sentinel/master.go:723	neighbor_sentinel_voted_for	{"neighbor_id": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "voted_for": "7b496577-5f63-4bca-8265-c9dda150a8df", "epoch": 1}
-2021-10-30T22:05:38.837+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "epoch": 2}
-2021-10-30T22:05:38.837+0700	[35mDEBUG[0m	go-sentinel/master.go:723	neighbor_sentinel_voted_for	{"neighbor_id": "164b4e76-4e30-4b3a-939c-c4e11ff68fd2", "voted_for": "7b496577-5f63-4bca-8265-c9dda150a8df", "epoch": 1}
-2021-10-30T22:05:38.837+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "epoch": 2}
-2021-10-30T22:05:38.837+0700	[35mDEBUG[0m	go-sentinel/master.go:723	neighbor_sentinel_voted_for	{"neighbor_id": "7b496577-5f63-4bca-8265-c9dda150a8df", "voted_for": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "epoch": 2}
-2021-10-30T22:05:38.837+0700	[35mDEBUG[0m	go-sentinel/master.go:723	neighbor_sentinel_voted_for	{"neighbor_id": "164b4e76-4e30-4b3a-939c-c4e11ff68fd2", "voted_for": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "epoch": 2}
-2021-10-30T22:05:38.837+0700	[35mDEBUG[0m	go-sentinel/master.go:723	neighbor_sentinel_voted_for	{"neighbor_id": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "voted_for": "7b496577-5f63-4bca-8265-c9dda150a8df", "epoch": 1}
-2021-10-30T22:05:39.684+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "epoch": 2}
-2021-10-30T22:05:39.684+0700	[35mDEBUG[0m	go-sentinel/master.go:547	sentinel_became_leader	{"run_id": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "epoch": 2}
-2021-10-30T22:05:39.684+0700	[35mDEBUG[0m	go-sentinel/master.go:555	failover_state_change	{"new_state": "select_slave", "epoch": 2}
-2021-10-30T22:05:39.684+0700	[35mDEBUG[0m	go-sentinel/master.go:574	slave_selected	{"slave_addr": "localhost:0", "slave_id": "b56e34f4-5163-4bfa-9fbc-bccf2f5575d1", "epoch": 2}
-2021-10-30T22:05:39.684+0700	[35mDEBUG[0m	go-sentinel/master.go:580	failover_state_change	{"new_state": "promote_slave", "epoch": 2}
-2021-10-30T22:05:39.837+0700	[35mDEBUG[0m	go-sentinel/master.go:309	slave_promoted	{"run_id": "b56e34f4-5163-4bfa-9fbc-bccf2f5575d1", "epoch": 2}
-2021-10-30T22:05:39.837+0700	[35mDEBUG[0m	go-sentinel/master.go:312	failover_state_change	{"epoch": 2, "new_state": "reconfig_slave"}
-2021-10-30T22:05:40.842+0700	[35mDEBUG[0m	go-sentinel/master.go:412	failover_state_change	{"new_state": "failover_done", "epoch": 2}
-2021-10-30T22:05:40.842+0700	[35mDEBUG[0m	go-sentinel/master.go:170	master_instance_created	{"master_name": "mymaster", "run_id": "b56e34f4-5163-4bfa-9fbc-bccf2f5575d1", "sentinel_run_id": "7b496577-5f63-4bca-8265-c9dda150a8df", "epoch": 2}
-2021-10-30T22:05:40.842+0700	[35mDEBUG[0m	go-sentinel/master.go:412	failover_state_change	{"new_state": "failover_done", "epoch": 2}
-2021-10-30T22:05:40.842+0700	[31mERROR[0m	go-sentinel/slave.go:77	sl.client.Info: dead
-2021-10-30T22:05:40.842+0700	[35mDEBUG[0m	go-sentinel/master.go:170	master_instance_created	{"master_name": "mymaster", "run_id": "b56e34f4-5163-4bfa-9fbc-bccf2f5575d1", "sentinel_run_id": "164b4e76-4e30-4b3a-939c-c4e11ff68fd2", "epoch": 2}
-2021-10-30T22:05:40.842+0700	[31mERROR[0m	go-sentinel/slave.go:77	sl.client.Info: dead
-run id 164b4e76-4e30-4b3a-939c-c4e11ff68fd2
-[164b4e76-4e30-4b3a-939c-c4e11ff68fd2]
-run id 7b496577-5f63-4bca-8265-c9dda150a8df
-[164b4e76-4e30-4b3a-939c-c4e11ff68fd2 7b496577-5f63-4bca-8265-c9dda150a8df]
-    sentinel_test.go:609: 
-        	Error Trace:	sentinel_test.go:609
-        	            				sentinel_test.go:565
-        	            				sentinel_test.go:490
-        	            				sentinel_test.go:509
-        	Error:      	Condition never satisfied
-        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
-        	Messages:   	term 1 has no slave promoted
-2021-10-30T22:05:41.839+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:41.839+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:41.839+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:41.839+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
+sending info from sentinel 2:5ea296bb-e197-4884-bf67-1e1741ecd455
+sending info from sentinel 2:5ea296bb-e197-4884-bf67-1e1741ecd455
+sending info from sentinel 2:5ea296bb-e197-4884-bf67-1e1741ecd455
+2021/10/31 13:54:06 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021-10-31T13:54:06.946+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "5ea296bb-e197-4884-bf67-1e1741ecd455", "sentinel_run_id": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "epoch": 0}
+2021-10-31T13:54:06.946+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "5ea296bb-e197-4884-bf67-1e1741ecd455", "sentinel_run_id": "eebf8b95-2c6c-45cc-bb1f-c38651bfbc5c", "epoch": 0}
+sending info from sentinel :
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+2021-10-31T13:54:06.946+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "5ea296bb-e197-4884-bf67-1e1741ecd455", "sentinel_run_id": "e69c7a5a-37a9-4219-845b-014d6c1f9869", "epoch": 0}
+sending info from sentinel :
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel :
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 19d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel :
+2021/10/31 13:54:06 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel :
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+2021/10/31 13:54:06 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+2021/10/31 13:54:06 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/31 13:54:06 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+2021/10/31 13:54:06 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+sending info from sentinel :
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 19d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 29d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+sending info from sentinel :
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 19d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 29d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info locked 3 9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 39d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info 9d859e96-cefd-48b6-ae2a-19d3d54308be return----------------
+debug: slave called info lock 29d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info locked 3 9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info locked 3 9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 39d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info 9d859e96-cefd-48b6-ae2a-19d3d54308be return----------------
+sending info from sentinel :
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel :
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+debug: slave called info lock 39d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info 9d859e96-cefd-48b6-ae2a-19d3d54308be return----------------
+debug: 2544a2dc-94a5-4aef-ac52-ff44628fe426 locked
+debug: 2544a2dc-94a5-4aef-ac52-ff44628fe426 unlocked
+debug: 956f6bcf-36a0-4f20-b831-2662aa3dc061 locked
+debug: 956f6bcf-36a0-4f20-b831-2662aa3dc061 unlocked
+debug: 247dd798-0cd9-44c1-bcf3-a97171b7c5ed locked
+debug: 247dd798-0cd9-44c1-bcf3-a97171b7c5ed unlocked
+debug: 4441468f-c27b-4996-8036-1f11b0bcc918 locked
+debug: 4441468f-c27b-4996-8036-1f11b0bcc918 unlocked
+2021-10-31T13:54:08.948+0700	[34mINFO[0m	go-sentinel/slave.go:221	subscribeHello: connected to new sentinel: localhost,2001,e69c7a5a-37a9-4219-845b-014d6c1f9869,0,mymaster,localhost,6767,0
+2021-10-31T13:54:08.949+0700	[34mINFO[0m	go-sentinel/master.go:163	subscribeHello: connected to new sentinel: localhost,2000,eebf8b95-2c6c-45cc-bb1f-c38651bfbc5c,0,mymaster,localhost,6767,0
+debug: ec12d8e7-5432-4d55-90d7-55a32fded172 locked
+debug: ec12d8e7-5432-4d55-90d7-55a32fded172 unlocked
+2021-10-31T13:54:08.949+0700	[34mINFO[0m	go-sentinel/slave.go:221	subscribeHello: connected to new sentinel: localhost,2002,811dfc14-0098-4711-9e22-8a6bc8a45d02,0,mymaster,localhost,6767,0
+2021-10-31T13:54:08.949+0700	[34mINFO[0m	go-sentinel/slave.go:221	subscribeHello: connected to new sentinel: localhost,2002,811dfc14-0098-4711-9e22-8a6bc8a45d02,0,mymaster,localhost,6767,0
+debug: 8164a78e-f8ca-4d35-b082-087b60bacd6d locked
+debug: 8164a78e-f8ca-4d35-b082-087b60bacd6d unlocked
+debug: 6c1e91d0-7203-4917-855f-1c98071d9a13 locked
+debug: 6c1e91d0-7203-4917-855f-1c98071d9a13 unlocked
+debug: a3c0bdc7-8aab-4ea4-8b19-388a358cd78f locked
+debug: a3c0bdc7-8aab-4ea4-8b19-388a358cd78f unlocked
+2021-10-31T13:54:08.950+0700	[34mINFO[0m	go-sentinel/master.go:163	subscribeHello: connected to new sentinel: localhost,2000,eebf8b95-2c6c-45cc-bb1f-c38651bfbc5c,0,mymaster,localhost,6767,0
+debug: 44b83fe2-49cd-4973-9003-e6eb59e9e832 locked
+debug: 44b83fe2-49cd-4973-9003-e6eb59e9e832 unlocked
+2021-10-31T13:54:08.950+0700	[34mINFO[0m	go-sentinel/slave.go:221	subscribeHello: connected to new sentinel: localhost,2001,e69c7a5a-37a9-4219-845b-014d6c1f9869,0,mymaster,localhost,6767,0
+debug: 5883c52a-fe6e-4213-9ffd-750e270b7841 locked
+debug: 5883c52a-fe6e-4213-9ffd-750e270b7841 unlocked
+debug: 8ad9c29c-5272-4944-a0b6-35b263f077aa locked
+debug: 8ad9c29c-5272-4944-a0b6-35b263f077aa unlocked
+debug: 56a42ede-5d69-4b2b-9b31-a2f7933849f5 locked
+debug: 56a42ede-5d69-4b2b-9b31-a2f7933849f5 unlocked
+debug: 08566519-7356-4fd0-8e10-30b3452d469f locked
+debug: 08566519-7356-4fd0-8e10-30b3452d469f unlocked
+debug: 0269f577-e1bd-4787-acd2-34174148f511 locked
+debug: 0269f577-e1bd-4787-acd2-34174148f511 unlocked
+debug: d9e91e33-d9f3-42d9-aa8d-b350833f5277 locked
+debug: d9e91e33-d9f3-42d9-aa8d-b350833f5277 unlocked
+debug: c32debcc-13e4-4919-a97a-a1dca9a7cd09 locked
+debug: c32debcc-13e4-4919-a97a-a1dca9a7cd09 unlocked
+debug: f7cdffb6-654b-4dec-9f19-7f8a38c22316 locked
+debug: f7cdffb6-654b-4dec-9f19-7f8a38c22316 unlocked
+debug: 103b0162-3001-4e8d-a4bc-4a9e6c9e7913 locked
+debug: 103b0162-3001-4e8d-a4bc-4a9e6c9e7913 unlocked
+debug: b26441a2-5de9-472b-855b-414b58f6e1bb locked
+debug: b26441a2-5de9-472b-855b-414b58f6e1bb unlocked
+debug: c7cdecd4-3f35-46b0-8913-15dfd972faff locked
+debug: c7cdecd4-3f35-46b0-8913-15dfd972faff unlocked
+debug: c22f4ef3-d956-4fa1-8b7a-bcce7fd6cbc7 locked
+debug: c22f4ef3-d956-4fa1-8b7a-bcce7fd6cbc7 unlocked
+debug: 09b8359b-27ff-4220-a0fa-2c6dbb361fa0 locked
+debug: 09b8359b-27ff-4220-a0fa-2c6dbb361fa0 unlocked
+debug: df095175-256c-4df0-92fc-609ba779b0ae locked
+debug: df095175-256c-4df0-92fc-609ba779b0ae unlocked
+debug: 30434de0-c29c-42b7-9309-fac9a3a5e7eb locked
+debug: 30434de0-c29c-42b7-9309-fac9a3a5e7eb unlocked
+debug: da5aec52-382d-4894-987a-bcd2c1358668 locked
+debug: da5aec52-382d-4894-987a-bcd2c1358668 unlocked
+debug: a78bfa5a-7262-467b-846f-0cfb6cbcb2f5 locked
+debug: 4c550e82-3010-4a09-903d-5b7464c90453 locked
+debug: 4c550e82-3010-4a09-903d-5b7464c90453 unlocked
+debug: a78bfa5a-7262-467b-846f-0cfb6cbcb2f5 unlocked
+debug: 7f39da9f-7316-42c6-a234-4ad071891195 locked
+debug: 7f39da9f-7316-42c6-a234-4ad071891195 unlocked
+debug: e2b3134f-d81e-4333-aa35-498c51aa9c3f locked
+debug: e2b3134f-d81e-4333-aa35-498c51aa9c3f unlocked
+debug: 8fc30ed5-45f3-402e-90d3-208958c5b183 locked
+debug: 115630db-c23e-45c0-8007-919c7c09730e locked
+debug: 24d11844-38b5-4a2f-bf90-80de564ddcb7 locked
+debug: 24d11844-38b5-4a2f-bf90-80de564ddcb7 unlocked
+debug: 8fc30ed5-45f3-402e-90d3-208958c5b183 unlocked
+debug: ca1b3040-1183-458f-893b-1add365eccbf locked
+debug: a9f43ed5-628b-42ae-a656-0d9497a0da77 locked
+debug: a9f43ed5-628b-42ae-a656-0d9497a0da77 unlocked
+debug: 1a124044-c965-46b9-b682-a2d20bd4f2ce locked
+debug: 1a124044-c965-46b9-b682-a2d20bd4f2ce unlocked
+debug: f0884634-119f-4e3b-b1fa-ef2d8614acb9 locked
+debug: f0884634-119f-4e3b-b1fa-ef2d8614acb9 unlocked
+debug: ca1b3040-1183-458f-893b-1add365eccbf unlocked
+debug: 115630db-c23e-45c0-8007-919c7c09730e unlocked
+debug: 70edece8-a457-42a7-8e19-8dfa699c4570 locked
+debug: 70edece8-a457-42a7-8e19-8dfa699c4570 unlocked
+debug: cbb36faa-1396-484d-a364-d47f19a36ab6 locked
+debug: 6b0ffdb3-f318-467b-a08f-c1d2d88b226d locked
+debug: cbb36faa-1396-484d-a364-d47f19a36ab6 unlocked
+debug: a1275e17-a156-4999-9a76-f3326aac04f1 locked
+debug: a1275e17-a156-4999-9a76-f3326aac04f1 unlocked
+debug: 6b0ffdb3-f318-467b-a08f-c1d2d88b226d unlocked
+debug: e3794f8a-8edc-4daa-bdcf-2515881f772a locked
+debug: e3794f8a-8edc-4daa-bdcf-2515881f772a unlocked
+debug: c5f884f9-cbed-47ce-96cc-8cb39b32cd47 locked
+debug: c5f884f9-cbed-47ce-96cc-8cb39b32cd47 unlocked
+debug: 391d6ea8-2a31-4d0b-a426-a66a99ee59df locked
+debug: 391d6ea8-2a31-4d0b-a426-a66a99ee59df unlocked
+debug: 922c2d98-608f-4355-9fd0-c24e4e44ee37 locked
+debug: d00c8c6d-658b-4ef5-8afc-b99483b1fb8b locked
+debug: d00c8c6d-658b-4ef5-8afc-b99483b1fb8b unlocked
+debug: 1b9e2719-97e7-4bcb-974f-d8b383dc037f locked
+debug: 1b9e2719-97e7-4bcb-974f-d8b383dc037f unlocked
+debug: 3c4c6c9d-344c-464c-b77e-8fbcd40234d1 locked
+debug: 3c4c6c9d-344c-464c-b77e-8fbcd40234d1 unlocked
+debug: 922c2d98-608f-4355-9fd0-c24e4e44ee37 unlocked
+debug: 30ffa296-3542-4c35-9c75-568c261f32fc locked
+debug: 30ffa296-3542-4c35-9c75-568c261f32fc unlocked
+2021-10-31T13:54:15.947+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+2021-10-31T13:54:15.947+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+2021-10-31T13:54:15.947+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel :9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 19d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 29d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info locked 3 9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 39d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info 9d859e96-cefd-48b6-ae2a-19d3d54308be return----------------
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel :9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 19d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel :9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 19d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 29d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info locked 3 9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 39d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info 9d859e96-cefd-48b6-ae2a-19d3d54308be return----------------
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+2021-10-31T13:54:16.947+0700	[35mDEBUG[0m	go-sentinel/master.go:517	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+2021-10-31T13:54:16.947+0700	[35mDEBUG[0m	go-sentinel/master.go:521	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "eebf8b95-2c6c-45cc-bb1f-c38651bfbc5c"}
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+2021-10-31 13:54:16.947589097 +0700 +07 m=+10.003500895 info every 1s now: 9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel :9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+2021-10-31T13:54:16.947+0700	[35mDEBUG[0m	go-sentinel/master.go:517	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+debug: slave called info lock 19d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 29d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info locked 3 9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 39d859e96-cefd-48b6-ae2a-19d3d54308be
+2021-10-31T13:54:16.947+0700	[35mDEBUG[0m	go-sentinel/master.go:521	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "811dfc14-0098-4711-9e22-8a6bc8a45d02"}
+debug: slave called info 9d859e96-cefd-48b6-ae2a-19d3d54308be return----------------
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+2021-10-31T13:54:16.947+0700	[35mDEBUG[0m	go-sentinel/master.go:517	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+2021-10-31 13:54:16.948034132 +0700 +07 m=+10.003945907 info every 1s now: fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+2021-10-31T13:54:16.948+0700	[35mDEBUG[0m	go-sentinel/master.go:521	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "e69c7a5a-37a9-4219-845b-014d6c1f9869"}
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+2021-10-31 13:54:16.948138396 +0700 +07 m=+10.004050169 info every 1s now: 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+2021-10-31T13:54:16.948+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "epoch": 1}
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+2021-10-31T13:54:16.948+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "epoch": 1}
+debug: slave called info lock 29d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info locked 3 9d859e96-cefd-48b6-ae2a-19d3d54308be
+2021-10-31T13:54:16.948+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "eebf8b95-2c6c-45cc-bb1f-c38651bfbc5c", "epoch": 1}
+debug: slave called info lock 39d859e96-cefd-48b6-ae2a-19d3d54308be
+2021-10-31T13:54:16.948+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "eebf8b95-2c6c-45cc-bb1f-c38651bfbc5c", "voted_for": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "epoch": 1}
+debug: slave called info 9d859e96-cefd-48b6-ae2a-19d3d54308be return----------------
+debug: 944bb3c0-acef-4079-9d06-9be1756d5ab0 locked
+debug: 944bb3c0-acef-4079-9d06-9be1756d5ab0 unlocked
+debug: bbb6407b-4d9e-44cd-8213-e07a42a0316b locked
+debug: bbb6407b-4d9e-44cd-8213-e07a42a0316b unlocked
+2021-10-31 13:54:16.948414467 +0700 +07 m=+10.004326243 info every 1s now: 9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel :9d859e96-cefd-48b6-ae2a-19d3d54308be
+2021-10-31T13:54:16.948+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "e69c7a5a-37a9-4219-845b-014d6c1f9869", "voted_for": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "epoch": 1}
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 19d859e96-cefd-48b6-ae2a-19d3d54308be
+2021-10-31T13:54:16.948+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "voted_for": "eebf8b95-2c6c-45cc-bb1f-c38651bfbc5c", "epoch": 1}
+debug: slave called info lock 29d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info locked 3 9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 39d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: 481f4862-2a8a-4528-b527-cb5792928add locked
+2021-10-31T13:54:16.948+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "e69c7a5a-37a9-4219-845b-014d6c1f9869", "voted_for": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "epoch": 1}
+debug: 481f4862-2a8a-4528-b527-cb5792928add unlocked
+2021-10-31 13:54:16.947858242 +0700 +07 m=+10.003770042 info every 1s now: 9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info 9d859e96-cefd-48b6-ae2a-19d3d54308be return----------------
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+2021-10-31T13:54:16.948+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "voted_for": "eebf8b95-2c6c-45cc-bb1f-c38651bfbc5c", "epoch": 1}
+2021-10-31 13:54:16.948314772 +0700 +07 m=+10.004226546 info every 1s now: 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel :9d859e96-cefd-48b6-ae2a-19d3d54308be
+2021-10-31 13:54:16.947879207 +0700 +07 m=+10.003790987 info every 1s now: 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 19d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 29d859e96-cefd-48b6-ae2a-19d3d54308be
+2021-10-31T13:54:16.948+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "eebf8b95-2c6c-45cc-bb1f-c38651bfbc5c", "voted_for": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "epoch": 1}
+debug: slave called info locked 3 9d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info lock 39d859e96-cefd-48b6-ae2a-19d3d54308be
+debug: slave called info 9d859e96-cefd-48b6-ae2a-19d3d54308be return----------------
+2021-10-31 13:54:16.948734954 +0700 +07 m=+10.004646732 info every 1s now: fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+2021-10-31 13:54:16.949255178 +0700 +07 m=+10.005166977 info every 1s now: fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+debug: 0403d0e2-1965-43be-ade2-cccb41944bae locked
+debug: 0403d0e2-1965-43be-ade2-cccb41944bae unlocked
+debug: db703f81-5a94-4b05-98bd-e1bc5921d629 locked
+debug: db703f81-5a94-4b05-98bd-e1bc5921d629 unlocked
+debug: bd751050-1c02-46c3-be99-fd1ea659beef locked
+debug: bd751050-1c02-46c3-be99-fd1ea659beef unlocked
+debug: c08ef1c4-c9bf-4f41-ba3d-19a31a8460f2 locked
+debug: c08ef1c4-c9bf-4f41-ba3d-19a31a8460f2 unlocked
+debug: 36f1a6ee-afa9-4e0f-a0f2-8267f44143dd locked
+debug: 36f1a6ee-afa9-4e0f-a0f2-8267f44143dd unlocked
+debug: b3baf52f-0295-40d6-8f72-56705f733e10 locked
+debug: b3baf52f-0295-40d6-8f72-56705f733e10 unlocked
+debug: ba888e5e-7b6b-4360-af5c-8b206f95384a locked
+debug: ba888e5e-7b6b-4360-af5c-8b206f95384a unlocked
+debug: 1613ccda-92aa-4dad-ace6-e834a3daba44 locked
+debug: 1613ccda-92aa-4dad-ace6-e834a3daba44 unlocked
+debug: d504e94c-596b-4f62-a6c4-217ed3028553 locked
+debug: d504e94c-596b-4f62-a6c4-217ed3028553 unlocked
+2021-10-31T13:54:17.835+0700	[35mDEBUG[0m	go-sentinel/master.go:559	sentinel_became_leader	{"run_id": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "epoch": 1}
+2021-10-31T13:54:17.835+0700	[35mDEBUG[0m	go-sentinel/master.go:567	failover_state_change	{"new_state": "select_slave", "epoch": 1}
+2021-10-31T13:54:17.835+0700	[35mDEBUG[0m	go-sentinel/master.go:586	slave_selected	{"slave_addr": "localhost:0", "slave_id": "9d859e96-cefd-48b6-ae2a-19d3d54308be", "epoch": 1}
+2021-10-31T13:54:17.835+0700	[35mDEBUG[0m	go-sentinel/master.go:592	failover_state_change	{"new_state": "promote_slave", "epoch": 1}
+sending info from sentinel :9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+sending info from sentinel :9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+killed 
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+2021-10-31T13:54:17.949+0700	[35mDEBUG[0m	go-sentinel/master.go:310	slave_promoted	{"run_id": "9d859e96-cefd-48b6-ae2a-19d3d54308be", "epoch": 1}
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+2021-10-31T13:54:17.949+0700	[35mDEBUG[0m	go-sentinel/master.go:313	failover_state_change	{"epoch": 1, "new_state": "reconfig_slave"}
+3df5afd9-1183-4c2c-9703-93be3ce2f07a acquired semaphore
+3df5afd9-1183-4c2c-9703-93be3ce2f07a sending slaveof
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+3df5afd9-1183-4c2c-9703-93be3ce2f07a:new master found: new localhost:0 vs old localhost:0
+sending info from sentinel :9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel 2:9d859e96-cefd-48b6-ae2a-19d3d54308be
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+done processing slaveof 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sent reconfig for slave 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+debug: ff1c3d37-3d8f-4ef6-accc-d2084b6c9d0c locked
+debug: ff1c3d37-3d8f-4ef6-accc-d2084b6c9d0c unlocked
+debug: a60b1b4d-2404-446d-8e16-7a474274f504 locked
+debug: a60b1b4d-2404-446d-8e16-7a474274f504 unlocked
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+2021-10-31T13:54:18.949+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+sending info from sentinel :
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+sending info from sentinel :
+2021-10-31T13:54:18.949+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "9d859e96-cefd-48b6-ae2a-19d3d54308be", "sentinel_run_id": "eebf8b95-2c6c-45cc-bb1f-c38651bfbc5c", "epoch": 1}
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel :
+sending info from sentinel dead:5ea296bb-e197-4884-bf67-1e1741ecd455
+2021-10-31T13:54:18.949+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+2021-10-31T13:54:18.949+0700	[31mERROR[0m	go-sentinel/slave.go:79	sl.client.Info: dead
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+2021-10-31T13:54:18.949+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "9d859e96-cefd-48b6-ae2a-19d3d54308be", "sentinel_run_id": "e69c7a5a-37a9-4219-845b-014d6c1f9869", "epoch": 1}
+sending info from sentinel :
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+sending info from sentinel :
+sending info from sentinel dead:5ea296bb-e197-4884-bf67-1e1741ecd455
+2021-10-31T13:54:18.949+0700	[31mERROR[0m	go-sentinel/slave.go:79	sl.client.Info: dead
+sending info from sentinel :
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+debug: ef52a1ac-946f-4dfd-a42d-50cee78cfc8d locked
+debug: ef52a1ac-946f-4dfd-a42d-50cee78cfc8d unlocked
+killed 
+killed 
+killed 
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+3df5afd9-1183-4c2c-9703-93be3ce2f07a:new master found: new localhost:0 vs old localhost:0
+3df5afd9-1183-4c2c-9703-93be3ce2f07a:configured in progress flag
+3df5afd9-1183-4c2c-9703-93be3ce2f07a:configured done flag
+killed 
+done, releasing semaphore: 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc acquired semaphore
+fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc sending slaveof
+done processing slaveof fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sent reconfig for slave fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+2021-10-31T13:54:18.950+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
+2021-10-31T13:54:18.950+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
+2021-10-31T13:54:18.950+0700	[31mERROR[0m	go-sentinel/master.go:727	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:54:18.950+0700	[31mERROR[0m	go-sentinel/master.go:727	sentinel.client.IsMasterDownByAddr: master does not exist
+debug: 4c27ea1b-99b4-4bbc-9dd9-01ceaee7c3a2 locked
+debug: 3f8cdba2-a9bf-40e3-8292-52f8befe17eb locked
+debug: 3f8cdba2-a9bf-40e3-8292-52f8befe17eb unlocked
+debug: ff4793b3-f61f-43a0-add8-40ed797026f2 locked
+debug: ff4793b3-f61f-43a0-add8-40ed797026f2 unlocked
+debug: 9b68c0d9-e63f-45f3-9776-dd980685615c locked
+debug: 9b68c0d9-e63f-45f3-9776-dd980685615c unlocked
+debug: 03ac41c0-0f7f-4c43-b30a-97c9cbe71583 locked
+debug: 32274e87-6d06-4c0d-9fc0-ecfbceed46dc locked
+debug: 4c27ea1b-99b4-4bbc-9dd9-01ceaee7c3a2 unlocked
+debug: 32274e87-6d06-4c0d-9fc0-ecfbceed46dc unlocked
+debug: 03ac41c0-0f7f-4c43-b30a-97c9cbe71583 unlocked
+killed 
+sending info from sentinel :fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc:new master found: new localhost:0 vs old localhost:0
+fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc:configured in progress flag
+fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc:configured done flag
+sending info from sentinel :3df5afd9-1183-4c2c-9703-93be3ce2f07a
+killed 
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+2021-10-31T13:54:19.950+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
+3df5afd9-1183-4c2c-9703-93be3ce2f07a:new master found: new localhost:0 vs old localhost:0
+done, releasing semaphore: fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
 done reconfig
-2021-10-30T22:05:42.839+0700	[35mDEBUG[0m	go-sentinel/master.go:319	failover_state_change	{"epoch": 2, "new_state": "reset_instance"}
-2021-10-30T22:05:42.839+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:42.839+0700	[35mDEBUG[0m	go-sentinel/master.go:412	failover_state_change	{"new_state": "failover_done", "epoch": 2}
-2021-10-30T22:05:42.839+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:42.839+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:42.839+0700	[35mDEBUG[0m	go-sentinel/master.go:170	master_instance_created	{"master_name": "mymaster", "run_id": "b56e34f4-5163-4bfa-9fbc-bccf2f5575d1", "sentinel_run_id": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "epoch": 2}
-2021-10-30T22:05:42.840+0700	[31mERROR[0m	go-sentinel/slave.go:77	sl.client.Info: dead
-2021-10-30T22:05:42.840+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-run id 44b1a895-5def-4857-bfe4-40dd37fdf48c
-[164b4e76-4e30-4b3a-939c-c4e11ff68fd2 7b496577-5f63-4bca-8265-c9dda150a8df 44b1a895-5def-4857-bfe4-40dd37fdf48c]
-2021-10-30T22:05:43.840+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:43.840+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:43.841+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:43.841+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:44.842+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:44.842+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:44.842+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:44.842+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:45.843+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:45.843+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:45.843+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:45.843+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:46.844+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:46.844+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:46.844+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:46.844+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-    sentinel_test.go:609: 
-        	Error Trace:	sentinel_test.go:609
-        	            				sentinel_test.go:550
-        	            				sentinel_test.go:492
-        	            				sentinel_test.go:509
-        	Error:      	Condition never satisfied
-        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
-        	Messages:   	term 1 has no master created
-2021-10-30T22:05:47.846+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:47.846+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:47.846+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:47.846+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:48.847+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:48.847+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:48.847+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:48.847+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:49.848+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:49.848+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:49.848+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:49.848+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:50.849+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:50.849+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:50.849+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:50.849+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:51.850+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:51.850+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:51.851+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:51.851+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:54:19.950+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
+2021-10-31T13:54:19.950+0700	[35mDEBUG[0m	go-sentinel/master.go:320	failover_state_change	{"epoch": 1, "new_state": "reset_instance"}
+2021-10-31T13:54:19.950+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+2021-10-31T13:54:19.950+0700	[31mERROR[0m	go-sentinel/master.go:727	sentinel.client.IsMasterDownByAddr: master does not exist
+ acquired semaphore
+2021-10-31T13:54:19.950+0700	[31mERROR[0m	go-sentinel/master.go:727	sentinel.client.IsMasterDownByAddr: master does not exist
+ sending slaveof
+sending info from sentinel :
+sending info from sentinel 2:fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 1fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info lock 2fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+debug: slave called info locked 3 fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sending info from sentinel :
+sending info from sentinel dead:5ea296bb-e197-4884-bf67-1e1741ecd455
+2021-10-31T13:54:19.951+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "9d859e96-cefd-48b6-ae2a-19d3d54308be", "sentinel_run_id": "811dfc14-0098-4711-9e22-8a6bc8a45d02", "epoch": 1}
+debug: slave called info lock 3fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+2021-10-31T13:54:19.951+0700	[31mERROR[0m	go-sentinel/slave.go:79	sl.client.Info: dead
+debug: slave called info fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc return----------------
+sending info from sentinel :
+sending info from sentinel 2:3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 13df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 23df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info locked 3 3df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info lock 33df5afd9-1183-4c2c-9703-93be3ce2f07a
+debug: slave called info 3df5afd9-1183-4c2c-9703-93be3ce2f07a return----------------
+ sending slaveof has error dead
+ acquired semaphore
+ sending slaveof
+done processing slaveof fe550e4a-bb5a-4db7-8cf0-b6b0d36f00cc
+sent reconfig for slave 
+--- PASS: TestResetMasterInstance (13.10s)
+    --- PASS: TestResetMasterInstance/select_slave_by_highest_offset (13.10s)
+PASS
+ok  	github.com/keva-dev/go-sentinel	13.109s
+=== RUN   TestResetMasterInstance
+=== RUN   TestResetMasterInstance/select_slave_by_highest_offset
+sending info from sentinel 2:65e7c6b0-3bbe-4243-9dd8-617e25d22988
+sending info from sentinel 2:65e7c6b0-3bbe-4243-9dd8-617e25d22988
+sending info from sentinel 2:65e7c6b0-3bbe-4243-9dd8-617e25d22988
+2021/10/31 13:54:27 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/31 13:54:27 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+sending info from sentinel :
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+2021-10-31T13:54:27.072+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "65e7c6b0-3bbe-4243-9dd8-617e25d22988", "sentinel_run_id": "d32e3dde-0882-4785-8720-d1956cd4d870", "epoch": 0}
+2021/10/31 13:54:27 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/31 13:54:27 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-31T13:54:27.072+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "65e7c6b0-3bbe-4243-9dd8-617e25d22988", "sentinel_run_id": "e12d0305-de2b-4d75-ac0a-6591c72ccd1b", "epoch": 0}
+sending info from sentinel :
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 1e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 2e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info locked 3 e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 3e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel :
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+2021/10/31 13:54:27 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+sending info from sentinel :
+2021/10/31 13:54:27 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+sending info from sentinel :
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel :
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 1e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel :
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 1e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 2e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info locked 3 e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 3e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info e4e55908-5f1c-41ec-9829-dc9e29e2587f return----------------
+sending info from sentinel :
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+debug: slave called info lock 2e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info locked 3 e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 3e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel :
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+debug: slave called info e4e55908-5f1c-41ec-9829-dc9e29e2587f return----------------
+debug: slave called info e4e55908-5f1c-41ec-9829-dc9e29e2587f return----------------
+2021-10-31T13:54:27.072+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "65e7c6b0-3bbe-4243-9dd8-617e25d22988", "sentinel_run_id": "8b1fc21f-d5d8-46fb-b631-4310595d077e", "epoch": 0}
+debug: b8c65065-b1e3-4967-b23e-20e48e2d37ce locked
+debug: b8c65065-b1e3-4967-b23e-20e48e2d37ce unlocked
+debug: 6eb9497b-cace-40c6-9bcd-52f796b76da7 locked
+debug: 6eb9497b-cace-40c6-9bcd-52f796b76da7 unlocked
+debug: 43867b30-1f7a-46ea-b3c4-8b583f3866f1 locked
+debug: 4d21eba1-f122-42e2-a463-74279daa621a locked
+debug: 348ab3fc-923d-4382-81a6-1e00cdb1e0b5 locked
+debug: 43867b30-1f7a-46ea-b3c4-8b583f3866f1 unlocked
+debug: 31c7e2b7-5875-49cb-b4d7-4634f32552fb locked
+debug: 31c7e2b7-5875-49cb-b4d7-4634f32552fb unlocked
+debug: 4d21eba1-f122-42e2-a463-74279daa621a unlocked
+debug: 348ab3fc-923d-4382-81a6-1e00cdb1e0b5 unlocked
+2021-10-31T13:54:29.074+0700	[34mINFO[0m	go-sentinel/slave.go:221	subscribeHello: connected to new sentinel: localhost,2001,e12d0305-de2b-4d75-ac0a-6591c72ccd1b,0,mymaster,localhost,6767,0
+2021-10-31T13:54:29.074+0700	[34mINFO[0m	go-sentinel/slave.go:221	subscribeHello: connected to new sentinel: localhost,2000,8b1fc21f-d5d8-46fb-b631-4310595d077e,0,mymaster,localhost,6767,0
+2021-10-31T13:54:29.074+0700	[34mINFO[0m	go-sentinel/slave.go:221	subscribeHello: connected to new sentinel: localhost,2001,e12d0305-de2b-4d75-ac0a-6591c72ccd1b,0,mymaster,localhost,6767,0
+debug: 70890f94-858a-415d-972d-eb26aa8f615d locked
+debug: 70890f94-858a-415d-972d-eb26aa8f615d unlocked
+2021-10-31T13:54:29.075+0700	[34mINFO[0m	go-sentinel/slave.go:221	subscribeHello: connected to new sentinel: localhost,2000,8b1fc21f-d5d8-46fb-b631-4310595d077e,0,mymaster,localhost,6767,0
+2021-10-31T13:54:29.075+0700	[34mINFO[0m	go-sentinel/master.go:163	subscribeHello: connected to new sentinel: localhost,2002,d32e3dde-0882-4785-8720-d1956cd4d870,0,mymaster,localhost,6767,0
+2021-10-31T13:54:29.075+0700	[34mINFO[0m	go-sentinel/master.go:163	subscribeHello: connected to new sentinel: localhost,2002,d32e3dde-0882-4785-8720-d1956cd4d870,0,mymaster,localhost,6767,0
+debug: b0c5ae28-df4f-4444-aeab-d0f81a98257c locked
+debug: b0c5ae28-df4f-4444-aeab-d0f81a98257c unlocked
+debug: 0a353259-5e1a-4a32-9543-dc26ed24cdbd locked
+debug: 116e6df1-b064-4bb9-a139-48ba07cfc7db locked
+debug: 0a353259-5e1a-4a32-9543-dc26ed24cdbd unlocked
+debug: 73a62296-a2de-47b0-aa40-19b934bad20c locked
+debug: 17d1eaee-ea65-4988-9cbf-ef2853286373 locked
+debug: 17d1eaee-ea65-4988-9cbf-ef2853286373 unlocked
+debug: 116e6df1-b064-4bb9-a139-48ba07cfc7db unlocked
+debug: 73a62296-a2de-47b0-aa40-19b934bad20c unlocked
+debug: ba706e2f-95bb-4836-9077-5bf7a4378bf2 locked
+debug: ba706e2f-95bb-4836-9077-5bf7a4378bf2 unlocked
+debug: cc3ec2ab-ee5b-4469-a0c3-628b5adc998f locked
+debug: cc3ec2ab-ee5b-4469-a0c3-628b5adc998f unlocked
+debug: 91069a90-e710-436e-830e-2d5dbdab8357 locked
+debug: 91069a90-e710-436e-830e-2d5dbdab8357 unlocked
+debug: 296e1853-3906-4278-a0d2-c91b09974cf6 locked
+debug: 296e1853-3906-4278-a0d2-c91b09974cf6 unlocked
+debug: 74dcb0a2-1088-48b8-a128-4ec981843590 locked
+debug: 74dcb0a2-1088-48b8-a128-4ec981843590 unlocked
+debug: 2f01af78-ebb3-447e-8d79-18867338fafc locked
+debug: 2f01af78-ebb3-447e-8d79-18867338fafc unlocked
+debug: 87735f80-431d-47d7-8691-7e23ed3ec724 locked
+debug: 87735f80-431d-47d7-8691-7e23ed3ec724 unlocked
+debug: 994a16d6-c4e3-418f-85fb-c089c0a94f5e locked
+debug: 994a16d6-c4e3-418f-85fb-c089c0a94f5e unlocked
+debug: 35061683-7da3-41dc-ac79-7e54357fbf8c locked
+debug: 35061683-7da3-41dc-ac79-7e54357fbf8c unlocked
+debug: e37e3fad-8ab4-4fba-a9ee-08f6625d5fd4 locked
+debug: e37e3fad-8ab4-4fba-a9ee-08f6625d5fd4 unlocked
+debug: 1e795c67-44a9-409a-aaae-344bf3cf73c8 locked
+debug: 1e795c67-44a9-409a-aaae-344bf3cf73c8 unlocked
+debug: b372c06d-6585-4ca3-8804-f23708b2e8f1 locked
+debug: b372c06d-6585-4ca3-8804-f23708b2e8f1 unlocked
+debug: ee57fe88-81aa-4699-a25c-cbd3906be85e locked
+debug: ee57fe88-81aa-4699-a25c-cbd3906be85e unlocked
+debug: b7a270b5-8c0e-49f8-824b-69dd8ceecc13 locked
+debug: b7a270b5-8c0e-49f8-824b-69dd8ceecc13 unlocked
+debug: 4f0fc979-6593-4735-a417-e212f6872a4b locked
+debug: 9f2d727f-6988-49c5-ad2f-116d11937f16 locked
+debug: 9f2d727f-6988-49c5-ad2f-116d11937f16 unlocked
+debug: 4f0fc979-6593-4735-a417-e212f6872a4b unlocked
+debug: 4b663875-6fe6-4ea1-8edb-8221cdac23e3 locked
+debug: cdee9c63-bf7c-4f68-9b62-a548343d2e33 locked
+debug: 05deb4dc-c66b-4566-acfb-61c322b7bd82 locked
+debug: 05deb4dc-c66b-4566-acfb-61c322b7bd82 unlocked
+debug: 4b663875-6fe6-4ea1-8edb-8221cdac23e3 unlocked
+debug: 60f02042-6622-4c27-98f1-6003cd0d21bf locked
+debug: 60f02042-6622-4c27-98f1-6003cd0d21bf unlocked
+debug: f818044f-b152-4e3e-963e-2808b6a14b7a locked
+debug: f818044f-b152-4e3e-963e-2808b6a14b7a unlocked
+debug: 02241a31-a899-4a68-aa87-22cd5fe33ec4 locked
+debug: 02241a31-a899-4a68-aa87-22cd5fe33ec4 unlocked
+debug: e8102809-4294-48a6-bda4-dcd5bba00311 locked
+debug: e8102809-4294-48a6-bda4-dcd5bba00311 unlocked
+debug: 43406603-6e12-404f-bac7-e908e21cc601 locked
+debug: 43406603-6e12-404f-bac7-e908e21cc601 unlocked
+debug: cdee9c63-bf7c-4f68-9b62-a548343d2e33 unlocked
+debug: fb636fc6-720e-44aa-a2ab-7d00e1af6345 locked
+debug: fb636fc6-720e-44aa-a2ab-7d00e1af6345 unlocked
+debug: 23f22bb5-5d0c-46cf-9622-5b7d8d446ab2 locked
+debug: 23f22bb5-5d0c-46cf-9622-5b7d8d446ab2 unlocked
+debug: 22145f25-1b3f-40de-aaae-b1494eaadddb locked
+debug: 22145f25-1b3f-40de-aaae-b1494eaadddb unlocked
+2021-10-31T13:54:35.073+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+debug: 32e76705-33d9-4f2c-aca4-b29bf7479558 locked
+debug: 32e76705-33d9-4f2c-aca4-b29bf7479558 unlocked
+debug: 847c37a4-225e-407e-ae14-d8b144bc9550 locked
+debug: bff216d8-5bcb-4242-a4bc-29452e5926ca locked
+debug: bff216d8-5bcb-4242-a4bc-29452e5926ca unlocked
+debug: 847c37a4-225e-407e-ae14-d8b144bc9550 unlocked
+debug: 03108975-65d6-490a-80ed-a3f419536c4d locked
+debug: 5ff4c712-30f7-4a74-9558-5cce6b663c98 locked
+debug: 5ff4c712-30f7-4a74-9558-5cce6b663c98 unlocked
+debug: 6e970f60-2490-4904-9a5c-ec210deac116 locked
+debug: 6e970f60-2490-4904-9a5c-ec210deac116 unlocked
+debug: 72b58e08-5079-4217-acec-01ef28d0163a locked
+debug: 72b58e08-5079-4217-acec-01ef28d0163a unlocked
+debug: f63a973e-cc79-4bce-ab8c-9838d5d39c00 locked
+debug: f63a973e-cc79-4bce-ab8c-9838d5d39c00 unlocked
+debug: 03108975-65d6-490a-80ed-a3f419536c4d unlocked
+debug: 5ff2a505-92cf-472e-bce0-56330e189407 locked
+debug: 5ff2a505-92cf-472e-bce0-56330e189407 unlocked
+2021-10-31T13:54:36.073+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+2021-10-31T13:54:36.073+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel :e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 1e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+2021-10-31T13:54:37.073+0700	[35mDEBUG[0m	go-sentinel/master.go:517	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+2021-10-31T13:54:37.073+0700	[35mDEBUG[0m	go-sentinel/master.go:521	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "d32e3dde-0882-4785-8720-d1956cd4d870"}
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+2021-10-31T13:54:37.073+0700	[35mDEBUG[0m	go-sentinel/master.go:517	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+2021-10-31T13:54:37.073+0700	[35mDEBUG[0m	go-sentinel/master.go:521	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "e12d0305-de2b-4d75-ac0a-6591c72ccd1b"}
+debug: slave called info lock 2e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info locked 3 e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 3e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info e4e55908-5f1c-41ec-9829-dc9e29e2587f return----------------
+2021-10-31 13:54:37.07356883 +0700 +07 m=+10.003980869 info every 1s now: 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+2021-10-31 13:54:37.073595399 +0700 +07 m=+10.004007465 info every 1s now: e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel :e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 1e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 2e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info locked 3 e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 3e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info e4e55908-5f1c-41ec-9829-dc9e29e2587f return----------------
+2021-10-31 13:54:37.073621803 +0700 +07 m=+10.004033846 info every 1s now: feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+sending info from sentinel :e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+2021-10-31T13:54:37.073+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "d32e3dde-0882-4785-8720-d1956cd4d870", "epoch": 1}
+2021-10-31 13:54:37.073864324 +0700 +07 m=+10.004276365 info every 1s now: feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: ba16c36b-851e-4400-8cf4-47b49c0f9437 locked
+debug: ba16c36b-851e-4400-8cf4-47b49c0f9437 unlocked
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+2021-10-31T13:54:37.073+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "e12d0305-de2b-4d75-ac0a-6591c72ccd1b", "voted_for": "d32e3dde-0882-4785-8720-d1956cd4d870", "epoch": 1}
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+2021-10-31T13:54:37.074+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "e12d0305-de2b-4d75-ac0a-6591c72ccd1b", "epoch": 1}
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+2021-10-31 13:54:37.07419004 +0700 +07 m=+10.004602104 info every 1s now: 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: c6d70555-c9fa-49a7-b9c3-5139117a7c55 locked
+debug: c6d70555-c9fa-49a7-b9c3-5139117a7c55 unlocked
+updateing sentinel epoch: 8b1fc21f-d5d8-46fb-b631-4310595d077e 1
+debug: 01f43787-f4b5-47af-a941-4e3292f03445 locked
+2021-10-31T13:54:37.074+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "d32e3dde-0882-4785-8720-d1956cd4d870", "voted_for": "e12d0305-de2b-4d75-ac0a-6591c72ccd1b", "epoch": 1}
+debug: 01f43787-f4b5-47af-a941-4e3292f03445 unlocked
+debug: slave called info lock 1e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 2e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info locked 3 e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+2021-10-31T13:54:37.074+0700	[35mDEBUG[0m	go-sentinel/rpc.go:75	sentinel_voted_for	{"voted_for": "d32e3dde-0882-4785-8720-d1956cd4d870", "epoch": 1}
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel :e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 1e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 2e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+2021-10-31T13:54:37.074+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "8b1fc21f-d5d8-46fb-b631-4310595d077e", "voted_for": "d32e3dde-0882-4785-8720-d1956cd4d870", "epoch": 1}
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+2021-10-31T13:54:37.074+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "8b1fc21f-d5d8-46fb-b631-4310595d077e", "voted_for": "d32e3dde-0882-4785-8720-d1956cd4d870", "epoch": 1}
+debug: slave called info locked 3 e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 3e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info e4e55908-5f1c-41ec-9829-dc9e29e2587f return----------------
+2021-10-31 13:54:37.074743696 +0700 +07 m=+10.005155741 info every 1s now: e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel :e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 1e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 2e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info locked 3 e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 3e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info e4e55908-5f1c-41ec-9829-dc9e29e2587f return----------------
+debug: 5f66b30a-392a-45c6-8737-69df74d83c8f locked
+debug: 5f66b30a-392a-45c6-8737-69df74d83c8f unlocked
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+2021-10-31 13:54:37.074954636 +0700 +07 m=+10.005366699 info every 1s now: 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 3e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info e4e55908-5f1c-41ec-9829-dc9e29e2587f return----------------
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+2021-10-31 13:54:37.075154038 +0700 +07 m=+10.005566079 info every 1s now: e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel :e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 1e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 2e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info locked 3 e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info lock 3e4e55908-5f1c-41ec-9829-dc9e29e2587f
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+debug: slave called info e4e55908-5f1c-41ec-9829-dc9e29e2587f return----------------
+2021-10-31T13:54:37.075+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "d32e3dde-0882-4785-8720-d1956cd4d870", "voted_for": "e12d0305-de2b-4d75-ac0a-6591c72ccd1b", "epoch": 1}
+2021-10-31 13:54:37.074974811 +0700 +07 m=+10.005386878 info every 1s now: feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+2021-10-31T13:54:37.075+0700	[35mDEBUG[0m	go-sentinel/master.go:735	neighbor_sentinel_voted_for	{"neighbor_id": "e12d0305-de2b-4d75-ac0a-6591c72ccd1b", "voted_for": "d32e3dde-0882-4785-8720-d1956cd4d870", "epoch": 1}
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+debug: 76fb68ea-86de-4d89-947f-46e3da7bf13b locked
+debug: 76fb68ea-86de-4d89-947f-46e3da7bf13b unlocked
+debug: 32fb99a1-ff86-44f3-9138-a693f1e73fe4 locked
+debug: 32fb99a1-ff86-44f3-9138-a693f1e73fe4 unlocked
+debug: e73163f1-5057-4d4d-9493-06f1f0182bc4 locked
+debug: 197f1eb0-0dbf-42ef-96f3-290a86e51a28 locked
+debug: 197f1eb0-0dbf-42ef-96f3-290a86e51a28 unlocked
+debug: 3cc5a5c9-b8e5-4a0a-9894-3320e8b38974 locked
+debug: 3cc5a5c9-b8e5-4a0a-9894-3320e8b38974 unlocked
+debug: e73163f1-5057-4d4d-9493-06f1f0182bc4 unlocked
+debug: 6f1146a6-f7fc-4c21-a75e-d56b25dc2d27 locked
+debug: f1cc79fb-5e18-4457-9be5-e9ad7bb3dd58 locked
+debug: f1cc79fb-5e18-4457-9be5-e9ad7bb3dd58 unlocked
+debug: 702f3f21-5140-4064-a39a-3f91cf7ab25a locked
+debug: 702f3f21-5140-4064-a39a-3f91cf7ab25a unlocked
+debug: 6f1146a6-f7fc-4c21-a75e-d56b25dc2d27 unlocked
+2021-10-31T13:54:37.154+0700	[35mDEBUG[0m	go-sentinel/master.go:559	sentinel_became_leader	{"run_id": "d32e3dde-0882-4785-8720-d1956cd4d870", "epoch": 1}
+2021-10-31T13:54:37.154+0700	[35mDEBUG[0m	go-sentinel/master.go:567	failover_state_change	{"new_state": "select_slave", "epoch": 1}
+2021-10-31T13:54:37.154+0700	[35mDEBUG[0m	go-sentinel/master.go:586	slave_selected	{"slave_addr": "localhost:0", "slave_id": "e4e55908-5f1c-41ec-9829-dc9e29e2587f", "epoch": 1}
+2021-10-31T13:54:37.154+0700	[35mDEBUG[0m	go-sentinel/master.go:592	failover_state_change	{"new_state": "promote_slave", "epoch": 1}
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+sending info from sentinel :e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+killed 
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+2021-10-31T13:54:38.075+0700	[35mDEBUG[0m	go-sentinel/master.go:310	slave_promoted	{"run_id": "e4e55908-5f1c-41ec-9829-dc9e29e2587f", "epoch": 1}
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+2021-10-31T13:54:38.075+0700	[35mDEBUG[0m	go-sentinel/master.go:313	failover_state_change	{"epoch": 1, "new_state": "reconfig_slave"}
+feb02cfb-d839-4dc9-80a4-381ef74b7ee5 acquired semaphore
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+sending info from sentinel :e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+feb02cfb-d839-4dc9-80a4-381ef74b7ee5 sending slaveof
+sending info from sentinel :e4e55908-5f1c-41ec-9829-dc9e29e2587f
+sending info from sentinel 2:e4e55908-5f1c-41ec-9829-dc9e29e2587f
+done processing slaveof feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sent reconfig for slave feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: 91e7abfd-398d-4ead-80d7-d117c5925f99 locked
+debug: 91e7abfd-398d-4ead-80d7-d117c5925f99 unlocked
+debug: 6256fe3f-6549-4d04-97d5-6a7b42928eb8 locked
+debug: 6256fe3f-6549-4d04-97d5-6a7b42928eb8 unlocked
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: a5bea16e-02f6-4a4c-8c4e-b482a9a7af7a locked
+debug: a5bea16e-02f6-4a4c-8c4e-b482a9a7af7a unlocked
+debug: bffc57d3-e990-40d4-bc41-397d24681821 locked
+debug: bffc57d3-e990-40d4-bc41-397d24681821 unlocked
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+feb02cfb-d839-4dc9-80a4-381ef74b7ee5:new master found: new localhost:0 vs old localhost:0
+feb02cfb-d839-4dc9-80a4-381ef74b7ee5:configured in progress flag
+feb02cfb-d839-4dc9-80a4-381ef74b7ee5:configured done flag
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+debug: 9ccfb774-ca9c-41a0-9840-60c863aa56d9 locked
+debug: 45fa1aca-63a4-43f4-aa06-b97d53698b94 locked
+debug: 45fa1aca-63a4-43f4-aa06-b97d53698b94 unlocked
+debug: 53fd20ef-1351-45b2-83d9-d21aa7aae77b locked
+debug: 53fd20ef-1351-45b2-83d9-d21aa7aae77b unlocked
+debug: 8a5d1765-d9da-484e-a2bf-4cea8a16176b locked
+debug: 8a5d1765-d9da-484e-a2bf-4cea8a16176b unlocked
+debug: 9ccfb774-ca9c-41a0-9840-60c863aa56d9 unlocked
+debug: 78245843-5e7e-4b93-b9b8-19249ca6d94d locked
+debug: 78245843-5e7e-4b93-b9b8-19249ca6d94d unlocked
+2021-10-31T13:54:39.078+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+sending info from sentinel :
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+2021-10-31T13:54:39.078+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "e4e55908-5f1c-41ec-9829-dc9e29e2587f", "sentinel_run_id": "e12d0305-de2b-4d75-ac0a-6591c72ccd1b", "epoch": 1}
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel :
+2021-10-31T13:54:39.078+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+sending info from sentinel dead:65e7c6b0-3bbe-4243-9dd8-617e25d22988
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+sending info from sentinel :
+sending info from sentinel dead:65e7c6b0-3bbe-4243-9dd8-617e25d22988
+2021-10-31T13:54:39.078+0700	[31mERROR[0m	go-sentinel/slave.go:79	sl.client.Info: dead
+sending info from sentinel :
+2021-10-31T13:54:39.078+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "e4e55908-5f1c-41ec-9829-dc9e29e2587f", "sentinel_run_id": "8b1fc21f-d5d8-46fb-b631-4310595d077e", "epoch": 1}
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+2021-10-31T13:54:39.078+0700	[31mERROR[0m	go-sentinel/slave.go:79	sl.client.Info: dead
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+sending info from sentinel :
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+sending info from sentinel :
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+killed 
+2021-10-31T13:54:40.076+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
+2021-10-31T13:54:40.076+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
+killed 
+done, releasing semaphore: feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+2ef602ad-b9da-43b7-8c4d-282ff97ca878 acquired semaphore
+2ef602ad-b9da-43b7-8c4d-282ff97ca878 sending slaveof
+done processing slaveof 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sent reconfig for slave 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+killed 
+killed 
+killed 
+2021-10-31T13:54:40.076+0700	[31mERROR[0m	go-sentinel/master.go:727	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:54:40.076+0700	[31mERROR[0m	go-sentinel/master.go:727	sentinel.client.IsMasterDownByAddr: master does not exist
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+2ef602ad-b9da-43b7-8c4d-282ff97ca878:new master found: new localhost:0 vs old localhost:0
+2ef602ad-b9da-43b7-8c4d-282ff97ca878:configured in progress flag
+2ef602ad-b9da-43b7-8c4d-282ff97ca878:configured done flag
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+killed 
+feb02cfb-d839-4dc9-80a4-381ef74b7ee5:new master found: new localhost:0 vs old localhost:0
+debug: f2455700-356d-4f59-b082-d60a43846373 locked
+debug: f2455700-356d-4f59-b082-d60a43846373 unlocked
+debug: dd26290d-177f-4a84-9eb1-ebd2bb63b6be locked
+debug: dd26290d-177f-4a84-9eb1-ebd2bb63b6be unlocked
+debug: 859c9db7-c951-4eda-8118-32b649baa96b locked
+debug: 859c9db7-c951-4eda-8118-32b649baa96b unlocked
+debug: 471817c4-1512-4b1c-a649-37a88fdf9abf locked
+debug: 471817c4-1512-4b1c-a649-37a88fdf9abf unlocked
+sending info from sentinel :feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+feb02cfb-d839-4dc9-80a4-381ef74b7ee5:new master found: new localhost:0 vs old localhost:0
+done, releasing semaphore: 2ef602ad-b9da-43b7-8c4d-282ff97ca878
 done reconfig
-2021-10-30T22:05:52.845+0700	[35mDEBUG[0m	go-sentinel/master.go:319	failover_state_change	{"epoch": 2, "new_state": "reset_instance"}
-2021-10-30T22:05:52.845+0700	[35mDEBUG[0m	go-sentinel/master.go:412	failover_state_change	{"new_state": "failover_done", "epoch": 2}
-2021-10-30T22:05:52.845+0700	[35mDEBUG[0m	go-sentinel/master.go:170	master_instance_created	{"master_name": "mymaster", "run_id": "b56e34f4-5163-4bfa-9fbc-bccf2f5575d1", "sentinel_run_id": "44b1a895-5def-4857-bfe4-40dd37fdf48c", "epoch": 2}
-2021-10-30T22:05:52.851+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:52.851+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:52.852+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:52.852+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-    sentinel_util_test.go:141: 
-        	Error Trace:	sentinel_util_test.go:141
-        	            				sentinel_util_test.go:204
-        	            				asm_amd64.s:1581
-        	Error:      	log consume error
-        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
-        	Messages:   	invalid failover state transition from failover_done to reset_instance
-run id 44b1a895-5def-4857-bfe4-40dd37fdf48c
-[164b4e76-4e30-4b3a-939c-c4e11ff68fd2 7b496577-5f63-4bca-8265-c9dda150a8df 44b1a895-5def-4857-bfe4-40dd37fdf48c 44b1a895-5def-4857-bfe4-40dd37fdf48c]
-2021-10-30T22:05:53.852+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:53.852+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:53.852+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:53.852+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:54.854+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:54.854+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:54.854+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:54.854+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:55.855+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:55.855+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:55.855+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:55.855+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:56.856+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:56.856+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
-2021-10-30T22:05:56.856+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-2021-10-30T22:05:56.856+0700	[31mERROR[0m	go-sentinel/master.go:715	sentinel.client.IsMasterDownByAddr: master does not exist
-    sentinel_test.go:609: 
-        	Error Trace:	sentinel_test.go:609
-        	            				sentinel_test.go:536
-        	            				sentinel_test.go:499
-        	            				sentinel_test.go:509
-        	Error:      	Condition never satisfied
-        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
-        	Messages:   	term 1 has not enough 3 master creation event
-    sentinel_test.go:505: 
-        	Error Trace:	sentinel_test.go:505
-        	            				sentinel_test.go:509
-        	Error:      	elements differ
-        	            	
-        	            	extra elements in list A:
-        	            	([]interface {}) (len=3) {
-        	            	 (string) (len=36) "44b1a895-5def-4857-bfe4-40dd37fdf48c",
-        	            	 (string) (len=36) "7b496577-5f63-4bca-8265-c9dda150a8df",
-        	            	 (string) (len=36) "164b4e76-4e30-4b3a-939c-c4e11ff68fd2"
-        	            	}
-        	            	
-        	            	
-        	            	listA:
-        	            	([]string) (len=3) {
-        	            	 (string) (len=36) "44b1a895-5def-4857-bfe4-40dd37fdf48c",
-        	            	 (string) (len=36) "7b496577-5f63-4bca-8265-c9dda150a8df",
-        	            	 (string) (len=36) "164b4e76-4e30-4b3a-939c-c4e11ff68fd2"
-        	            	}
-        	            	
-        	            	
-        	            	listB:
-        	            	([]string) <nil>
-        	Test:       	TestResetMasterInstance/select_slave_by_highest_offset
-        	Messages:   	mismatch sentinels instances
---- FAIL: TestResetMasterInstance (28.06s)
-    --- FAIL: TestResetMasterInstance/select_slave_by_highest_offset (28.06s)
-FAIL
-FAIL	github.com/keva-dev/go-sentinel	28.063s
-FAIL
+2021-10-31T13:54:41.077+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
+sending info from sentinel :2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+2021-10-31T13:54:41.077+0700	[35mDEBUG[0m	go-sentinel/master.go:320	failover_state_change	{"epoch": 1, "new_state": "reset_instance"}
+2ef602ad-b9da-43b7-8c4d-282ff97ca878:new master found: new localhost:0 vs old localhost:0
+2021-10-31T13:54:41.077+0700	[31mERROR[0m	go-sentinel/master.go:727	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:54:41.077+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+ acquired semaphore
+ sending slaveof
+ sending slaveof has error dead
+2021-10-31T13:54:41.077+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "e4e55908-5f1c-41ec-9829-dc9e29e2587f", "sentinel_run_id": "d32e3dde-0882-4785-8720-d1956cd4d870", "epoch": 1}
+sending info from sentinel :
+sending info from sentinel dead:65e7c6b0-3bbe-4243-9dd8-617e25d22988
+ acquired semaphore
+ sending slaveof
+2021-10-31T13:54:41.077+0700	[31mERROR[0m	go-sentinel/slave.go:79	sl.client.Info: dead
+done processing slaveof 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+sent reconfig for slave 
+sending info from sentinel :
+sending info from sentinel 2:2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 12ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 22ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info locked 3 2ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info lock 32ef602ad-b9da-43b7-8c4d-282ff97ca878
+debug: slave called info 2ef602ad-b9da-43b7-8c4d-282ff97ca878 return----------------
+sending info from sentinel :
+sending info from sentinel 2:feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 1feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 2feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info locked 3 feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info lock 3feb02cfb-d839-4dc9-80a4-381ef74b7ee5
+debug: slave called info feb02cfb-d839-4dc9-80a4-381ef74b7ee5 return----------------
+2021-10-31T13:54:41.077+0700	[31mERROR[0m	go-sentinel/rpc.go:90	master does not exist
+2021-10-31T13:54:41.077+0700	[31mERROR[0m	go-sentinel/master.go:727	sentinel.client.IsMasterDownByAddr: master does not exist
+debug: 3b46d88e-7835-4b4a-a1e1-f18fa765635f locked
+debug: 78172fd9-eb3c-4f79-891f-05978c346960 locked
+debug: 60a0eb30-8fe7-44c6-882a-943def3794eb locked
+debug: 60a0eb30-8fe7-44c6-882a-943def3794eb unlocked
+debug: a51bc9cf-bf57-4d64-93cb-836e66ebe84e locked
+debug: a51bc9cf-bf57-4d64-93cb-836e66ebe84e unlocked
+debug: 78172fd9-eb3c-4f79-891f-05978c346960 unlocked
+debug: f859e13a-2145-481b-ac88-298014311e24 locked
+debug: f859e13a-2145-481b-ac88-298014311e24 unlocked
+debug: 448abd57-6e3c-42c4-8d15-86dda720cace locked
+debug: 448abd57-6e3c-42c4-8d15-86dda720cace unlocked
+debug: 5f11f70e-d811-43a0-8027-a8a6e9768355 locked
+debug: 5f11f70e-d811-43a0-8027-a8a6e9768355 unlocked
+debug: ce3ee2d3-5963-4315-be82-c0739e0efaa8 locked
+debug: ce3ee2d3-5963-4315-be82-c0739e0efaa8 unlocked
+debug: f997478d-a966-46fd-ad11-cc5e1fc72692 locked
+debug: f997478d-a966-46fd-ad11-cc5e1fc72692 unlocked
+debug: 19d461cd-de85-44b4-b330-ab973604edad locked
+debug: 19d461cd-de85-44b4-b330-ab973604edad unlocked
+debug: e15e1d4f-e0d7-4897-a0e3-7858e3d89c2d locked
+debug: e15e1d4f-e0d7-4897-a0e3-7858e3d89c2d unlocked
+debug: 3b46d88e-7835-4b4a-a1e1-f18fa765635f unlocked
+--- PASS: TestResetMasterInstance (14.05s)
+    --- PASS: TestResetMasterInstance/select_slave_by_highest_offset (14.05s)
+PASS
+ok  	github.com/keva-dev/go-sentinel	14.058s
+=== RUN   TestResetMasterInstance
+=== RUN   TestResetMasterInstance/select_slave_by_highest_offset
+2021/10/31 13:58:15 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/31 13:58:15 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-31T13:58:15.665+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "a2dcf465-24c6-437e-8ee6-a57554747b9c", "sentinel_run_id": "6ae5cdfc-4a92-4a2e-9688-a424692d2c83", "epoch": 0}
+2021-10-31T13:58:15.665+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "a2dcf465-24c6-437e-8ee6-a57554747b9c", "sentinel_run_id": "47158c5e-f6b5-44c1-a167-516ef3f98366", "epoch": 0}
+2021-10-31T13:58:15.665+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "a2dcf465-24c6-437e-8ee6-a57554747b9c", "sentinel_run_id": "f129607a-60ba-47ee-ad54-162c9df3a79e", "epoch": 0}
+2021/10/31 13:58:15 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/31 13:58:15 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/31 13:58:15 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/31 13:58:15 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-31T13:58:17.668+0700	[34mINFO[0m	go-sentinel/slave.go:218	subscribeHello: connected to new sentinel: localhost,2000,6ae5cdfc-4a92-4a2e-9688-a424692d2c83,0,mymaster,localhost,6767,0
+2021-10-31T13:58:17.668+0700	[34mINFO[0m	go-sentinel/slave.go:218	subscribeHello: connected to new sentinel: localhost,2002,47158c5e-f6b5-44c1-a167-516ef3f98366,0,mymaster,localhost,6767,0
+2021-10-31T13:58:17.668+0700	[34mINFO[0m	go-sentinel/slave.go:218	subscribeHello: connected to new sentinel: localhost,2002,47158c5e-f6b5-44c1-a167-516ef3f98366,0,mymaster,localhost,6767,0
+2021-10-31T13:58:17.669+0700	[34mINFO[0m	go-sentinel/slave.go:218	subscribeHello: connected to new sentinel: localhost,2000,6ae5cdfc-4a92-4a2e-9688-a424692d2c83,0,mymaster,localhost,6767,0
+2021-10-31T13:58:17.669+0700	[34mINFO[0m	go-sentinel/master.go:163	subscribeHello: connected to new sentinel: localhost,2001,f129607a-60ba-47ee-ad54-162c9df3a79e,0,mymaster,localhost,6767,0
+2021-10-31T13:58:17.669+0700	[34mINFO[0m	go-sentinel/master.go:163	subscribeHello: connected to new sentinel: localhost,2001,f129607a-60ba-47ee-ad54-162c9df3a79e,0,mymaster,localhost,6767,0
+2021-10-31T13:58:23.665+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+2021-10-31T13:58:24.665+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+2021-10-31T13:58:24.665+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+2021-10-31T13:58:25.666+0700	[35mDEBUG[0m	go-sentinel/master.go:511	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-31T13:58:25.666+0700	[35mDEBUG[0m	go-sentinel/master.go:515	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "47158c5e-f6b5-44c1-a167-516ef3f98366"}
+2021-10-31T13:58:25.666+0700	[35mDEBUG[0m	go-sentinel/master.go:511	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-31T13:58:25.666+0700	[35mDEBUG[0m	go-sentinel/master.go:515	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "f129607a-60ba-47ee-ad54-162c9df3a79e"}
+2021-10-31T13:58:25.666+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "47158c5e-f6b5-44c1-a167-516ef3f98366", "epoch": 1}
+2021-10-31T13:58:25.666+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "47158c5e-f6b5-44c1-a167-516ef3f98366", "epoch": 1}
+2021-10-31T13:58:25.666+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "6ae5cdfc-4a92-4a2e-9688-a424692d2c83", "voted_for": "47158c5e-f6b5-44c1-a167-516ef3f98366", "epoch": 1}
+2021-10-31T13:58:25.666+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "f129607a-60ba-47ee-ad54-162c9df3a79e", "voted_for": "47158c5e-f6b5-44c1-a167-516ef3f98366", "epoch": 1}
+2021-10-31T13:58:25.666+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "f129607a-60ba-47ee-ad54-162c9df3a79e", "epoch": 1}
+2021-10-31T13:58:25.666+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "6ae5cdfc-4a92-4a2e-9688-a424692d2c83", "voted_for": "47158c5e-f6b5-44c1-a167-516ef3f98366", "epoch": 1}
+2021-10-31T13:58:25.667+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "47158c5e-f6b5-44c1-a167-516ef3f98366", "voted_for": "f129607a-60ba-47ee-ad54-162c9df3a79e", "epoch": 1}
+2021-10-31T13:58:25.748+0700	[35mDEBUG[0m	go-sentinel/master.go:553	sentinel_became_leader	{"run_id": "47158c5e-f6b5-44c1-a167-516ef3f98366", "epoch": 1}
+2021-10-31T13:58:25.748+0700	[35mDEBUG[0m	go-sentinel/master.go:561	failover_state_change	{"new_state": "select_slave", "epoch": 1}
+2021-10-31T13:58:25.748+0700	[35mDEBUG[0m	go-sentinel/master.go:580	slave_selected	{"slave_addr": "localhost:0", "slave_id": "8087f5bd-36dd-4d54-97f6-31cb4bbdab79", "epoch": 1}
+2021-10-31T13:58:25.748+0700	[35mDEBUG[0m	go-sentinel/master.go:586	failover_state_change	{"new_state": "promote_slave", "epoch": 1}
+2021-10-31T13:58:26.666+0700	[35mDEBUG[0m	go-sentinel/master.go:310	slave_promoted	{"run_id": "8087f5bd-36dd-4d54-97f6-31cb4bbdab79", "epoch": 1}
+2021-10-31T13:58:26.667+0700	[35mDEBUG[0m	go-sentinel/master.go:313	failover_state_change	{"epoch": 1, "new_state": "reconfig_slave"}
+2021-10-31T13:58:26.667+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "47158c5e-f6b5-44c1-a167-516ef3f98366", "voted_for": "f129607a-60ba-47ee-ad54-162c9df3a79e", "epoch": 1}
+2021-10-31T13:58:26.667+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "f129607a-60ba-47ee-ad54-162c9df3a79e", "voted_for": "47158c5e-f6b5-44c1-a167-516ef3f98366", "epoch": 1}
+2021-10-31T13:58:27.669+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+2021-10-31T13:58:27.670+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+2021-10-31T13:58:27.670+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "8087f5bd-36dd-4d54-97f6-31cb4bbdab79", "sentinel_run_id": "f129607a-60ba-47ee-ad54-162c9df3a79e", "epoch": 1}
+2021-10-31T13:58:27.670+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "8087f5bd-36dd-4d54-97f6-31cb4bbdab79", "sentinel_run_id": "6ae5cdfc-4a92-4a2e-9688-a424692d2c83", "epoch": 1}
+2021-10-31T13:58:27.670+0700	[31mERROR[0m	go-sentinel/slave.go:77	sl.client.Info: dead
+2021-10-31T13:58:27.670+0700	[31mERROR[0m	go-sentinel/slave.go:77	sl.client.Info: dead
+2021-10-31T13:58:28.668+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:28.668+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:28.668+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:58:28.668+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+done reconfig
+2021-10-31T13:58:29.668+0700	[35mDEBUG[0m	go-sentinel/master.go:320	failover_state_change	{"epoch": 1, "new_state": "reset_instance"}
+2021-10-31T13:58:29.668+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+2021-10-31T13:58:29.668+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "8087f5bd-36dd-4d54-97f6-31cb4bbdab79", "sentinel_run_id": "47158c5e-f6b5-44c1-a167-516ef3f98366", "epoch": 1}
+2021-10-31T13:58:29.668+0700	[31mERROR[0m	go-sentinel/slave.go:77	sl.client.Info: dead
+2021-10-31T13:58:29.669+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:29.669+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:29.669+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:58:29.669+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+--- PASS: TestResetMasterInstance (14.10s)
+    --- PASS: TestResetMasterInstance/select_slave_by_highest_offset (14.10s)
+PASS
+ok  	github.com/keva-dev/go-sentinel	14.110s
+=== RUN   TestResetMasterInstance
+=== RUN   TestResetMasterInstance/select_slave_by_highest_offset
+2021-10-31T13:58:33.767+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "e09e39af-26e3-4755-94e6-2606341a8c3a", "sentinel_run_id": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "epoch": 0}
+2021-10-31T13:58:33.767+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "e09e39af-26e3-4755-94e6-2606341a8c3a", "sentinel_run_id": "4a1ceed2-555d-4307-8097-73b4cf7de0f9", "epoch": 0}
+2021/10/31 13:58:33 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/31 13:58:33 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/31 13:58:33 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/31 13:58:33 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021/10/31 13:58:33 rpc.Register: method "Shutdown" has 1 input parameters; needs exactly three
+2021/10/31 13:58:33 rpc.Register: method "Start" has 1 input parameters; needs exactly three
+2021-10-31T13:58:33.767+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "e09e39af-26e3-4755-94e6-2606341a8c3a", "sentinel_run_id": "9ca00f60-854e-4480-af05-58b47d3951f0", "epoch": 0}
+2021-10-31T13:58:35.770+0700	[34mINFO[0m	go-sentinel/slave.go:218	subscribeHello: connected to new sentinel: localhost,2002,4a1ceed2-555d-4307-8097-73b4cf7de0f9,0,mymaster,localhost,6767,0
+2021-10-31T13:58:35.770+0700	[34mINFO[0m	go-sentinel/slave.go:218	subscribeHello: connected to new sentinel: localhost,2002,4a1ceed2-555d-4307-8097-73b4cf7de0f9,0,mymaster,localhost,6767,0
+2021-10-31T13:58:35.770+0700	[34mINFO[0m	go-sentinel/slave.go:218	subscribeHello: connected to new sentinel: localhost,2001,9ca00f60-854e-4480-af05-58b47d3951f0,0,mymaster,localhost,6767,0
+2021-10-31T13:58:35.771+0700	[34mINFO[0m	go-sentinel/slave.go:218	subscribeHello: connected to new sentinel: localhost,2001,9ca00f60-854e-4480-af05-58b47d3951f0,0,mymaster,localhost,6767,0
+2021-10-31T13:58:35.772+0700	[34mINFO[0m	go-sentinel/slave.go:218	subscribeHello: connected to new sentinel: localhost,2000,56516214-0bc6-404a-9e8d-4aeeb49d5aff,0,mymaster,localhost,6767,0
+2021-10-31T13:58:35.772+0700	[34mINFO[0m	go-sentinel/master.go:163	subscribeHello: connected to new sentinel: localhost,2000,56516214-0bc6-404a-9e8d-4aeeb49d5aff,0,mymaster,localhost,6767,0
+2021-10-31T13:58:41.768+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+2021-10-31T13:58:41.768+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+2021-10-31T13:58:41.768+0700	[33mWARN[0m	go-sentinel/master.go:40	master mymaster is subjectively down
+2021-10-31T13:58:42.768+0700	[35mDEBUG[0m	go-sentinel/master.go:511	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-31T13:58:42.768+0700	[35mDEBUG[0m	go-sentinel/master.go:511	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-31T13:58:42.768+0700	[35mDEBUG[0m	go-sentinel/master.go:515	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "9ca00f60-854e-4480-af05-58b47d3951f0"}
+2021-10-31T13:58:42.768+0700	[35mDEBUG[0m	go-sentinel/master.go:515	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "56516214-0bc6-404a-9e8d-4aeeb49d5aff"}
+2021-10-31T13:58:42.768+0700	[35mDEBUG[0m	go-sentinel/master.go:511	failover_state_change	{"new_state": "wait_leader_election", "epoch": 1}
+2021-10-31T13:58:42.768+0700	[35mDEBUG[0m	go-sentinel/master.go:515	sentinel_requesting_leader_election	{"epoch": 1, "sentinel_run_id": "4a1ceed2-555d-4307-8097-73b4cf7de0f9"}
+2021-10-31T13:58:42.768+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "epoch": 1}
+2021-10-31T13:58:42.768+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "epoch": 1}
+2021-10-31T13:58:42.769+0700	[35mDEBUG[0m	go-sentinel/rpc.go:73	sentinel_voted_for	{"voted_for": "4a1ceed2-555d-4307-8097-73b4cf7de0f9", "epoch": 1}
+2021-10-31T13:58:42.769+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "4a1ceed2-555d-4307-8097-73b4cf7de0f9", "voted_for": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "epoch": 1}
+2021-10-31T13:58:42.769+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "9ca00f60-854e-4480-af05-58b47d3951f0", "voted_for": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "epoch": 1}
+2021-10-31T13:58:42.769+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "9ca00f60-854e-4480-af05-58b47d3951f0", "voted_for": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "epoch": 1}
+2021-10-31T13:58:42.769+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "4a1ceed2-555d-4307-8097-73b4cf7de0f9", "voted_for": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "epoch": 1}
+2021-10-31T13:58:42.769+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "voted_for": "4a1ceed2-555d-4307-8097-73b4cf7de0f9", "epoch": 1}
+2021-10-31T13:58:42.769+0700	[35mDEBUG[0m	go-sentinel/master.go:729	neighbor_sentinel_voted_for	{"neighbor_id": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "voted_for": "4a1ceed2-555d-4307-8097-73b4cf7de0f9", "epoch": 1}
+2021-10-31T13:58:43.655+0700	[35mDEBUG[0m	go-sentinel/master.go:553	sentinel_became_leader	{"run_id": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "epoch": 1}
+2021-10-31T13:58:43.655+0700	[35mDEBUG[0m	go-sentinel/master.go:561	failover_state_change	{"new_state": "select_slave", "epoch": 1}
+2021-10-31T13:58:43.656+0700	[35mDEBUG[0m	go-sentinel/master.go:580	slave_selected	{"slave_addr": "localhost:1", "slave_id": "645b50ea-f9c9-42e1-b8c3-4170974d78c9", "epoch": 1}
+2021-10-31T13:58:43.656+0700	[35mDEBUG[0m	go-sentinel/master.go:586	failover_state_change	{"new_state": "promote_slave", "epoch": 1}
+2021-10-31T13:58:43.769+0700	[35mDEBUG[0m	go-sentinel/master.go:310	slave_promoted	{"run_id": "645b50ea-f9c9-42e1-b8c3-4170974d78c9", "epoch": 1}
+2021-10-31T13:58:43.769+0700	[35mDEBUG[0m	go-sentinel/master.go:313	failover_state_change	{"epoch": 1, "new_state": "reconfig_slave"}
+2021-10-31T13:58:43.774+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+2021-10-31T13:58:43.774+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "645b50ea-f9c9-42e1-b8c3-4170974d78c9", "sentinel_run_id": "9ca00f60-854e-4480-af05-58b47d3951f0", "epoch": 1}
+2021-10-31T13:58:43.774+0700	[31mERROR[0m	go-sentinel/slave.go:77	sl.client.Info: dead
+2021-10-31T13:58:43.774+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+2021-10-31T13:58:43.774+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "645b50ea-f9c9-42e1-b8c3-4170974d78c9", "sentinel_run_id": "4a1ceed2-555d-4307-8097-73b4cf7de0f9", "epoch": 1}
+2021-10-31T13:58:43.774+0700	[31mERROR[0m	go-sentinel/slave.go:77	sl.client.Info: dead
+2021-10-31T13:58:44.770+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:44.770+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:44.771+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:58:44.771+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:58:45.772+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:45.772+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:45.772+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:58:45.772+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:58:46.773+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:46.773+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:46.773+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:58:46.773+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+done reconfig
+2021-10-31T13:58:47.771+0700	[35mDEBUG[0m	go-sentinel/master.go:320	failover_state_change	{"epoch": 1, "new_state": "reset_instance"}
+2021-10-31T13:58:47.771+0700	[35mDEBUG[0m	go-sentinel/master.go:413	failover_state_change	{"new_state": "failover_done", "epoch": 1}
+2021-10-31T13:58:47.771+0700	[31mERROR[0m	go-sentinel/slave.go:77	sl.client.Info: dead
+2021-10-31T13:58:47.771+0700	[35mDEBUG[0m	go-sentinel/master.go:171	master_instance_created	{"master_name": "mymaster", "run_id": "645b50ea-f9c9-42e1-b8c3-4170974d78c9", "sentinel_run_id": "56516214-0bc6-404a-9e8d-4aeeb49d5aff", "epoch": 1}
+2021-10-31T13:58:47.774+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:47.774+0700	[31mERROR[0m	go-sentinel/rpc.go:88	master does not exist
+2021-10-31T13:58:47.775+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+2021-10-31T13:58:47.775+0700	[31mERROR[0m	go-sentinel/master.go:721	sentinel.client.IsMasterDownByAddr: master does not exist
+--- PASS: TestResetMasterInstance (14.10s)
+    --- PASS: TestResetMasterInstance/select_slave_by_highest_offset (14.10s)
+PASS
+ok  	github.com/keva-dev/go-sentinel	14.109s

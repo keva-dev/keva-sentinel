@@ -27,7 +27,11 @@ func (m *InstancesManager) killCurrentMaster() {
 func (m *InstancesManager) getInstanceByAddr(addr string) *ToyKeva {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	return m.addrMap[addr]
+	instance, ok := m.addrMap[addr]
+	if !ok {
+		panic(fmt.Sprintf("instance %s does not exist", addr))
+	}
+	return instance
 }
 
 func (m *InstancesManager) getMaster() *ToyKeva {
@@ -56,6 +60,7 @@ type ToyKeva struct {
 func (keva *ToyKeva) slaveOf(host, port string) {
 	addr := fmt.Sprintf("%s:%s", host, port)
 	instance := keva.InstancesManager.getInstanceByAddr(addr)
+
 	keva.mu.Lock()
 	keva.role = "slave"
 	keva.slaves = nil
@@ -71,6 +76,7 @@ func (keva *ToyKeva) info() string {
 	ret.WriteString(fmt.Sprintf("role:%s\n", keva.role))
 	ret.WriteString(fmt.Sprintf("run_id:%s\n", keva.id))
 	slaves := keva.slaves
+	isSlave := keva.role == "slave"
 	keva.mu.Unlock()
 	for idx := range slaves {
 		sl := keva.slaves[idx]
@@ -84,21 +90,35 @@ func (keva *ToyKeva) info() string {
 		))
 		sl.mu.Unlock()
 	}
-	keva.mu.Lock()
-	defer keva.mu.Unlock()
-	if keva.role == "slave" {
-		ret.WriteString(fmt.Sprintf("master_host:%s\n", keva.masterHost))
-		ret.WriteString(fmt.Sprintf("master_port:%s\n", keva.masterPort))
-		if !keva.master.isAlive() {
-			ret.WriteString(fmt.Sprintf("master_link_down_since_seconds:%d\n", int(keva.master.diedSince().Seconds())))
-			ret.WriteString("master_link_status:down\n")
-		} else {
-			ret.WriteString("master_link_down_since_seconds:-1\n")
-			ret.WriteString("master_link_status:up\n")
-		}
-		ret.WriteString(fmt.Sprintf("slave_repl_offset:%d\n", keva.offset))
-		ret.WriteString(fmt.Sprintf("slave_priority:%d\n", keva.priority))
+	var (
+		masterDead bool
+		diedSince  int
+	)
+	if isSlave {
+		locked(keva.master.mu, func() {
+			masterDead = !keva.master.alive
+			if masterDead {
+				diedSince = int(time.Since(*keva.master.diedAt).Seconds())
+			}
+		})
+
 	}
+
+	locked(keva.mu, func() {
+		if keva.role == "slave" {
+			ret.WriteString(fmt.Sprintf("master_host:%s\n", keva.masterHost))
+			ret.WriteString(fmt.Sprintf("master_port:%s\n", keva.masterPort))
+			if masterDead {
+				ret.WriteString(fmt.Sprintf("master_link_down_since_seconds:%d\n", diedSince))
+				ret.WriteString("master_link_status:down\n")
+			} else {
+				ret.WriteString("master_link_down_since_seconds:-1\n")
+				ret.WriteString("master_link_status:up\n")
+			}
+			ret.WriteString(fmt.Sprintf("slave_repl_offset:%d\n", keva.offset))
+			ret.WriteString(fmt.Sprintf("slave_priority:%d\n", keva.priority))
+		}
+	})
 	return ret.String()
 }
 
@@ -243,6 +263,7 @@ func (cl *toyClient) Info() (string, error) {
 	if !cl.link.isAlive() {
 		return "", fmt.Errorf("dead")
 	}
+
 	return cl.link.info(), nil
 }
 

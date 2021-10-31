@@ -41,8 +41,6 @@ func (s *Sentinel) updateEpochIfNeeded(newEpoch int) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if newEpoch > s.currentEpoch {
-
-		fmt.Printf("updateing sentinel epoch: %s %d\n", s.runID, newEpoch)
 		s.currentEpoch = newEpoch
 	}
 }

@@ -124,6 +124,7 @@ func (s *Sentinel) sayHelloRoutineToMaster(m *masterInstance, helloChan HelloCha
 // Todo: this function is per instance, not per master
 func (s *Sentinel) subscribeHello(m *masterInstance) {
 	helloChan := m.client.SubscribeHelloChan()
+	defer helloChan.Close()
 	selfID := s.selfID()
 	go s.sayHelloRoutineToMaster(m, helloChan)
 	for !m.keepSendingPeriodRequest() {
@@ -418,7 +419,6 @@ func (s *Sentinel) resetMasterInstance(m *masterInstance, isfollower bool) {
 
 // TODO: write test for this func
 func (s *Sentinel) reconfigRemoteSlaves(m *masterInstance) error {
-	defer fmt.Println("done reconfig")
 	m.mu.Lock()
 
 	slaveList := make([]*slaveInstance, 0, len(m.slaves))
@@ -501,6 +501,7 @@ func (s *Sentinel) nextFailoverAllowed(m *masterInstance) time.Duration {
 			locked(&m.mu, func() {
 				if m.failOverStartTime.Equal(startTime) {
 					// if some how, this sentinel receive new epoch from hello message
+					// before this code block runs,
 					// it will uncessarily increment the epoch one more time, causing already
 					// voting candidates to fail, need logic to check this
 					// TODO

@@ -40,7 +40,6 @@ func (suite *testSuite) handleLogEventMasterInstanceCreated(instanceIdx int, log
 	runID := ctxMap["run_id"].(string)
 	term := int(ctxMap["epoch"].(int64))
 	sentinelRunID := ctxMap["sentinel_run_id"].(string)
-	fmt.Printf("run id %s\n", sentinelRunID)
 	suite.mu.Lock()
 	defer suite.mu.Unlock()
 	previousMasterID, exist := suite.termsMasterID[term]
@@ -54,7 +53,6 @@ func (suite *testSuite) handleLogEventMasterInstanceCreated(instanceIdx int, log
 	}
 	suite.termsMasterID[term] = runID
 	suite.termsMasterInstanceCreation[term] = append(suite.termsMasterInstanceCreation[term], sentinelRunID)
-	fmt.Println(suite.termsMasterInstanceCreation[term])
 }
 
 func (suite *testSuite) handleLogEventSlavePromoted(instanceIdx int, log observer.LoggedEntry) {

@@ -103,8 +103,8 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 
 	// a function to create fake client from sentinel to slaves, when first discovered by infoing master
 	toySlaveFactory := func(sl *slaveInstance) error {
-		toyInstance := slaveMap[sl.addr]
-		sl.client = NewToyKevaClient(toyInstance)
+		instance := cluster.getInstanceByAddr(sl.addr)
+		sl.client = NewToyKevaClient(instance)
 		return nil
 	}
 	// make master remember slaves
@@ -542,7 +542,7 @@ func (s *testSuite) checkTermMasterCreation(term int, length int) []string {
 			return true
 		}
 		return false
-	}, 10*time.Second, "term %d has not enough %d master creation event", term, length)
+	}, 5*time.Second, "term %d has not enough %d master creation event", term, length)
 	return ret
 }
 func (s *testSuite) checkTermMasterRunID(term int) string {

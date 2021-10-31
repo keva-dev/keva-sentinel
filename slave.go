@@ -176,6 +176,7 @@ func (s *Sentinel) sayHelloRoutineToSlave(sl *slaveInstance, helloChan HelloChan
 func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 	//TODO: handle connection lost/broken pipe
 	helloChan := sl.client.SubscribeHelloChan()
+	defer helloChan.Close()
 
 	selfID := s.selfID()
 	go s.sayHelloRoutineToSlave(sl, helloChan)
@@ -234,7 +235,6 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 		s.mu.Lock()
 		currentEpoch := s.currentEpoch
 		if neighborEpoch > currentEpoch {
-			fmt.Printf("updateing sentinel epoch hello: %s %d\n", s.runID, neighborEpoch)
 			s.currentEpoch = neighborEpoch
 			// Not sure if this needs reseting anything in fsm
 			//TODO panic("not implemented")
