@@ -9,4 +9,6 @@ var (
 	logEventSelectedSlave         = "slave_selected"
 	logEventSlavePromoted         = "slave_promoted"
 	logEventMasterInstanceCreated = "master_instance_created"
+
+	logEventODown = "master_objectively_down"
 )

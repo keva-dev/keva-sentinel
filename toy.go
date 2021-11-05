@@ -11,10 +11,11 @@ import (
 )
 
 type InstancesManager struct {
-	currentTerm   int
-	currentMaster *ToyKeva
-	addrMap       map[string]*ToyKeva
-	mu            *sync.Mutex
+	currentTerm         int
+	currentMaster       *ToyKeva
+	addrMap             map[string]*ToyKeva
+	mu                  *sync.Mutex
+	simulateConnections map[string]*toyClient
 }
 
 func (m *InstancesManager) killCurrentMaster() {
@@ -55,6 +56,10 @@ type ToyKeva struct {
 	subs       map[string]chan string //key by fake sessionid
 	*slaveInfo                        // only set if current keva is a slave
 	*InstancesManager
+}
+
+func (keva *ToyKeva) getAddr() string {
+	return fmt.Sprintf("%s:%s", keva.host, keva.port)
 }
 
 func (keva *ToyKeva) slaveOf(host, port string) {

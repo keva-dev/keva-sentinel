@@ -63,7 +63,7 @@ type Sentinel struct {
 
 	//given a preassigned slaveInstance struct, assign missing fields to make it complete
 	// - create client from given address, for example
-	slaveFactory func(*slaveInstance) error
+	// slaveFactory func(*slaveInstance) error
 
 	clientFactory func(string) (InternalClient, error)
 	listener      net.Listener

@@ -125,11 +125,11 @@ func (s *Sentinel) newSlaveInstance(masterHost, masterPort, host, port string, r
 		masterDownNotify:     make(chan struct{}, 1),
 		masterRoleSwitchChan: make(chan struct{}),
 	}
-	err := s.slaveFactory(newslave)
-	if err != nil {
-		s.logger.Errorf("s.slaveFactory: %s", err)
-		return nil, err
-	}
+	// err := s.slaveFactory(newslave)
+	// if err != nil {
+	// 	s.logger.Errorf("s.slaveFactory: %s", err)
+	// 	return nil, err
+	// }
 	cl, err := s.clientFactory(fmt.Sprintf("%s:%s", host, port))
 	if err != nil {
 		return nil, err

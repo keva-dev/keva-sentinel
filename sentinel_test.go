@@ -42,9 +42,9 @@ type testSuite struct {
 	mapRunIDtoIdx map[string]int // code use runID as identifier, test suite use integer index, use this to remap
 	mapIdxtoRunID map[int]string // code use runID as identifier, test suite use integer index, use this to remap
 	instances     []*Sentinel
-	masterLinks   []*toyClient // each represent a connection from a sentinel to master
-	conf          Config
-	cluster       *InstancesManager
+	// masterLinks   []*toyClient // each represent a connection from a sentinel to master
+	conf    Config
+	cluster *InstancesManager
 	// master        *ToyKeva
 	slavesMap map[string]*ToyKeva
 	history
@@ -94,19 +94,14 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 	host, port := parts[0], parts[1]
 	// fake cluster of instances
 	toyCluster := &InstancesManager{
-		addrMap: map[string]*ToyKeva{},
-		mu:      &sync.Mutex{},
+		addrMap:             map[string]*ToyKeva{},
+		mu:                  &sync.Mutex{},
+		simulateConnections: map[string]*toyClient{},
 	}
 
 	cluster := toyCluster.NewMasterToyKeva(host, port)
 	slaveMap := cluster.SpawnSlaves(3)
 
-	// a function to create fake client from sentinel to slaves, when first discovered by infoing master
-	toySlaveFactory := func(sl *slaveInstance) error {
-		instance := cluster.getInstanceByAddr(sl.addr)
-		sl.client = NewToyKevaClient(instance)
-		return nil
-	}
 	// make master remember slaves
 	sentinels := []*Sentinel{}
 	logObservers := make([]*observer.ObservedLogs, numInstances)
@@ -123,14 +118,22 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 		mapRunIDToIdx[s.runID] = localIdx
 		mapIdxToRunID[localIdx] = s.runID
 
-		// a function to create fake client from sentinel to master
+		// a function to create fake client from sentinel to other instance
 		s.clientFactory = func(addr string) (InternalClient, error) {
+			curMaster := cluster.getMaster()
+
 			instance := cluster.getInstanceByAddr(addr)
 			client := NewToyKevaClient(instance)
+
+			if curMaster.getAddr() == addr {
+				cluster.mu.Lock()
+				defer cluster.mu.Unlock()
+				cluster.simulateConnections[s.runID] = client
+			}
 			return client, nil
 		}
 
-		s.slaveFactory = toySlaveFactory
+		// s.slaveFactory = toySlaveFactory
 		customLogger, observer := customLogObserver()
 		logObservers[localIdx] = observer
 		s.logger = customLogger
@@ -214,10 +217,20 @@ func TestSDown(t *testing.T) {
 			masterI.mu.Unlock()
 		}
 
-		disconnecteds := suite.masterLinks[:numSdown]
-		for _, link := range disconnecteds {
-			link.disconnect()
+		suite.cluster.mu.Lock()
+		counter := 0
+		downInstances := map[string]struct{}{}
+		for runID := range suite.cluster.simulateConnections {
+			s := suite.cluster.simulateConnections[runID]
+			downInstances[runID] = struct{}{}
+			s.disconnect()
+			counter++
+			if counter == numSdown {
+				break
+			}
 		}
+		suite.cluster.mu.Unlock()
+
 		// links[disconnectedIdx].disconnect()
 
 		time.Sleep(suite.conf.Masters[0].DownAfter)
@@ -225,22 +238,23 @@ func TestSDown(t *testing.T) {
 		time.Sleep(1 * time.Second)
 
 		// check if a given sentinel is in sdown state, and holds for a long time
-		for i := 0; i < numSdown; i++ {
-			checkMasterState(t, defaultMasterAddr, suite.instances[i], masterStateSubjDown)
-		}
-		// others still see master is up
-		for i := numSdown; i < numInstances; i++ {
-			checkMasterState(t, defaultMasterAddr, suite.instances[i], masterStateUp)
+		for _, sentinel := range suite.instances {
+			_, isDown := downInstances[sentinel.selfID()]
+			if isDown {
+				// should be subjdown
+				checkMasterState(t, defaultMasterAddr, sentinel, masterStateSubjDown)
+			} else {
+				// should be normal
+				checkMasterState(t, defaultMasterAddr, sentinel, masterStateUp)
+			}
+
 		}
 	}
 	t.Run("1 out of 3 subjectively down", func(t *testing.T) {
 		checkSdown(t, 1, 3)
 	})
-	t.Run("2 out of 3 subjectively down", func(t *testing.T) {
+	t.Run("2 out of 4 subjectively down", func(t *testing.T) {
 		checkSdown(t, 2, 3)
-	})
-	t.Run("3 out of 5 subjectively down", func(t *testing.T) {
-		checkSdown(t, 3, 5)
 	})
 
 }
