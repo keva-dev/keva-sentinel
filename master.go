@@ -679,7 +679,6 @@ func (s *Sentinel) checkObjDown(m *masterInstance) {
 	if down >= quorum {
 		m.state = masterStateObjDown
 		m.stopSendingRequest = true
-		fmt.Printf("down vs quorum: %d %d\n", down, quorum)
 		s.logger.Debugw(logEventODown)
 	}
 }

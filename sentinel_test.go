@@ -147,7 +147,7 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 	time.Sleep(3 * time.Second)
 	for _, s := range sentinels {
 		s.mu.Lock()
-		masterI, ok := s.masterInstances[defaultMasterAddr]
+		masterI, ok := s.masterInstances[masterAddr]
 		assert.True(t, ok)
 		s.mu.Unlock()
 		masterI.mu.Lock()

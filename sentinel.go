@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/spf13/viper"
-	kevago "github.com/tuhuynh27/keva/go-client"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -80,11 +79,7 @@ func defaultSlaveFactory(sl *slaveInstance) error {
 }
 
 func newInternalClient(addr string) (InternalClient, error) {
-	cl, err := kevago.NewInternalClient(addr)
-	if err != nil {
-		return nil, err
-	}
-	return &internalClientImpl{cl}, nil
+	return newRedisClient(addr), nil
 }
 
 func NewFromConfig(conf Config) (*Sentinel, error) {
@@ -173,25 +168,6 @@ func (s *Sentinel) Shutdown() {
 	locked(s.mu, func() {
 		s.listener.Close()
 	})
-}
-
-type internalClientImpl struct {
-	*kevago.InternalClient
-}
-
-func (s *internalClientImpl) SlaveOf(addr, port string) error {
-	panic("unimplemented")
-	return nil
-}
-
-func (s *internalClientImpl) SlaveOfNoOne() error {
-	panic("unimplemented")
-	return nil
-}
-
-func (s *internalClientImpl) SubscribeHelloChan() HelloChan {
-	panic("unimplemented")
-	return nil
 }
 
 type sentinelInstance struct {
