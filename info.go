@@ -241,27 +241,36 @@ var (
 // syntax of info replied by keva is different from redis. We need to know at the beginning
 // of the string the role of the instance first
 func (s *Sentinel) preparseInfo(r *bufio.Scanner) (role instanceRole, err error) {
-	found := r.Scan()
-	if !found {
-		if r.Err() == nil {
-			err = io.EOF
+	var firstLine string
+	for {
+		found := r.Scan()
+		if !found {
+			if r.Err() == nil {
+				err = io.EOF
+				return
+			}
+			err = r.Err()
 			return
 		}
-		err = r.Err()
+		line := r.Text()
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
+		firstLine = line
+		break
 	}
-	line := r.Text()
 
-	if !strings.HasPrefix(line, "role:") {
+	if !strings.HasPrefix(firstLine, "role:") {
 		err = fmt.Errorf("invalid info reply, first line must contain role")
 		return
 	}
-	switch line[5:] {
+	switch firstLine[5:] {
 	case "master":
 		role = instanceRoleMaster
 	case "slave":
 		role = instanceRoleSlave
 	default:
-		err = fmt.Errorf("invalid role: %s", line[5:])
+		err = fmt.Errorf("invalid role: %s", firstLine[5:])
 	}
 	return
 

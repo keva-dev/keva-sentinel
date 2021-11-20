@@ -17,6 +17,16 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 )
 
+func TestSimpleCheck(t *testing.T) {
+	s := &failoverTestSuite{}
+	defer func() {
+		s.TearDownTest(t)
+	}()
+	s.SetUpSuite(t)
+	s.SetUpTest(t)
+	s.TestSimpleCheck(t)
+}
+
 type failoverTestSuite struct {
 }
 
@@ -42,6 +52,7 @@ func (s *failoverTestSuite) SetUpTest(t *testing.T) {
 
 func (s *failoverTestSuite) TearDownTest(t *testing.T) {
 	for _, port := range testPort {
+		fmt.Println("stopping redis")
 		s.stopRedis(t, port)
 	}
 }
@@ -57,9 +68,10 @@ func (r *redisChecker) Write(data []byte) (int, error) {
 	defer r.Unlock()
 
 	r.buf.Write(data)
-	if strings.Contains(r.buf.String(), "The server is now ready to accept connections") {
+	if strings.Contains(r.buf.String(), "to accept connections") {
 		r.ok = true
 	}
+	fmt.Println(string(data))
 
 	return len(data), nil
 }
@@ -86,8 +98,7 @@ func (s *failoverTestSuite) startRedis(t *testing.T, port int) {
 		}
 		time.Sleep(500 * time.Millisecond)
 	}
-	logger.Fatal("redis-server can not start ok after 10s")
-
+	assert.FailNow(t, "redis-server can not start ok after 10s")
 }
 
 func (s *failoverTestSuite) stopRedis(c *testing.T, port int) {
@@ -105,12 +116,11 @@ func (s *failoverTestSuite) doCommand(t *testing.T, port int, cmd string, cmdArg
 }
 
 func (s *failoverTestSuite) TestSimpleCheck(t *testing.T) {
-	cfg := new(Config)
 
 	masterPort := testPort[0]
 
 	setupIntegration(t, 3, func(c *Config) {
-		cfg.Masters = []MasterMonitor{
+		c.Masters = []MasterMonitor{
 			{
 				Addr:      fmt.Sprintf("127.0.0.1:%d", masterPort),
 				DownAfter: time.Second,
@@ -161,6 +171,7 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 		customConf(&conf)
 	}
 	masterAddr := conf.Masters[0].Addr
+	fmt.Printf("master addr: %s\n", masterAddr)
 	// parts := strings.Split(masterAddr, ":")
 	// host, port := parts[0], parts[1]
 
@@ -182,7 +193,8 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 
 		// a function to create fake client from sentinel to other instance
 		s.clientFactory = func(addr string) (InternalClient, error) {
-			panic("big todo")
+			client, err := newInternalClient(addr)
+			return client, err
 		}
 
 		// s.slaveFactory = toySlaveFactory

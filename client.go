@@ -17,19 +17,19 @@ func newRedisClient(addr string) *redisClient {
 	}
 }
 func (c *redisClient) Info() (string, error) {
-	str := c.cl.Info(context.Background())
+	str := c.cl.Info(context.Background(), "replication")
 	err := str.Err()
 	if err != nil {
 		return "", err
 	}
-	return str.String(), nil
+	return str.Result()
 }
 func (c *redisClient) Ping() (string, error) {
 	sttcmd := c.cl.Ping(context.Background())
 	if sttcmd.Err() != nil {
 		return "", sttcmd.Err()
 	}
-	return sttcmd.String(), nil
+	return sttcmd.Result()
 }
 func (c *redisClient) SubscribeHelloChan() HelloChan {
 	ps := c.cl.Subscribe(context.Background(), helloChan)
@@ -47,7 +47,8 @@ func (c *redisClient) SlaveOf(host, port string) error {
 	if sttcmd.Err() != nil {
 		return sttcmd.Err()
 	}
-	return nil
+	_, err := sttcmd.Result()
+	return err
 }
 
 // SlaveOfNoOne() error
