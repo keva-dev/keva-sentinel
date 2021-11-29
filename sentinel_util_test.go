@@ -34,6 +34,23 @@ func (suite *testSuite) handleLogEventSentinelVotedFor(instanceIdx int, log obse
 	}
 	suite.termsVote[term][instanceIdx] = termInfo
 }
+
+func (suite *testSuite) handleLogEventSlaveInstanceCreated(instanceIdx int, log observer.LoggedEntry) {
+	ctxMap := log.ContextMap()
+	// TODO: add master name when sentinel can handle multile masters masterName := ctxMap["master_name"].(string)
+	address := ctxMap["address"].(string)
+	masterID := ctxMap["master_id"].(string)
+	sentinelID := ctxMap["sentinel_run_id"].(string)
+	suite.mu.Lock()
+	defer suite.mu.Unlock()
+	masterslaveMap, ok := suite.instancesMasterSlaveMap[sentinelID]
+	if !ok {
+		masterslaveMap = map[string][]string{}
+	}
+	masterslaveMap[masterID] = append(masterslaveMap[masterID], address)
+	suite.instancesMasterSlaveMap[sentinelID] = masterslaveMap
+}
+
 func (suite *testSuite) handleLogEventMasterInstanceCreated(instanceIdx int, log observer.LoggedEntry) {
 	ctxMap := log.ContextMap()
 	// TODO: add master name when sentinel can handle multile masters masterName := ctxMap["master_name"].(string)
@@ -206,6 +223,8 @@ func (s *testSuite) consumeLogs(instanceIdx int, observer *observer.ObservedLogs
 				s.handleLogEventSlavePromoted(instanceIdx, entry)
 			case logEventMasterInstanceCreated:
 				s.handleLogEventMasterInstanceCreated(instanceIdx, entry)
+			case logEventSlaveInstanceCreated:
+				s.handleLogEventSlaveInstanceCreated(instanceIdx, entry)
 			}
 		}
 		time.Sleep(100 * time.Millisecond)

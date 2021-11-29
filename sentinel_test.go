@@ -52,17 +52,20 @@ type testSuite struct {
 	t            *testing.T
 }
 type history struct {
-	currentLeader               string
-	currentTerm                 int
-	termsVote                   map[int][]termInfo // key by term seq, val is array of each sentinels' term info
-	termsVoters                 map[int][]string
-	termsLeader                 map[int]string
-	termsSelectedSlave          map[int]string
-	termsPromotedSlave          map[int]string
-	termsMasterID               map[int]string
+	currentLeader      string
+	currentTerm        int
+	termsVote          map[int][]termInfo // key by term seq, val is array of each sentinels' term info
+	termsVoters        map[int][]string
+	termsLeader        map[int]string
+	termsSelectedSlave map[int]string
+	termsPromotedSlave map[int]string
+	termsMasterID      map[int]string
+	// masterSlaveMap              map[string]map[string]string
+	instancesMasterSlaveMap     map[string]instanceMasterSlaveMap
 	termsMasterInstanceCreation map[int][]string      // check which sentinel has initialize master instance
 	failOverStates              map[int]failOverState // capture current failoverstate of each instance
 }
+type instanceMasterSlaveMap = map[string][]string
 type termInfo struct {
 	selfVote      string
 	neighborVotes map[string]string // info about what a sentinel sees other sentinel voted
@@ -171,6 +174,7 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 			termsPromotedSlave:          map[int]string{},
 			termsMasterID:               map[int]string{},
 			termsMasterInstanceCreation: map[int][]string{},
+			instancesMasterSlaveMap:     map[string]instanceMasterSlaveMap{},
 		},
 		mapRunIDtoIdx: mapRunIDToIdx,
 		logObservers:  logObservers,
@@ -556,7 +560,7 @@ func (s *testSuite) checkTermMasterCreation(term int, length int) []string {
 			return true
 		}
 		return false
-	}, 5*time.Second, "term %d has not enough %d master creation event", term, length)
+	}, 7*time.Second, "term %d has not enough %d master creation event", term, length)
 	return ret
 }
 func (s *testSuite) checkTermMasterRunID(term int) string {

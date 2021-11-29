@@ -266,6 +266,11 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 }
 
 func (s *Sentinel) slaveRoutine(sl *slaveInstance) {
+	s.logger.Debugw(logEventSlaveInstanceCreated,
+		"master_id", sl.reportedMaster.runID,
+		"address", sl.addr,
+		"sentinel_run_id", s.runID,
+	)
 	go s.slaveInfoRoutine(sl)
 	go s.slaveHelloRoutine(sl)
 	ticker := time.NewTicker(time.Second)

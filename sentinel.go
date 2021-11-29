@@ -32,6 +32,7 @@ type Config struct {
 }
 
 type MasterMonitor struct {
+	RunID                string         `mapstructure:"run_id"`
 	Name                 string         `mapstructure:"name"`
 	Addr                 string         `mapstructure:"addr"`
 	Quorum               int            `mapstructure:"quorum"`
@@ -135,6 +136,7 @@ func (s *Sentinel) Start() error {
 	}
 	s.mu.Lock()
 	master := &masterInstance{
+		runID:                   m.RunID,
 		sentinelConf:            m,
 		name:                    m.Name,
 		host:                    masterIP,

@@ -235,7 +235,7 @@ func (s *Sentinel) parseInfoMaster(masterAddress string, info string) (bool, err
 }
 
 var (
-	slaveInfoRegexp = regexp.MustCompile("ip=(.*),port=([0-9]+),state=(online|offline),offset=([0-9]+),lag=([0-9]+)")
+	slaveInfoRegexp = regexp.MustCompile("ip=(.*),port=([0-9]+),state=(online|offline|wait_bgsave),offset=([0-9]+),lag=([0-9]+)")
 )
 
 // syntax of info replied by keva is different from redis. We need to know at the beginning

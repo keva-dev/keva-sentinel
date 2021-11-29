@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/garyburd/redigo/redis"
+	"github.com/google/uuid"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest/observer"
@@ -25,6 +26,15 @@ func TestSimpleCheck(t *testing.T) {
 	s.SetUpSuite(t)
 	s.SetUpTest(t)
 	s.TestSimpleCheck(t)
+}
+func TestFailover(t *testing.T) {
+	s := &failoverTestSuite{}
+	defer func() {
+		s.TearDownTest(t)
+	}()
+	s.SetUpSuite(t)
+	s.SetUpTest(t)
+	s.TestFailoverCheck(t)
 }
 
 type failoverTestSuite struct {
@@ -127,36 +137,9 @@ func (s *failoverTestSuite) TestSimpleCheck(t *testing.T) {
 			},
 		}
 	})
-
-	// app, err := NewApp(cfg)
-	// c.Assert(err, IsNil)
-
-	// defer app.Close()
-
-	// go func() {
-	// 	app.Run()
-	// }()
-
-	// s.doCommand(c, port, "SET", "a", 1)
-	// n, err := redis.Int(s.doCommand(c, port, "GET", "a"), nil)
-	// c.Assert(err, IsNil)
-	// c.Assert(n, Equals, 1)
-
-	// ch := s.addBeforeHandler(app)
-
-	// ms := app.masters.GetMasters()
-	// assert.Equal()
-	// c.Assert(ms, DeepEquals, []string{fmt.Sprintf("127.0.0.1:%d", port)})
-
-	s.stopRedis(t, masterPort)
-
-	// select {
-	// case <-ch:
-	// case <-time.After(5 * time.Second):
-	// 	c.Fatal("check is not ok after 5s, too slow")
-	// }
 }
 
+// after this return, numInstances of sentinels have already recognized master
 func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) *testSuite {
 	file := filepath.Join("test", "config", "sentinel.yaml")
 	viper.SetConfigType("yaml")
@@ -171,11 +154,6 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 		customConf(&conf)
 	}
 	masterAddr := conf.Masters[0].Addr
-	fmt.Printf("master addr: %s\n", masterAddr)
-	// parts := strings.Split(masterAddr, ":")
-	// host, port := parts[0], parts[1]
-
-	// make master remember slaves
 	sentinels := []*Sentinel{}
 	logObservers := make([]*observer.ObservedLogs, numInstances)
 	testLock := &sync.Mutex{}
@@ -231,6 +209,7 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 			termsPromotedSlave:          map[int]string{},
 			termsMasterID:               map[int]string{},
 			termsMasterInstanceCreation: map[int][]string{},
+			instancesMasterSlaveMap:     map[string]instanceMasterSlaveMap{},
 		},
 		mapRunIDtoIdx: mapRunIDToIdx,
 		logObservers:  logObservers,
@@ -243,38 +222,68 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 	return suite
 }
 
-// func (s *failoverTestSuite) TestFailoverCheck(c *C) {
-// 	cfg := new(Config)
-// 	cfg.Addr = ":11000"
+func (s *failoverTestSuite) TestFailoverCheck(t *testing.T) {
+	var masterAddr string
+	masterPort := testPort[0]
 
-// 	port := testPort[0]
-// 	masterAddr := fmt.Sprintf("127.0.0.1:%d", port)
+	s.buildReplTopo(t, testPort[0], testPort[1:])
+	masterID := uuid.NewString()
 
-// 	cfg.Masters = []string{masterAddr}
-// 	cfg.CheckInterval = 500
-// 	cfg.MaxDownTime = 1
+	suite := setupIntegration(t, 3, func(c *Config) {
+		masterAddr = fmt.Sprintf("127.0.0.1:%d", masterPort)
+		c.Masters = []MasterMonitor{
+			{
+				Name:                 "test",
+				RunID:                masterID,
+				Addr:                 masterAddr,
+				DownAfter:            time.Second,
+				Quorum:               2,
+				FailoverTimeout:      time.Second * 10,
+				ReconfigSlaveTimeout: time.Second * 10,
+				ParallelSync:         1,
+			},
+		}
+	})
+	//slave instances connected
+	ok := eventually(t, func() bool {
+		suite.mu.Lock()
+		defer suite.mu.Unlock()
+		for runID := range suite.mapRunIDtoIdx {
+			masterSlavesMap, exist := suite.instancesMasterSlaveMap[runID]
+			if !exist {
+				return false
+			}
+			slaves, exist := masterSlavesMap[masterID]
+			if !exist {
+				return false
+			}
+			// may check more detail here
+			if len(slaves) != len(testPort[1:]) {
+				return false
+			}
+		}
 
-// 	app, err := NewApp(cfg)
-// 	c.Assert(err, IsNil)
+		return true
+	}, time.Second*3, "slave instances monitoring routines are not intitialized")
+	if !ok {
+		return
+	}
 
-// 	defer app.Close()
+	// setup slave for master
 
-// 	ch := s.addAfterHandler(app)
+	// kill master
+	s.stopRedis(t, masterPort)
 
-// 	go func() {
-// 		app.Run()
-// 	}()
+	// check if all instance create new master instance
+	instanceIDs := suite.checkTermMasterCreation(1, 3)
+	suite.mu.Lock()
+	totalInstances := []string{}
+	for _, s := range suite.instances {
+		totalInstances = append(totalInstances, s.runID)
+	}
+	assert.ElementsMatch(t, totalInstances, instanceIDs, "mismatch sentinels instances")
 
-// 	s.buildReplTopo(c)
-
-// 	s.stopRedis(c, port)
-
-// 	select {
-// 	case <-ch:
-// 	case <-time.After(5 * time.Second):
-// 		c.Fatal("failover is not ok after 5s, too slow")
-// 	}
-// }
+}
 
 // func (s *failoverTestSuite) TestOneFaftFailoverCheck(c *C) {
 // 	s.testOneClusterFailoverCheck(c, "raft")
@@ -323,27 +332,32 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 // 	}
 // }
 
-func (s *failoverTestSuite) buildReplTopo(t *testing.T) {
-	port := testPort[0]
+func (s *failoverTestSuite) buildReplTopo(t *testing.T, masterPort int, slavePorts []int) {
+	// port := testPort[0]
+	for _, p := range slavePorts {
+		s.doCommand(t, p, "SLAVEOF", "127.0.0.1", masterPort)
+	}
 
-	s.doCommand(t, testPort[1], "SLAVEOF", "127.0.0.1", port)
-	s.doCommand(t, testPort[2], "SLAVEOF", "127.0.0.1", port)
+	s.doCommand(t, masterPort, "SET", "a", 10)
+	s.doCommand(t, masterPort, "SET", "b", 20)
 
-	s.doCommand(t, port, "SET", "a", 10)
-	s.doCommand(t, port, "SET", "b", 20)
+	// wait data sync
+	for _, p := range slavePorts {
+		s.waitReplConnected(t, p, 10)
+	}
 
-	s.waitReplConnected(t, testPort[1], 10)
-	s.waitReplConnected(t, testPort[2], 10)
+	s.waitSync(t, masterPort, 10)
+	time.Sleep(2 * time.Second)
 
-	s.waitSync(t, port, 10)
-
-	n, err := redis.Int(s.doCommand(t, testPort[1], "GET", "a"), nil)
-	assert.NoError(t, err)
-	assert.Equal(t, 10, n)
-
-	n, err = redis.Int(s.doCommand(t, testPort[2], "GET", "a"), nil)
-	assert.NoError(t, err)
-	assert.Equal(t, 10, n)
+	// slaves are fully sync
+	for _, p := range slavePorts {
+		n, err := redis.Int(s.doCommand(t, p, "GET", "a"), nil)
+		assert.NoError(t, err)
+		if err != nil {
+			fmt.Printf("here : %s\n", err.Error())
+		}
+		assert.Equal(t, 10, n)
+	}
 }
 
 func (s *failoverTestSuite) waitReplConnected(t *testing.T, port int, timeout int) {
@@ -379,7 +393,6 @@ func (s *failoverTestSuite) waitSync(t *testing.T, port int, timeout int) {
 				}
 			}
 		}
-
 		if same {
 			return
 		}
