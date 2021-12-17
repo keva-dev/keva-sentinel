@@ -146,9 +146,9 @@ func (s *Sentinel) subscribeHello(m *masterInstance) {
 		m.mu.Lock()
 		_, ok := m.sentinels[runid]
 		if !ok {
-			client, err := newRPCClient(parts[0], parts[1])
+			client, err := NewRedisProtoInternalClient(parts[0], parts[1])
 			if err != nil {
-				s.logger.Errorf("newRPCClient: cannot create new client to other sentinel with info: %s: %s", newmsg, err)
+				s.logger.Errorf("NewRedisProtoInternalClient: cannot create new client to other sentinel with info: %s: %s", newmsg, err)
 				m.mu.Unlock()
 				continue
 			}
@@ -774,6 +774,7 @@ func (s *Sentinel) askSentinelsIfMasterIsDown(m *masterInstance) {
 					SelfID:       "",
 				})
 				if err != nil {
+					fmt.Println(err)
 					//skip for now
 				} else {
 					sInstance.mu.Lock()

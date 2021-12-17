@@ -18,7 +18,7 @@ import (
 	"go.uber.org/zap/zaptest/observer"
 )
 
-func TestSimpleCheck(t *testing.T) {
+func TestIntegration_SimpleCheck(t *testing.T) {
 	s := &failoverTestSuite{}
 	defer func() {
 		s.TearDownTest(t)
@@ -27,14 +27,14 @@ func TestSimpleCheck(t *testing.T) {
 	s.SetUpTest(t)
 	s.TestSimpleCheck(t)
 }
-func TestFailover(t *testing.T) {
+func TestIntegration_Failover(t *testing.T) {
 	s := &failoverTestSuite{}
 	defer func() {
 		s.TearDownTest(t)
 	}()
 	s.SetUpSuite(t)
 	s.SetUpTest(t)
-	s.TestFailoverCheck(t)
+	s.CheckFailover(t)
 }
 
 type failoverTestSuite struct {
@@ -222,7 +222,7 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 	return suite
 }
 
-func (s *failoverTestSuite) TestFailoverCheck(t *testing.T) {
+func (s *failoverTestSuite) CheckFailover(t *testing.T) {
 	var masterAddr string
 	masterPort := testPort[0]
 
@@ -282,55 +282,7 @@ func (s *failoverTestSuite) TestFailoverCheck(t *testing.T) {
 		totalInstances = append(totalInstances, s.runID)
 	}
 	assert.ElementsMatch(t, totalInstances, instanceIDs, "mismatch sentinels instances")
-
 }
-
-// func (s *failoverTestSuite) TestOneFaftFailoverCheck(c *C) {
-// 	s.testOneClusterFailoverCheck(c, "raft")
-// }
-
-// func (s *failoverTestSuite) checkLeader(c *C, apps []*App) *App {
-// 	for i := 0; i < 20; i++ {
-// 		for _, app := range apps {
-// 			if app != nil && app.cluster.IsLeader() {
-// 				return app
-// 			}
-// 		}
-// 		time.Sleep(500 * time.Millisecond)
-// 	}
-
-// 	c.Assert(1, Equals, 0)
-
-// 	return nil
-// }
-
-// func (s *failoverTestSuite) testOneClusterFailoverCheck(c *C, broker string) {
-// 	apps := s.newClusterApp(c, 1, 0, broker)
-// 	app := apps[0]
-
-// 	defer app.Close()
-
-// 	s.checkLeader(c, apps)
-
-// 	port := testPort[0]
-// 	masterAddr := fmt.Sprintf("127.0.0.1:%d", port)
-
-// 	err := app.addMasters([]string{masterAddr})
-// 	c.Assert(err, IsNil)
-
-// 	ch := s.addBeforeHandler(app)
-
-// 	ms := app.masters.GetMasters()
-// 	c.Assert(ms, DeepEquals, []string{fmt.Sprintf("127.0.0.1:%d", port)})
-
-// 	s.stopRedis(c, port)
-
-// 	select {
-// 	case <-ch:
-// 	case <-time.After(5 * time.Second):
-// 		c.Fatal("check is not ok after 5s, too slow")
-// 	}
-// }
 
 func (s *failoverTestSuite) buildReplTopo(t *testing.T, masterPort int, slavePorts []int) {
 	// port := testPort[0]

@@ -9,12 +9,5 @@ masters:
     down_after: 5s
     failover_timeout: 10s
     reconfig_slave_timeout: 10s
-    config_epoch: 
-    known_replicas:
-      - addr: "localhost:6768"
     parallel_sync: 1
-    # TODO: support return known sentinel from keva
-    # known_sentinels:
-    #   - addr: "localhost:25673"
-    #     id: ""
 current_epoch: 0

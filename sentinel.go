@@ -3,6 +3,7 @@ package sentinel
 import (
 	"fmt"
 	"net"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -54,6 +55,9 @@ type KnownReplica struct {
 }
 
 type Sentinel struct {
+	protoMutex *sync.Mutex
+	tcpDone    bool
+
 	mu              *sync.Mutex
 	quorum          int
 	conf            Config
@@ -91,6 +95,7 @@ func NewFromConfig(conf Config) (*Sentinel, error) {
 		runID:           conf.MyID,
 		conf:            conf,
 		mu:              &sync.Mutex{},
+		protoMutex:      &sync.Mutex{},
 		clientFactory:   newInternalClient,
 		masterInstances: map[string]*masterInstance{},
 		logger:          newLogger(),
@@ -161,14 +166,15 @@ func (s *Sentinel) Start() error {
 		return fmt.Errorf("reported address of master %s is not currently in master role", m.Name)
 	}
 
-	go s.serveRPC()
+	go s.serveTCP()
 	go s.masterRoutine(master)
 	return nil
 }
 
 func (s *Sentinel) Shutdown() {
-	locked(s.mu, func() {
+	locked(s.protoMutex, func() {
 		s.listener.Close()
+		s.tcpDone = true
 	})
 }
 
@@ -248,10 +254,54 @@ type IsMasterDownByAddrArgs struct {
 	CurrentEpoch int
 	SelfID       string
 }
+
+func (req *IsMasterDownByAddrArgs) decode(parts [][]byte) error {
+	if len(parts) != 5 {
+		return fmt.Errorf("invalid arg")
+	}
+	req.Name, req.IP, req.Port, req.SelfID = string(parts[0]), string(parts[1]), string(parts[2]), string(parts[4])
+	intepoch, err := strconv.Atoi(string(parts[3]))
+	if err != nil {
+		return err
+	}
+	req.CurrentEpoch = intepoch
+	return nil
+}
+
 type IsMasterDownByAddrReply struct {
 	MasterDown    bool
 	VotedLeaderID string
 	LeaderEpoch   int
+}
+
+func (res *IsMasterDownByAddrReply) decode(parts []string) error {
+	if len(parts) != 3 {
+		return fmt.Errorf("invalid arg")
+	}
+	res.MasterDown = false
+	if parts[0] == "1" {
+		res.MasterDown = true
+	}
+	leaderEpoch, err := strconv.Atoi(parts[2])
+	if err != nil {
+		return err
+	}
+	res.LeaderEpoch = leaderEpoch
+	res.VotedLeaderID = parts[1]
+	return nil
+}
+
+func (res *IsMasterDownByAddrReply) toLines() []string {
+	down := "0"
+	if res.MasterDown {
+		down = "1"
+	}
+	return []string{
+		down,
+		res.VotedLeaderID,
+		strconv.Itoa(res.LeaderEpoch),
+	}
+
 }
 
 const (

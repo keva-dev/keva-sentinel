@@ -144,7 +144,6 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 		assert.NoError(t, err)
 
 		sentinels = append(sentinels, s)
-		defer s.Shutdown()
 	}
 	// sleep for 2 second to ensure all sentinels have pubsub and recognized each other
 	time.Sleep(3 * time.Second)
@@ -498,6 +497,7 @@ func TestResetMasterInstance(t *testing.T) {
 		suite := setupWithCustomConfig(t, numInstances, func(c *Config) {
 			c.Masters[0].Quorum = numInstances/2 + 1 // force normal quorum
 		})
+		defer suite.CleanUp()
 		expectedNewMaster := slaveCustomizer(suite.slavesMap)
 		expectedNewMaster.mu.Lock()
 		expectedID := expectedNewMaster.id

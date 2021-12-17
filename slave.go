@@ -201,9 +201,9 @@ func (s *Sentinel) slaveHelloRoutine(sl *slaveInstance) {
 		masterName := m.name
 		_, ok := m.sentinels[runid]
 		if !ok {
-			client, err := newRPCClient(parts[0], parts[1])
+			client, err := NewRedisProtoInternalClient(parts[0], parts[1])
 			if err != nil {
-				s.logger.Errorf("newRPCClient: cannot create new client to other sentinel with info: %s: %s\ndebug: %s", newmsg, err, newmsg)
+				s.logger.Errorf("NewRedisProtoInternalClient: cannot create new client to other sentinel with info: %s: %s\ndebug: %s", newmsg, err, newmsg)
 				m.mu.Unlock()
 				continue
 			}
