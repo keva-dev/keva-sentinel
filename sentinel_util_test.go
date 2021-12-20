@@ -19,7 +19,7 @@ func (suite *testSuite) handleLogEventSentinelVotedFor(instanceIdx int, log obse
 	defer suite.mu.Unlock()
 	_, exist := suite.termsVote[term]
 	if !exist {
-		suite.termsVote[term] = make([]termInfo, len(suite.instances))
+		suite.termsVote[term] = make([]voteInfo, len(suite.instances))
 	}
 	termInfo := suite.termsVote[term][instanceIdx]
 	if termInfo.selfVote != "" {
@@ -102,7 +102,6 @@ func (suite *testSuite) handleLogEventSelectedSlave(instanceIdx int, log observe
 			term, previousSelected, selectedSlave)
 	}
 	suite.termsSelectedSlave[term] = selectedSlave
-	suite.currentLeader = selectedSlave
 }
 
 func (suite *testSuite) handleLogEventRequestingElection(instanceIdx int, log observer.LoggedEntry) {
@@ -111,7 +110,7 @@ func (suite *testSuite) handleLogEventRequestingElection(instanceIdx int, log ob
 	term := int(ctxMap["epoch"].(int64))
 	suite.mu.Lock()
 	defer suite.mu.Unlock()
-	suite.termsVoters[term] = append(suite.termsVoters[term], runid)
+	suite.termsVoteRequesters[term] = append(suite.termsVoteRequesters[term], runid)
 }
 
 func (suite *testSuite) handleLogEventBecameTermLeader(instanceIdx int, log observer.LoggedEntry) {
@@ -181,7 +180,7 @@ func (suite *testSuite) handleLogEventNeighborVotedFor(instanceIdx int, log obse
 	defer suite.mu.Unlock()
 	_, exist := suite.termsVote[term]
 	if !exist {
-		suite.termsVote[term] = make([]termInfo, len(suite.instances))
+		suite.termsVote[term] = make([]voteInfo, len(suite.instances))
 	}
 	termInfo := suite.termsVote[term][instanceIdx]
 

@@ -52,21 +52,21 @@ type testSuite struct {
 	t            *testing.T
 }
 type history struct {
-	currentLeader      string
-	currentTerm        int
-	termsVote          map[int][]termInfo // key by term seq, val is array of each sentinels' term info
-	termsVoters        map[int][]string
-	termsLeader        map[int]string
-	termsSelectedSlave map[int]string
-	termsPromotedSlave map[int]string
-	termsMasterID      map[int]string
+	currentLeader       string
+	currentTerm         int
+	termsVote           map[int][]voteInfo // key by term seq, val is array of each sentinels' term info
+	termsVoteRequesters map[int][]string
+	termsLeader         map[int]string
+	termsSelectedSlave  map[int]string
+	termsPromotedSlave  map[int]string
+	termsMasterID       map[int]string
 	// masterSlaveMap              map[string]map[string]string
 	instancesMasterSlaveMap     map[string]instanceMasterSlaveMap
 	termsMasterInstanceCreation map[int][]string      // check which sentinel has initialize master instance
 	failOverStates              map[int]failOverState // capture current failoverstate of each instance
 }
 type instanceMasterSlaveMap = map[string][]string
-type termInfo struct {
+type voteInfo struct {
 	selfVote      string
 	neighborVotes map[string]string // info about what a sentinel sees other sentinel voted
 }
@@ -165,8 +165,8 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 		// master:      master,
 		slavesMap: slaveMap,
 		history: history{
-			termsVote:                   map[int][]termInfo{},
-			termsVoters:                 map[int][]string{},
+			termsVote:                   map[int][]voteInfo{},
+			termsVoteRequesters:         map[int][]string{},
 			termsLeader:                 map[int]string{},
 			failOverStates:              map[int]failOverState{},
 			termsSelectedSlave:          map[int]string{},
@@ -176,6 +176,7 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 			instancesMasterSlaveMap:     map[string]instanceMasterSlaveMap{},
 		},
 		mapRunIDtoIdx: mapRunIDToIdx,
+		mapIdxtoRunID: mapIdxToRunID,
 		logObservers:  logObservers,
 		t:             t,
 	}
@@ -265,6 +266,7 @@ func TestSDown(t *testing.T) {
 func TestODown(t *testing.T) {
 	testOdown := func(t *testing.T, numInstances int) {
 		suite := setup(t, numInstances)
+		defer suite.CleanUp()
 
 		for _, s := range suite.instances {
 			s.mu.Lock()
@@ -339,6 +341,7 @@ func TestLeaderVoteNotConflict(t *testing.T) {
 		suite := setupWithCustomConfig(t, numInstances, func(c *Config) {
 			c.Masters[0].Quorum = numInstances/2 + 1 // force normal quorum
 		})
+		defer suite.CleanUp()
 		suite.cluster.killCurrentMaster()
 		time.Sleep(suite.conf.Masters[0].DownAfter)
 
@@ -346,7 +349,7 @@ func TestLeaderVoteNotConflict(t *testing.T) {
 		// others still see master is up
 		gr := errgroup.Group{}
 		suite.mu.Lock()
-		suite.termsVote[1] = make([]termInfo, len(suite.instances))
+		suite.termsVote[1] = make([]voteInfo, len(suite.instances))
 		suite.mu.Unlock()
 		for idx := range suite.instances {
 			instanceIdx := idx
@@ -419,6 +422,7 @@ func TestLeaderElection(t *testing.T) {
 		suite := setupWithCustomConfig(t, numInstances, func(c *Config) {
 			c.Masters[0].Quorum = numInstances/2 + 1 // force normal quorum
 		})
+		defer suite.CleanUp()
 		suite.cluster.killCurrentMaster()
 		time.Sleep(suite.conf.Masters[0].DownAfter)
 		//TODO: check more info of this recognized leader
@@ -443,6 +447,7 @@ func TestPromoteSlave(t *testing.T) {
 		suite := setupWithCustomConfig(t, numInstances, func(c *Config) {
 			c.Masters[0].Quorum = numInstances/2 + 1 // force normal quorum
 		})
+		defer suite.CleanUp()
 		expectedChosenSlave := slaveCustomizer(suite.slavesMap)
 
 		suite.cluster.killCurrentMaster()
@@ -595,16 +600,30 @@ func (s *testSuite) checkTermPromotedSlave(term int) string {
 
 func (s *testSuite) checkVotersOfTerm(term int, expectVoters int) []string {
 	var ret []string
+	var votesNum int
 	eventually(s.t, func() bool {
-		s.mu.Lock()
-		defer s.mu.Unlock()
-		voters := s.termsVoters[term]
-		if len(voters) == expectVoters {
-			ret = voters
-			return true
-		}
-		return false
-	}, 10*time.Second, "term %d does not have %d voters", term, expectVoters)
+		var found bool
+		locked(s.mu, func() {
+			voteHistory := s.termsVote[term]
+			if voteHistory == nil {
+				return
+			}
+			var count int
+			var currentVoters []string
+			for idx, item := range voteHistory {
+				if item.selfVote != "" {
+					count++
+					currentVoters = append(currentVoters, s.mapIdxtoRunID[idx])
+				}
+			}
+			votesNum = count
+			found = (count == expectVoters)
+			if found {
+				ret = currentVoters
+			}
+		})
+		return found
+	}, 10*time.Second, "term %d have %d instead of %d voters", term, votesNum, expectVoters)
 	return ret
 }
 

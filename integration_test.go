@@ -201,9 +201,9 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 		mu:        testLock,
 		conf:      conf,
 		history: history{
-			termsVote:                   map[int][]termInfo{},
-			termsVoters:                 map[int][]string{},
-			termsLeader:                 map[int]string{},
+			termsVote:                   map[int][]voteInfo{}, // vote history of each sentinel instance in terms
+			termsVoteRequesters:         map[int][]string{},   // candidates who request for vote in terms
+			termsLeader:                 map[int]string{},     // candidates who became leader in terms
 			failOverStates:              map[int]failOverState{},
 			termsSelectedSlave:          map[int]string{},
 			termsPromotedSlave:          map[int]string{},
