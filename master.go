@@ -112,7 +112,7 @@ func (s *Sentinel) sayHelloRoutineToMaster(m *masterInstance, helloChan HelloCha
 		)
 		err := helloChan.Publish(info)
 		if err != nil {
-			s.logger.Errorf("helloChan.Publish: %s", err)
+			s.logger.Errorf("SayHelloRoutineToMaster helloChan.Publish: %s", err)
 		}
 	}
 }
@@ -173,6 +173,7 @@ func (s *Sentinel) masterRoutine(m *masterInstance) {
 		"run_id", m.runID,
 		"sentinel_run_id", s.runID,
 		"epoch", m.configEpoch,
+		"addr", m.getAddr(),
 	)
 	go s.masterPingRoutine(m)
 	go s.subscribeHello(m)

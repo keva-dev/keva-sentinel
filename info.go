@@ -14,11 +14,11 @@ import (
 func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bool, error) {
 	r := bufio.NewScanner(strings.NewReader(info))
 	r.Split(bufio.ScanLines)
-	role, err := s.preparseInfo(r)
+	generic, err := s.preparseInfo(r)
 	if err != nil {
 		return false, err
 	}
-	if role != instanceRoleSlave {
+	if generic.role != "slave" {
 		return true, nil
 	}
 
@@ -43,17 +43,6 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 			panic("not reached")
 		}
 		line := r.Text()
-		if strings.HasPrefix(line, "run_id:") {
-			if len(slaveIns.runID) == 0 {
-				slaveIns.runID = line[7:]
-			} else {
-				if len(slaveIns.runID) != len(line[7:]) && slaveIns.runID != line[7:] {
-					//reboot logic
-					slaveIns.runID = line[7:]
-				}
-			}
-			continue
-		}
 		//master_link_down_since_seconds:-1
 		if len(line) >= 32 && line[:30] == "master_link_down_since_seconds" {
 			intSec, err := strconv.Atoi(line[:30])
@@ -102,6 +91,7 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 		}
 
 	}
+	slaveIns.runID = generic.runID
 	currentMasterAddr := fmt.Sprintf("%s:%s", slaveIns.masterHost, slaveIns.masterPort)
 	if currentMasterAddr != masterAddr {
 		//TODO: check if old master is still alive
@@ -142,11 +132,11 @@ func (s *Sentinel) parseInfoSlave(m *masterInstance, slaveAddr, info string) (bo
 func (s *Sentinel) parseInfoMaster(masterAddress string, info string) (bool, error) {
 	r := bufio.NewScanner(strings.NewReader(info))
 	r.Split(bufio.ScanLines)
-	role, err := s.preparseInfo(r)
+	generic, err := s.preparseInfo(r)
 	if err != nil {
 		return false, err
 	}
-	if role != instanceRoleMaster {
+	if generic.role != "master" {
 		return true, nil
 	}
 	s.mu.Lock()
@@ -164,23 +154,13 @@ func (s *Sentinel) parseInfoMaster(masterAddress string, info string) (bool, err
 		slaveCheck[key] = false
 	}
 	newSlaves := []*slaveInstance{}
+	m.runID = generic.runID
 
 	for r.Scan() {
 		if r.Err() != nil {
 			panic("not reached")
 		}
 		line := r.Text()
-		if strings.HasPrefix(line, "run_id:") {
-			if len(m.runID) == 0 {
-				m.runID = line[7:]
-			} else {
-				if len(m.runID) != len(line[7:]) && m.runID != line[7:] {
-					//reboot logic
-					m.runID = line[7:]
-				}
-			}
-			continue
-		}
 		// slave0:ip=127.0.0.1,port=6379,state=online,offset=42,lag=0
 		if strings.HasPrefix(line, "slave") {
 			parts := strings.Split(line[5:], ":")
@@ -240,9 +220,12 @@ var (
 
 // syntax of info replied by keva is different from redis. We need to know at the beginning
 // of the string the role of the instance first
-func (s *Sentinel) preparseInfo(r *bufio.Scanner) (role instanceRole, err error) {
+func (s *Sentinel) preparseInfo(r *bufio.Scanner) (info genericInfo, err error) {
 	var firstLine string
 	for {
+		if info.role != "" && info.runID != "" {
+			return
+		}
 		found := r.Scan()
 		if !found {
 			if r.Err() == nil {
@@ -256,22 +239,23 @@ func (s *Sentinel) preparseInfo(r *bufio.Scanner) (role instanceRole, err error)
 		if strings.HasPrefix(line, "#") {
 			continue
 		}
-		firstLine = line
-		break
+		if strings.HasPrefix(line, "role:") {
+			role := line[5:]
+			if role != "master" && role != "slave" {
+				err = fmt.Errorf("invalid role: %s", firstLine[5:])
+				return
+			}
+			info.role = line[5:]
+			continue
+		}
+		if strings.HasPrefix(line, "run_id:") {
+			info.runID = line[7:]
+			continue
+		}
 	}
+}
 
-	if !strings.HasPrefix(firstLine, "role:") {
-		err = fmt.Errorf("invalid info reply, first line must contain role")
-		return
-	}
-	switch firstLine[5:] {
-	case "master":
-		role = instanceRoleMaster
-	case "slave":
-		role = instanceRoleSlave
-	default:
-		err = fmt.Errorf("invalid role: %s", firstLine[5:])
-	}
-	return
-
+type genericInfo struct {
+	runID string
+	role  string
 }

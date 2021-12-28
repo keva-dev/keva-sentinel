@@ -16,8 +16,10 @@ func newRedisClient(addr string) *redisClient {
 		cl: cl,
 	}
 }
+
+// Waiting for https://github.com/redis/redis/issues/2416 so we can do `info server replication`
 func (c *redisClient) Info() (string, error) {
-	str := c.cl.Info(context.Background(), "replication")
+	str := c.cl.Info(context.Background())
 	err := str.Err()
 	if err != nil {
 		return "", err

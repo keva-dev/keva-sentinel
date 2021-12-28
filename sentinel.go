@@ -173,7 +173,9 @@ func (s *Sentinel) Start() error {
 
 func (s *Sentinel) Shutdown() {
 	locked(s.protoMutex, func() {
-		s.listener.Close()
+		if s.listener != nil {
+			s.listener.Close()
+		}
 		s.tcpDone = true
 	})
 }

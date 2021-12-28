@@ -55,20 +55,24 @@ func (suite *testSuite) handleLogEventMasterInstanceCreated(instanceIdx int, log
 	ctxMap := log.ContextMap()
 	// TODO: add master name when sentinel can handle multile masters masterName := ctxMap["master_name"].(string)
 	runID := ctxMap["run_id"].(string)
+	addr := ctxMap["addr"].(string)
 	term := int(ctxMap["epoch"].(int64))
 	sentinelRunID := ctxMap["sentinel_run_id"].(string)
 	suite.mu.Lock()
 	defer suite.mu.Unlock()
-	previousMasterID, exist := suite.termsMasterID[term]
+	previousMaster, exist := suite.termsMasterInfo[term]
 	if exist {
-		if previousMasterID != runID {
-			assert.Failf(suite.t, "conflict master id per term", "term %d has multiple master ID: %s and %s", previousMasterID,
+		if previousMaster.runID != runID {
+			assert.Failf(suite.t, "conflict master id per term", "term %d has multiple master ID: %s and %s", previousMaster.runID,
 				runID)
 
 			return
 		}
 	}
-	suite.termsMasterID[term] = runID
+	suite.termsMasterInfo[term] = masterInfo{
+		runID: runID,
+		addr:  addr,
+	}
 	suite.termsMasterInstanceCreation[term] = append(suite.termsMasterInstanceCreation[term], sentinelRunID)
 }
 

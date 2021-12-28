@@ -67,7 +67,7 @@ func (s *Sentinel) IsMasterDownByAddr(req *IsMasterDownByAddrArgs, reply *IsMast
 	master, exist := s.masterInstances[addr]
 	s.mu.Unlock()
 	if !exist {
-		err := fmt.Errorf("master does not exist")
+		err := fmt.Errorf("master %s with addr %s does not exist or has been deleted", req.Name, addr)
 		s.logger.Errorf(err.Error())
 		return err
 	}
@@ -173,11 +173,14 @@ func (s *Sentinel) processCmd(cmd redcon.Command, w *redcon.Writer) error {
 		if len(parts) < 3 {
 			return fmt.Errorf("missing master name")
 		}
-		ret, err := s.tcpGetMasterAddrByname(string(parts[2]))
+		lines, err := s.tcpGetMasterAddrByname(string(parts[2]))
 		if err != nil {
 			return err
 		}
-		w.WriteString(ret)
+		w.WriteArray(len(lines))
+		for _, item := range lines {
+			w.WriteBulkString(item)
+		}
 		return nil
 	case "is-master-down-by-addr":
 		if len(parts[2:]) != 5 {
@@ -214,13 +217,11 @@ func (s *Sentinel) tcpIsMasterDownByAddr(args [][]byte) ([]string, error) {
 }
 
 // Should be understood by redis client
-func (s *Sentinel) tcpGetMasterAddrByname(name string) (string, error) {
+func (s *Sentinel) tcpGetMasterAddrByname(name string) ([]string, error) {
 	s.mu.Lock()
 	temp := make([]*masterInstance, 0, len(s.masterInstances))
-	count := 0
 	for addr := range s.masterInstances {
-		temp[count] = s.masterInstances[addr]
-		count++
+		temp = append(temp, s.masterInstances[addr])
 	}
 	s.mu.Unlock()
 	var (
@@ -243,9 +244,9 @@ func (s *Sentinel) tcpGetMasterAddrByname(name string) (string, error) {
 		}
 	}
 	if !found {
-		return "_\n", nil
+		return nil, fmt.Errorf("not found master")
 	}
-	return fmt.Sprintf("%s\n%s\n", host, port), nil
+	return []string{host, port}, nil
 }
 
 type redisProtoInternalClient struct {

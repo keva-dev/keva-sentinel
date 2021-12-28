@@ -59,13 +59,17 @@ type history struct {
 	termsLeader         map[int]string
 	termsSelectedSlave  map[int]string
 	termsPromotedSlave  map[int]string
-	termsMasterID       map[int]string
+	termsMasterInfo     map[int]masterInfo
 	// masterSlaveMap              map[string]map[string]string
 	instancesMasterSlaveMap     map[string]instanceMasterSlaveMap
 	termsMasterInstanceCreation map[int][]string      // check which sentinel has initialize master instance
 	failOverStates              map[int]failOverState // capture current failoverstate of each instance
 }
 type instanceMasterSlaveMap = map[string][]string
+type masterInfo struct {
+	runID string
+	addr  string
+}
 type voteInfo struct {
 	selfVote      string
 	neighborVotes map[string]string // info about what a sentinel sees other sentinel voted
@@ -171,7 +175,7 @@ func setupWithCustomConfig(t *testing.T, numInstances int, customConf func(*Conf
 			failOverStates:              map[int]failOverState{},
 			termsSelectedSlave:          map[int]string{},
 			termsPromotedSlave:          map[int]string{},
-			termsMasterID:               map[int]string{},
+			termsMasterInfo:             map[int]masterInfo{},
 			termsMasterInstanceCreation: map[int][]string{},
 			instancesMasterSlaveMap:     map[string]instanceMasterSlaveMap{},
 		},
@@ -512,10 +516,11 @@ func TestResetMasterInstance(t *testing.T) {
 		//TODO: check more info of this recognized leader
 		promotedSlave := suite.checkTermPromotedSlave(1)
 		suite.checkClusterHasLeader()
-		newRunID := suite.checkTermMasterRunID(1)
-		assert.Equal(t, promotedSlave, newRunID)
-		if newRunID != "" {
-			assert.Equal(t, newRunID, expectedID, "failover to wrong master", "term %d wants master %s instead of %s", expectedID, newRunID)
+		masterInfo := suite.checkTermMasterInfo(1)
+		assert.Equal(t, promotedSlave, masterInfo.runID)
+		if masterInfo.runID != "" {
+			assert.Equal(t, masterInfo.runID, expectedID, "failover to wrong master", "term %d wants master %s instead of %s",
+				expectedID, masterInfo.runID)
 		}
 
 		// check if all instance create new master instance
@@ -568,14 +573,14 @@ func (s *testSuite) checkTermMasterCreation(term int, length int) []string {
 	}, 7*time.Second, "term %d has not enough %d master creation event", term, length)
 	return ret
 }
-func (s *testSuite) checkTermMasterRunID(term int) string {
-	var ret string
+func (s *testSuite) checkTermMasterInfo(term int) masterInfo {
+	var ret masterInfo
 	eventually(s.t, func() bool {
 		s.mu.Lock()
 		defer s.mu.Unlock()
-		runID, exist := s.termsMasterID[term]
-		if exist && runID != "" {
-			ret = runID
+		masterInfo, exist := s.termsMasterInfo[term]
+		if exist && masterInfo.runID != "" {
+			ret = masterInfo
 			return true
 		}
 		return false

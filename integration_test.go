@@ -1,8 +1,12 @@
 package sentinel
 
 import (
+	"bufio"
 	"bytes"
+	"context"
+	"errors"
 	"fmt"
+	"io"
 	"os/exec"
 	"path/filepath"
 	"strconv"
@@ -12,7 +16,7 @@ import (
 	"time"
 
 	"github.com/garyburd/redigo/redis"
-	"github.com/google/uuid"
+	redisv8 "github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap/zaptest/observer"
@@ -183,7 +187,6 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 		assert.NoError(t, err)
 
 		sentinels = append(sentinels, s)
-		defer s.Shutdown()
 	}
 	// sleep for 2 second to ensure all sentinels have pubsub and recognized each other
 	time.Sleep(3 * time.Second)
@@ -207,7 +210,7 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 			failOverStates:              map[int]failOverState{},
 			termsSelectedSlave:          map[int]string{},
 			termsPromotedSlave:          map[int]string{},
-			termsMasterID:               map[int]string{},
+			termsMasterInfo:             map[int]masterInfo{},
 			termsMasterInstanceCreation: map[int][]string{},
 			instancesMasterSlaveMap:     map[string]instanceMasterSlaveMap{},
 		},
@@ -221,16 +224,44 @@ func setupIntegration(t *testing.T, numInstances int, customConf func(*Config)) 
 	}
 	return suite
 }
+func (s *failoverTestSuite) getRunID(masterAddr string) (string, error) {
+	str, err := redisv8.NewClient(&redisv8.Options{Addr: masterAddr}).Info(context.Background(), "server").Result()
+	if err != nil {
+		return "", err
+	}
+	sc := bufio.NewScanner(strings.NewReader(str))
+	sc.Split(bufio.ScanLines)
+
+	for sc.Scan() {
+		err := sc.Err()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				return "", fmt.Errorf("cannot find runid")
+			}
+			return "", err
+		}
+		item := sc.Text()
+		if strings.HasPrefix(item, "run_id:") {
+			return item[7:], nil
+		}
+	}
+	return "", fmt.Errorf("cannot find runid")
+}
 
 func (s *failoverTestSuite) CheckFailover(t *testing.T) {
-	var masterAddr string
+	var (
+		masterAddr string
+		masterID   string
+	)
 	masterPort := testPort[0]
 
 	s.buildReplTopo(t, testPort[0], testPort[1:])
-	masterID := uuid.NewString()
 
 	suite := setupIntegration(t, 3, func(c *Config) {
 		masterAddr = fmt.Sprintf("127.0.0.1:%d", masterPort)
+		apiMasterID, err := s.getRunID(masterAddr)
+		assert.NoError(t, err)
+		masterID = apiMasterID
 		c.Masters = []MasterMonitor{
 			{
 				Name:                 "test",
@@ -244,6 +275,7 @@ func (s *failoverTestSuite) CheckFailover(t *testing.T) {
 			},
 		}
 	})
+	defer suite.CleanUp()
 	//slave instances connected
 	ok := eventually(t, func() bool {
 		suite.mu.Lock()
@@ -281,7 +313,29 @@ func (s *failoverTestSuite) CheckFailover(t *testing.T) {
 	for _, s := range suite.instances {
 		totalInstances = append(totalInstances, s.runID)
 	}
+	suite.mu.Unlock()
 	assert.ElementsMatch(t, totalInstances, instanceIDs, "mismatch sentinels instances")
+	correctMasterInfo := suite.checkTermMasterInfo(1)
+	masterAddrs := [][]string{}
+	for _, s := range suite.instances {
+		port := s.conf.Port
+		sentinelClient := redisv8.NewSentinelClient(&redisv8.Options{
+			Addr: fmt.Sprintf("localhost:%s", port),
+		})
+		cmd := sentinelClient.GetMasterAddrByName(context.Background(), "test")
+		assert.NoError(t, cmd.Err())
+		newMasterAddr, err := cmd.Result()
+		assert.NoError(t, err)
+		masterAddrs = append(masterAddrs, newMasterAddr)
+	}
+	// all sentinel report the same new master addr
+	for _, item := range masterAddrs[1:] {
+		assert.Equal(t, masterAddrs[0], item)
+	}
+	hasAddr := fmt.Sprintf("%s:%s", masterAddrs[0][0], masterAddrs[0][1])
+	assert.Equal(t, correctMasterInfo.addr, hasAddr)
+	// master address has changed
+	assert.NotEqual(t, masterAddr, masterAddr[0])
 }
 
 func (s *failoverTestSuite) buildReplTopo(t *testing.T, masterPort int, slavePorts []int) {
